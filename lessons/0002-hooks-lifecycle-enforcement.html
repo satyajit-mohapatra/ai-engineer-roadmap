@@ -142,9 +142,27 @@
   .step-body { flex: 1; }
   .step-title { font-weight: 600; font-size: 0.92rem; margin-bottom: 0.25rem; }
   .step-desc { font-size: 0.85rem; color: var(--muted); }
+
+  .lesson-nav{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);font-size:.85rem}
+  .lesson-nav a{color:var(--muted);display:flex;align-items:center;gap:.35rem;transition:color .15s ease}
+  .lesson-nav a:hover{color:var(--accent);text-decoration:none}
+  .lesson-nav .nav-center a{color:var(--accent)}
+  .lesson-nav .nav-spacer{flex:1}
+  .lesson-nav .nav-prev,.lesson-nav .nav-next{max-width:38%}
+  .lesson-nav .nav-next{justify-content:flex-end;text-align:right}
+  .lesson-nav .nav-disabled{color:var(--border);cursor:default}
+  @media (max-width:600px){.lesson-nav{font-size:.78rem}.lesson-nav .nav-prev,.lesson-nav .nav-next{max-width:32%}}
 </style>
 </head>
 <body>
+<nav class="lesson-nav">
+  <a class="nav-prev" href="0001-model-vs-harness.html">&larr; 01. Model vs Harness</a>
+  <span class="nav-spacer"></span>
+  <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
+  <span class="nav-spacer"></span>
+  <a class="nav-next" href="0003-skills-reusable-workflows.html">03. Skills &rarr;</a>
+</nav>
+
 
 <div class="lesson-meta">
   <span class="tag">Lesson 2</span>

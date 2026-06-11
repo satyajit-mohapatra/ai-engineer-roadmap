@@ -56,9 +56,27 @@
   .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
   .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
   .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+
+  .lesson-nav{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);font-size:.85rem}
+  .lesson-nav a{color:var(--muted);display:flex;align-items:center;gap:.35rem;transition:color .15s ease}
+  .lesson-nav a:hover{color:var(--accent);text-decoration:none}
+  .lesson-nav .nav-center a{color:var(--accent)}
+  .lesson-nav .nav-spacer{flex:1}
+  .lesson-nav .nav-prev,.lesson-nav .nav-next{max-width:38%}
+  .lesson-nav .nav-next{justify-content:flex-end;text-align:right}
+  .lesson-nav .nav-disabled{color:var(--border);cursor:default}
+  @media (max-width:600px){.lesson-nav{font-size:.78rem}.lesson-nav .nav-prev,.lesson-nav .nav-next{max-width:32%}}
 </style>
 </head>
 <body>
+<nav class="lesson-nav">
+  <a class="nav-prev" href="0023-vector-databases.html">&larr; 23. Vector Databases</a>
+  <span class="nav-spacer"></span>
+  <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
+  <span class="nav-spacer"></span>
+  <a class="nav-next" href="0025-agents-function-calling.html">25. AI Agents &amp; Function Calling &rarr;</a>
+</nav>
+
 
 <div class="lesson-meta">
   <span class="tag">Lesson 24</span>
