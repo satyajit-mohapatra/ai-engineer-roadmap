@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 15: How LLMs Work</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .token-strip{display:flex;flex-wrap:wrap;gap:.3rem;margin:1rem 0 1.5rem}
+  .tok{font-family:var(--mono);font-size:.8rem;padding:.25rem .5rem;border-radius:4px;background:var(--accent-dim);color:#a5b4fc;border:1px solid var(--accent)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 15</span>
+  <span class="tag green">Roadmap · LLM Fundamentals</span>
+  <span class="tag orange">Mental Model</span>
+  <span class="tag yellow">~15 min</span>
+</div>
+
+<h1>How LLMs Work</h1>
+<p class="subtitle">A precise-enough mental model. Not the math — the moving parts you need to reason about every other lesson.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">The one-sentence model</div>
+  An LLM is a function that, given a sequence of tokens, predicts a probability distribution over the <em>next</em> token — and you generate text by sampling from that distribution, appending, and repeating. Everything else is detail.
+</div>
+
+<!-- ── TOKENS ──────────────────────────────────────────────── -->
+<h2>1. Tokens — the unit of everything</h2>
+
+<p>Models don't see characters or words. They see <strong>tokens</strong> — sub-word chunks produced by a tokenizer. "Tokenization" is roughly "split text into common fragments." A rule of thumb: <strong>~4 characters ≈ 1 token</strong> in English; ~750 words ≈ 1,000 tokens.</p>
+
+<div class="token-strip">
+  <span class="tok">Token</span><span class="tok">ization</span><span class="tok"> splits</span><span class="tok"> text</span><span class="tok"> into</span><span class="tok"> chunks</span><span class="tok">.</span>
+</div>
+
+<p>Tokens are the currency of LLMs. You're billed per token, the context window is measured in tokens, and latency scales with tokens. You already met this in <a href="0007-context-window-anatomy.html">Lesson 7</a> — here's the link to <em>why</em>: tokens are literally the model's input and output alphabet.</p>
+
+<!-- ── TRANSFORMER ─────────────────────────────────────────── -->
+<h2>2. The Transformer &amp; attention</h2>
+
+<p>Modern LLMs are <strong>transformers</strong> (Vaswani et al., 2017, <a href="https://arxiv.org/abs/1706.03762">"Attention Is All You Need"</a>). The core trick is <strong>self-attention</strong>: for each token, the model computes how much every other token in the context should influence it. This is how it captures meaning that depends on distant words ("the <em>trade</em> I opened yesterday lost money" — "it" later refers to the trade).</p>
+
+<p>Two consequences you'll use constantly:</p>
+<ul>
+  <li><strong>Attention is the reason context matters.</strong> The model literally weighs everything in the window against everything else. Junk in the context dilutes attention — the empirical basis for the whole context-engineering discipline (Lessons 7–8).</li>
+  <li><strong>Attention cost grows ~quadratically with context length.</strong> Doubling the prompt more than doubles the compute. This is why long contexts are slow and why compression (Lesson 11) pays off.</li>
+</ul>
+
+<!-- ── TRAINING vs INFERENCE ───────────────────────────────── -->
+<h2>3. Training vs Inference — two different worlds</h2>
+
+<table>
+  <tr><th></th><th>Training</th><th>Inference</th></tr>
+  <tr><td>When</td><td>Once, before release (months, huge GPU clusters)</td><td>Every time you call the API</td></tr>
+  <tr><td>What happens</td><td>Weights are adjusted to predict next tokens well across trillions of tokens</td><td>Weights are frozen; model just runs forward to predict next token</td></tr>
+  <tr><td>Stages</td><td>Pre-training → fine-tuning → RLHF/alignment</td><td>Prefill (read prompt) → decode (emit tokens one by one)</td></tr>
+  <tr><td>You control</td><td>Nothing (unless you fine-tune — Lesson 28)</td><td>The prompt, the sampling parameters (Lesson 17)</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-label">Why this split matters</div>
+  Because weights are <strong>frozen at inference</strong>, the model cannot learn from your conversation. It has no memory between calls. Everything it "knows" about your task must be in the context window <em>right now</em>. This single fact is the root of RAG, memory systems, and context engineering. The model isn't learning — you're re-teaching it every call.
+</div>
+
+<!-- ── GENERATION LOOP ─────────────────────────────────────── -->
+<h2>4. The generation loop (autoregression)</h2>
+
+<pre><span class="pre-label">how a response is produced</span>context = [your prompt tokens]
+<span class="keyword">while</span> not done:
+    probs = model(context)        <span class="comment"># distribution over next token</span>
+    next  = sample(probs, temp)   <span class="comment"># pick one (Lesson 17)</span>
+    context.append(next)          <span class="comment"># feed it back in</span>
+    <span class="keyword">if</span> next == STOP: done = True</pre>
+
+<p>This is <strong>autoregressive</strong> generation: each new token is conditioned on everything before it, including tokens the model just produced. Two implications:</p>
+<ul>
+  <li><strong>Hallucination is structural.</strong> The model optimizes for <em>plausible next token</em>, not <em>true</em>. A confident, well-formed falsehood is exactly what the objective rewards if it's statistically likely. Grounding (RAG, Lesson 24) is the fix.</li>
+  <li><strong>Output is sequential, so latency scales with output length.</strong> Streaming exists because the first token can be shown before the last is computed.</li>
+</ul>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">A user complains: "I told the chatbot my name in our last session and today it doesn't remember." What is the precise technical reason — and the correct fix layer?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>The model forgot during training; retrain it on the user's data to fix this</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Weights are frozen at inference, so there's no cross-call memory; persist it and re-inject into context</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>The temperature was too high; lower it so the model retains facts between sessions</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>The tokenizer dropped the name; switch to a tokenizer that preserves proper nouns</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. At inference the weights are frozen, so nothing from one call carries to the next. "Memory" is an engineering construct: you persist the fact (a file, a DB, the memory system from Lesson 5) and re-inject it into the context window on the next call. Temperature and tokenizers are unrelated to cross-session recall.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">The model isn't "forgetting" — at inference, weights are frozen and there is no state between calls. The fix is at the engineering layer: persist the fact and re-inject it into the next call's context (option B). Retraining, temperature, and tokenizers don't create cross-session memory.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">Why does padding a prompt with large amounts of marginally-relevant text tend to <em>hurt</em> answer quality, in terms of how the model actually works?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Extra text is ignored entirely, so it has no effect either way on the output</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">B</div><div>It increases temperature automatically, making the model more random in its replies</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">C</div><div>Self-attention weighs all tokens against each other, so noise dilutes attention on the signal</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>The tokenizer fails on long inputs, corrupting the prompt before the model sees it</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. Self-attention computes relevance of every token to every other token. Irrelevant filler still participates in those weightings, diluting the attention the model can place on the parts that actually matter. This is the mechanistic justification for context engineering — curate the window, don't just fill it.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">The mechanism is self-attention: every token is weighed against every other token, so filler doesn't get cleanly "ignored" — it competes for attention and dilutes the signal (option C). It doesn't change temperature, isn't silently dropped, and doesn't break the tokenizer.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want to actually <em>see</em> tokenization? Ask me to tokenize a snippet of your Pine Script and count the tokens, or to walk through what "prefill vs decode" means for the latency you observe in Claude Code. Anything fuzzy about attention — ask.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📺 <a href="https://www.youtube.com/watch?v=7xTGNNLPyMI">Andrej Karpathy — "Deep Dive into LLMs like ChatGPT"</a> (or his shorter "Intro to LLMs"). The clearest end-to-end explanation of training and inference that exists, by someone who built them.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — "How LLMs Work" node</a></li>
+  <li><a href="https://arxiv.org/abs/1706.03762">Vaswani et al. — Attention Is All You Need (2017)</a></li>
+  <li><a href="https://bbycroft.net/llm">bbycroft.net/llm — 3D visualization of a transformer running</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 15 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

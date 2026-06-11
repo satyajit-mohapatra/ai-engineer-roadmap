@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 17: Inference Parameters</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 17</span>
+  <span class="tag green">Roadmap · LLM Fundamentals</span>
+  <span class="tag orange">Hands-on</span>
+  <span class="tag yellow">~14 min</span>
+</div>
+
+<h1>Inference Parameters</h1>
+<p class="subtitle">The dials on the sampling step. Most people set them by superstition. You're going to set them by knowing what each one does.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">Recall from Lesson 15</div>
+  Generation = repeatedly sampling the next token from a probability distribution. These parameters control <em>how</em> that sample is drawn. They change nothing about the model's knowledge — only its willingness to take the less-likely path.
+</div>
+
+<!-- ── TEMPERATURE ─────────────────────────────────────────── -->
+<h2>Temperature — the randomness dial</h2>
+
+<p><strong>Temperature</strong> reshapes the probability distribution before sampling. Low temperature sharpens it (the top token dominates → deterministic, focused). High temperature flattens it (unlikely tokens get a real chance → creative, varied, riskier).</p>
+
+<table>
+  <tr><th>Temperature</th><th>Behavior</th><th>Use for</th></tr>
+  <tr><td><code>0.0</code></td><td>Near-deterministic, always picks the likeliest path</td><td>Extraction, classification, code, structured output, math</td></tr>
+  <tr><td><code>0.2–0.5</code></td><td>Mostly focused, slight variation</td><td>Summaries, factual Q&amp;A, RAG answers</td></tr>
+  <tr><td><code>0.7–1.0</code></td><td>Creative, diverse</td><td>Brainstorming, marketing copy, fiction</td></tr>
+  <tr><td><code>&gt;1.0</code></td><td>Often incoherent</td><td>Rarely — experiments only</td></tr>
+</table>
+
+<div class="callout warning">
+  <div class="callout-label">Common myth</div>
+  Temperature 0 is <em>not</em> guaranteed bit-for-bit deterministic in production — batching, hardware, and mixture-of-experts routing introduce tiny nondeterminism. It's "as deterministic as you can get," not a promise.
+</div>
+
+<!-- ── TOP-P / TOP-K ───────────────────────────────────────── -->
+<h2>Top-p and Top-k — the truncation dials</h2>
+
+<p>These limit <em>which</em> tokens are eligible before sampling:</p>
+<ul>
+  <li><strong>Top-k</strong>: only consider the <em>k</em> most-likely tokens. <code>top_k=1</code> = greedy (always the single best).</li>
+  <li><strong>Top-p (nucleus)</strong>: consider the smallest set of tokens whose cumulative probability ≥ <em>p</em>. <code>top_p=0.9</code> = "the tokens that make up 90% of the probability mass." Adapts to how confident the model is at each step.</li>
+</ul>
+
+<div class="callout insight">
+  <div class="callout-label">Rule of thumb</div>
+  <strong>Tune temperature OR top-p, not both at once</strong> — they interact and make results hard to reason about. Most APIs default to leaving one at its neutral value. Top-p ≈ 0.9–1.0 is a safe default; reach for temperature as your primary creativity dial.
+</div>
+
+<!-- ── PENALTIES ───────────────────────────────────────────── -->
+<h2>Frequency, presence &amp; repetition penalties</h2>
+
+<table>
+  <tr><th>Parameter</th><th>What it discourages</th></tr>
+  <tr><td><code>frequency_penalty</code></td><td>Reusing the <em>same</em> tokens (scales with how often they've appeared) — reduces verbatim repetition</td></tr>
+  <tr><td><code>presence_penalty</code></td><td>Reusing <em>any</em> already-seen token at all — pushes toward new topics/vocabulary</td></tr>
+  <tr><td><code>repetition_penalty</code></td><td>Open-source equivalent (e.g. in Ollama/HF) — multiplicatively dampens repeated tokens</td></tr>
+</table>
+<p>Default these to 0. Bump them slightly (0.1–0.5) only if you see the model looping or padding.</p>
+
+<!-- ── TOKENS / STOP ───────────────────────────────────────── -->
+<h2>Max tokens &amp; stop sequences</h2>
+<ul>
+  <li><strong><code>max_tokens</code></strong> caps the <em>output</em> length (not the prompt). Hit the cap and the response is truncated mid-sentence — set it generously for long answers, tightly for cost control on short ones.</li>
+  <li><strong><code>stop</code></strong> sequences end generation when a string appears (e.g. <code>"\n\n"</code> or <code>"###"</code>). Useful for fixed formats and to prevent the model from continuing past where you want it.</li>
+</ul>
+
+<pre><span class="pre-label">python — a deliberate config for RAG answers</span><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+client = OpenAI()
+resp = client.chat.completions.create(
+    model=<span class="string">"gpt-5"</span>,
+    messages=[...],
+    temperature=0.2,        <span class="comment"># grounded, low creativity</span>
+    max_tokens=500,         <span class="comment"># bound the cost</span>
+    stop=[<span class="string">"\n\nSources:"</span>],   <span class="comment"># stop before it invents a sources list</span>
+)</pre>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">You're building a function that extracts a stock ticker and a numeric price from messy text and returns strict JSON. What temperature, and why?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>0.9 — high temperature gives the model freedom to handle messy edge cases better</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>0.0 — extraction wants the single most-likely parse, deterministic and repeatable</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>0.5 — a middle value is always the safest choice for any structured task</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>1.5 — maximum creativity ensures the JSON formatting stays varied and robust</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. Extraction and structured output want the single most-likely parse — there's no value in creativity, and randomness only risks malformed JSON or inconsistent fields across runs. Temperature 0 gives you the most focused, repeatable behavior. Creativity (higher temps) is for generation tasks, not parsing.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Extraction → temperature 0 (option B). You want the single most-likely, deterministic parse. Higher temperatures inject randomness that produces inconsistent fields and malformed JSON across runs — the opposite of what a strict extractor needs.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">A model keeps repeating the same phrase over and over in long outputs. Which adjustment most directly targets that, and what's the standard caution?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Raise max_tokens; the repetition is just the model running out of room to vary</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Add a small frequency penalty; caution — push it too high and output gets incoherent</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Set top_k to 1; greedy decoding eliminates all repetition by definition</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Tune temperature and top-p together aggressively for maximum effect</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. <code>frequency_penalty</code> directly discourages reusing the same tokens, which is exactly the loop you're seeing. The caution: too high and the model avoids necessary words, producing strained or incoherent text. Greedy decoding (top_k=1) often <em>causes</em> repetition rather than fixing it, and tuning temperature + top-p together is the thing to avoid.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">A small <code>frequency_penalty</code> directly discourages reusing the same tokens (option B), with the caution that overdoing it makes output incoherent. More tokens won't help; top_k=1 (greedy) often <em>worsens</em> looping; and tuning temperature + top-p together is explicitly discouraged.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want a side-by-side demo? Ask: "show me the same prompt at temperature 0 vs 1 so I can see the difference," or "what params would you set for [a specific task in my repo]?" I'll give you a concrete config you can paste in.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API Reference — Chat Completions parameters</a>. The authoritative definition of each parameter, its range, and default. Anthropic's <a href="https://docs.anthropic.com/en/api/messages">Messages API docs</a> are the equivalent for Claude.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — temperature, top-p, top-k, sampling-parameters nodes</a></li>
+  <li><a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI — Chat Completions API reference</a></li>
+  <li><a href="https://docs.anthropic.com/en/api/messages">Anthropic — Messages API reference</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 17 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

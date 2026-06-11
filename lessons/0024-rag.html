@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 24: Retrieval-Augmented Generation</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .pipe{display:flex;flex-direction:column;gap:.3rem;margin:1.5rem 0}
+  .pipe-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:.83rem}
+  .pipe-icon{width:1.75rem;height:1.75rem;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;font-family:var(--mono);font-weight:700}
+  .pipe-desc{color:var(--muted);font-size:.82rem;flex:1}
+  .pipe-arrow{color:var(--border);font-size:.85rem;text-align:center}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 24</span>
+  <span class="tag green">Roadmap · RAG</span>
+  <span class="tag orange">RAG Stack 3/3 · Keystone</span>
+  <span class="tag yellow">~18 min</span>
+</div>
+
+<h1>Retrieval-Augmented Generation</h1>
+<p class="subtitle">The technique that lets a model answer questions about <em>your</em> data. Embeddings + vector DB + generation, assembled.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">The one-line definition</div>
+  <strong>RAG</strong>: before answering, <em>retrieve</em> relevant chunks of your documents and put them in the context window, so the model generates an answer <em>grounded</em> in your data instead of its frozen training knowledge.
+</div>
+
+<!-- ── WHY ─────────────────────────────────────────────────── -->
+<h2>Why RAG exists</h2>
+<p>Recall from Lesson 15: the model's weights are frozen and it knows nothing private or post-cutoff. RAG is the standard fix. It directly attacks the two biggest LLM failure modes:</p>
+<ul>
+  <li><strong>Hallucination</strong> — grounding the answer in retrieved text gives the model facts to cite instead of inventing.</li>
+  <li><strong>Knowledge gaps</strong> — your internal docs, current data, and proprietary knowledge become answerable without retraining.</li>
+</ul>
+
+<!-- ── PIPELINE ────────────────────────────────────────────── -->
+<h2>The pipeline (memorize this)</h2>
+
+<h3>Indexing — done once, ahead of time</h3>
+<div class="pipe">
+  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(99,102,241,.15);color:var(--accent)">1</div><div><strong>Chunk</strong></div><div class="pipe-desc">Split documents into passages (~200–800 tokens) that each carry one coherent idea</div></div>
+  <div class="pipe-arrow">↓</div>
+  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(34,197,94,.15);color:var(--green)">2</div><div><strong>Embed</strong></div><div class="pipe-desc">Turn each chunk into a vector (Lesson 22)</div></div>
+  <div class="pipe-arrow">↓</div>
+  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(251,146,60,.15);color:var(--orange)">3</div><div><strong>Store / Index</strong></div><div class="pipe-desc">Put vectors + text + metadata into a vector DB (Lesson 23)</div></div>
+</div>
+
+<h3>Retrieval + generation — every query</h3>
+<div class="pipe">
+  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(99,102,241,.15);color:var(--accent)">4</div><div><strong>Retrieve</strong></div><div class="pipe-desc">Embed the question, fetch top-k nearest chunks (optionally filter by metadata)</div></div>
+  <div class="pipe-arrow">↓</div>
+  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(192,132,252,.15);color:var(--purple)">5</div><div><strong>Rerank</strong> (optional)</div><div class="pipe-desc">Re-score the candidates with a cross-encoder for precision; keep the best few</div></div>
+  <div class="pipe-arrow">↓</div>
+  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(34,197,94,.15);color:var(--green)">6</div><div><strong>Generate</strong></div><div class="pipe-desc">Put chunks + question in the prompt; model answers grounded in them, with citations</div></div>
+</div>
+
+<pre><span class="pre-label">python — the generation step, distilled</span>chunks = vectordb.query(embed(question), k=4)        <span class="comment"># retrieve</span>
+context = <span class="string">"\n\n"</span>.join(c.text <span class="keyword">for</span> c <span class="keyword">in</span> chunks)
+prompt = f<span class="string">"""Answer using ONLY the context. Cite chunk numbers.
+If the answer isn't in the context, say you don't know.
+
+Context:
+{context}
+
+Question: {question}"""</span>
+answer = llm(prompt, temperature=0.2)                  <span class="comment"># generate</span></pre>
+
+<div class="callout insight">
+  <div class="callout-label">RAG is context engineering with a search step</div>
+  Look at step 6: it's just assembling a good context window (your Phase 1 skill) where the relevant material is <em>selected</em> automatically by similarity. RAG is the "select" strategy from <a href="0008-four-strategies-deep-dive.html">Lesson 8</a> applied to an external corpus. You already know the destination — RAG is the on-ramp.
+</div>
+
+<!-- ── PITFALLS ────────────────────────────────────────────── -->
+<h2>Where RAG goes wrong</h2>
+<table>
+  <tr><th>Failure</th><th>Cause &amp; fix</th></tr>
+  <tr><td>Retrieves irrelevant chunks</td><td>Bad chunking (too big/small) or weak embeddings. Fix chunk size; try a better embedding model.</td></tr>
+  <tr><td>Right chunk retrieved, ranked low</td><td>Add a <strong>reranker</strong> (cross-encoder) to reorder candidates by true relevance.</td></tr>
+  <tr><td>Answer ignores the context</td><td>Prompt the model to use <em>only</em> the context and to say "I don't know" otherwise; lower temperature.</td></tr>
+  <tr><td>Chunk lacks context to stand alone</td><td>Overlap chunks slightly; add titles/metadata to each chunk.</td></tr>
+</table>
+
+<!-- ── RAG vs FT ───────────────────────────────────────────── -->
+<h2>RAG vs Fine-tuning</h2>
+<p>A question you'll be asked constantly. <strong>RAG adds knowledge; fine-tuning adds behavior.</strong></p>
+<table>
+  <tr><th>Use RAG when…</th><th>Use fine-tuning when…</th></tr>
+  <tr><td>You need current/private <em>facts</em></td><td>You need a consistent <em>style</em>, format, or skill</td></tr>
+  <tr><td>Data changes often (just re-index)</td><td>Behavior is stable and well-defined</td></tr>
+  <tr><td>You need citations / traceability</td><td>You want shorter prompts at inference</td></tr>
+</table>
+<p>They're complementary, not rivals — and for most teams, <strong>start with RAG</strong> (and good prompting). Full fine-tuning treatment in <a href="0028-fine-tuning.html">Lesson 28</a>.</p>
+
+<h2>Frameworks</h2>
+<p>You can build RAG by hand (recommended once, to understand it). In production, frameworks remove boilerplate: <strong>LangChain</strong> and <strong>LlamaIndex</strong> are the big two; <strong>Haystack</strong> and <strong>RAGFlow</strong> are strong alternatives. They give you loaders, chunkers, retrievers, and rerankers as composable pieces.</p>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">Your RAG system retrieves the correct chunk (it's in the top-10) but the answer is still wrong because that chunk ranked 8th and the model focused on chunks 1–3. What's the targeted fix?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Switch from RAG to fine-tuning, since retrieval clearly can't find the right chunk</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Add a reranker to reorder the retrieved candidates by true relevance before generation</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Raise the generation temperature so the model explores lower-ranked chunks more</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Remove the metadata filter so more chunks are eligible for retrieval</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. The right chunk <em>was</em> retrieved — the problem is ordering, which is exactly what a reranker (a cross-encoder that re-scores candidates against the query) fixes: it promotes the truly relevant chunk so it lands in the top few the model attends to. Fine-tuning doesn't help retrieval; temperature doesn't fix ranking; loosening filters adds noise.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Retrieval found it but ranked it poorly — that's a reranking problem (option B). A cross-encoder reranker re-scores candidates so the relevant chunk rises into the top few. Fine-tuning addresses behavior not retrieval, temperature won't fix order, and dropping filters just adds noise.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">Your app must answer questions about a knowledge base that's updated daily, with source citations. RAG or fine-tuning, and why?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">A</div><div>RAG — facts change daily (just re-index) and retrieved chunks give you citations</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">B</div><div>Fine-tuning — bake the knowledge into the weights so no retrieval is needed</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Fine-tuning — it's the only way to get a consistent answer format with citations</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Neither — just use a bigger model with a longer context and paste everything in</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. Frequently-changing facts plus a citation requirement is the textbook RAG case: you re-index when data changes (no retraining), and because answers are grounded in retrieved chunks, you can cite the source. Fine-tuning bakes in stale facts and gives no citations; pasting an entire daily-changing KB into context is costly and doesn't scale.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Daily-changing facts + citations = RAG (option A): re-index on change, and cite the retrieved chunks. Fine-tuning would freeze stale facts and can't cite sources; and dumping the whole KB into a long context is expensive and brittle.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>This is the big one — let's build it. Ask: "walk me through a hand-rolled RAG over my [docs folder] in Node, no framework," then later "now show me the same thing in LlamaIndex." Building it once by hand is the fastest way to truly own RAG.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📺 <a href="https://www.youtube.com/watch?v=sVcwVQRHIc8">"RAG from Scratch" — LangChain series</a> (or the original <a href="https://arxiv.org/abs/2005.11401">Lewis et al. RAG paper, 2020</a>). The from-scratch series builds every stage of the pipeline above, step by step.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — RAG cluster (chunking, indexing, retrieval, generation, reranking, RAG vs fine-tuning)</a></li>
+  <li><a href="https://arxiv.org/abs/2005.11401">Lewis et al. — Retrieval-Augmented Generation (2020)</a></li>
+  <li><a href="https://docs.llamaindex.ai/">LlamaIndex docs</a> · <a href="https://python.langchain.com/docs/tutorials/rag/">LangChain RAG tutorial</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 24 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

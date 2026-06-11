@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 28: Fine-Tuning</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 28</span>
+  <span class="tag green">Roadmap · Fine-Tuning</span>
+  <span class="tag orange">Advanced</span>
+  <span class="tag yellow">~13 min</span>
+</div>
+
+<h1>Fine-Tuning</h1>
+<p class="subtitle">Changing the model's weights to bake in behavior. The most-reached-for, least-often-needed tool in the kit — here's when it's actually right.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout warning">
+  <div class="callout-label">Read this first</div>
+  Fine-tuning is the answer to fewer problems than beginners think. Before fine-tuning, exhaust: <strong>better prompting → few-shot → RAG</strong>. Most "we need to fine-tune" instincts are solved by one of those, faster and cheaper. The roadmap places it late for this reason.
+</div>
+
+<!-- ── WHAT ────────────────────────────────────────────────── -->
+<h2>What fine-tuning actually does</h2>
+<p>You take a pre-trained model and continue training it on <em>your</em> examples (input→output pairs), nudging the weights so it adopts a behavior. Unlike RAG (which adds <em>knowledge</em> at query time), fine-tuning changes the model's <strong>default behavior</strong> — its style, format, tone, or skill at a narrow task.</p>
+
+<div class="callout key">
+  <div class="callout-label">The mantra (from Lesson 24)</div>
+  <strong>RAG adds knowledge. Fine-tuning adds behavior.</strong> If you can phrase the need as "it should <em>know</em> X," reach for RAG. If it's "it should always <em>respond like</em> Y," consider fine-tuning.
+</div>
+
+<!-- ── WHEN ────────────────────────────────────────────────── -->
+<h2>When fine-tuning earns its keep</h2>
+<ul>
+  <li><strong>Consistent style/format</strong> the prompt can't reliably enforce, at scale (e.g. always output in your house tone or a strict domain DSL).</li>
+  <li><strong>A narrow, repeated task</strong> where a smaller fine-tuned model matches a big general model — cheaper and faster per call.</li>
+  <li><strong>Latency/cost</strong> — fine-tuning lets you drop long few-shot prompts (the behavior is now in the weights), shrinking every request.</li>
+  <li><strong>Specialized classification/extraction</strong> with thousands of labeled examples.</li>
+</ul>
+
+<h2>When NOT to fine-tune</h2>
+<ul>
+  <li>You need <em>current</em> or <em>private facts</em> → RAG.</li>
+  <li>You have few examples (dozens) → few-shot prompting.</li>
+  <li>The task keeps changing → you'd be re-tuning constantly.</li>
+  <li>You haven't yet tried hard at prompting → do that first; it's free.</li>
+</ul>
+
+<!-- ── HOW ─────────────────────────────────────────────────── -->
+<h2>How it works in practice</h2>
+<p>Two paths:</p>
+<table>
+  <tr><th>Path</th><th>What you do</th></tr>
+  <tr><td><strong>Hosted</strong> (OpenAI, etc.)</td><td>Upload a JSONL of examples, click train, get a custom model ID you call like any other. Easiest entry.</td></tr>
+  <tr><td><strong>Open-weight</strong> (LoRA / PEFT)</td><td>Use <strong>LoRA</strong> (Low-Rank Adaptation) to train a small set of adapter weights instead of the whole model — cheap enough to run on modest GPUs. The standard modern technique.</td></tr>
+</table>
+
+<pre><span class="pre-label">jsonl — the training data format (hosted)</span>{<span class="string">"messages"</span>:[{<span class="string">"role"</span>:<span class="string">"system"</span>,<span class="string">"content"</span>:<span class="string">"Terse options analyst."</span>},
+  {<span class="string">"role"</span>:<span class="string">"user"</span>,<span class="string">"content"</span>:<span class="string">"Explain theta."</span>},
+  {<span class="string">"role"</span>:<span class="string">"assistant"</span>,<span class="string">"content"</span>:<span class="string">"Time decay: option loses value daily, fastest near expiry."</span>}]}
+<span class="comment"># ...hundreds to thousands of consistent examples like this</span></pre>
+
+<div class="callout insight">
+  <div class="callout-label">LoRA, in one line</div>
+  Instead of updating billions of weights, LoRA learns a few small "adapter" matrices that adjust the model's behavior — orders of magnitude cheaper to train and store, with most of the benefit. It's why fine-tuning open models is now accessible, not a data-center-only luxury.
+</div>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">A team wants the model to "know our latest internal pricing, which changes weekly." They propose fine-tuning monthly. What should you advise?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Fine-tune weekly instead of monthly so the pricing is always fresh in the weights</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Use RAG — facts that change weekly belong in retrieval, not baked into weights</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Fine-tune once on all historical pricing so the model can interpolate future prices</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Raise the model's temperature so it adapts to new pricing automatically</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. This is a <em>knowledge</em> need with frequently-changing facts — the textbook RAG case (Lesson 24). Fine-tuning bakes facts into weights that go stale immediately, and re-tuning weekly is slow, costly, and fragile. Put the pricing in a retrievable store and let the model fetch the current value at query time.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Frequently-changing facts = RAG (option B), not fine-tuning. Weights go stale the moment pricing changes; re-tuning weekly is wasteful; models can't "interpolate" future prices; and temperature has nothing to do with knowledge freshness.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">You have 5,000 high-quality examples of your exact house writing style and need every output in that style, with shorter prompts to cut cost. Which technique fits, and what's the cheap modern way to do it on an open model?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>RAG — retrieve style examples and paste them into every prompt at query time</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Fine-tuning, done cheaply with LoRA adapters rather than full-weight training</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Few-shot only — never fine-tune, just keep adding more examples to the prompt</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Higher temperature, which makes the model match a consistent house style</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. Consistent <em>behavior/style</em> at scale, with thousands of examples and a goal of shorter prompts, is the canonical fine-tuning case — and LoRA is the cheap modern way to do it on open weights (train small adapter matrices instead of the whole model). RAG and few-shot would keep stuffing style into every prompt (the opposite of the cost goal), and temperature doesn't impose a style.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">This is a behavior/style need at scale with a cost goal — fine-tuning, done cheaply via LoRA (option B). RAG and few-shot put examples in every prompt, contradicting the "shorter prompts" goal; temperature doesn't create a consistent house style.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Not sure whether your problem needs fine-tuning, RAG, or just better prompting? Describe it and I'll run it through the decision tree with you — that judgment is the actual skill here, more than the mechanics of training.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://platform.openai.com/docs/guides/fine-tuning">OpenAI — Fine-tuning guide</a> for the hosted path, and the <a href="https://huggingface.co/docs/peft">Hugging Face PEFT/LoRA docs</a> for the open-weight path. Both include "should you even fine-tune?" guidance worth heeding.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — fine-tuning &amp; RAG-vs-fine-tuning nodes</a></li>
+  <li><a href="https://platform.openai.com/docs/guides/fine-tuning">OpenAI — Fine-tuning guide</a></li>
+  <li><a href="https://arxiv.org/abs/2106.09685">Hu et al. — LoRA (2021)</a> · <a href="https://huggingface.co/docs/peft">Hugging Face PEFT</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 28 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

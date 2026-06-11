@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glossary — Context & Harness Engineering</title>
+<style>
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --border: #2a2d3e;
+    --text: #e2e8f0; --muted: #8892a4; --accent: #6366f1;
+    --green: #22c55e; --yellow: #f59e0b;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans);
+    max-width: 700px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.7; }
+  h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+  .section-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent);
+    padding: 0.4rem 0; border-bottom: 1px solid var(--border);
+    margin: 2rem 0 0.75rem;
+  }
+  dl { display: flex; flex-direction: column; gap: 0.1rem; }
+  .entry { display: grid; grid-template-columns: 180px 1fr; border: 1px solid var(--border);
+    border-radius: 6px; overflow: hidden; }
+  .entry + .entry { margin-top: 0.4rem; }
+  dt { padding: 0.75rem 1rem; background: var(--surface); font-family: var(--mono);
+    font-size: 0.82rem; color: #a5b4fc; font-weight: 600; display: flex; align-items: flex-start; }
+  dd { padding: 0.75rem 1rem; font-size: 0.88rem; color: var(--text); }
+  dd span.layer { font-size: 0.72rem; color: var(--muted); display: block; margin-top: 0.2rem; }
+  code { font-family: var(--mono); font-size: 0.82em; background: var(--surface);
+    border: 1px solid var(--border); padding: 0.1em 0.35em; border-radius: 3px; color: #a5b4fc; }
+</style>
+</head>
+<body>
+
+<h1>Glossary</h1>
+<p class="sub">Context &amp; Harness Engineering &nbsp;·&nbsp; Updated 2026-06-08</p>
+
+<div class="section-label">Core Equation</div>
+<dl>
+  <div class="entry"><dt>Agent</dt><dd>Model + Harness. The full system, not just the LLM.</dd></div>
+  <div class="entry"><dt>Model</dt><dd>The neural network (e.g. Claude Sonnet 4.6). Fixed — you don't change it.</dd></div>
+  <div class="entry"><dt>Harness</dt><dd>Everything wrapped around the model: prompts, tools, hooks, skills, memory, MCP servers. This is what you engineer.</dd></div>
+</dl>
+
+<div class="section-label">Six Harness Layers</div>
+<dl>
+  <div class="entry"><dt>CLAUDE.md</dt><dd>Project-level rules injected into every session. Write operation. Lives in repo root.<span class="layer">Layer 1 — System knowledge</span></dd></div>
+  <div class="entry"><dt>Tool surface</dt><dd>What actions Claude can take: Bash, Read, Edit, Write, Agent…<span class="layer">Layer 2 — Actions</span></dd></div>
+  <div class="entry"><dt>MCP server</dt><dd>Model Context Protocol. External systems wired in as tools (GitHub, Jira, APIs). Extends the tool surface.<span class="layer">Layer 3 — External systems</span></dd></div>
+  <div class="entry"><dt>Skill</dt><dd>A reusable, triggerable workflow — a Markdown file with instructions Claude reads when invoked. Invoked via <code>/skill-name</code>.<span class="layer">Layer 4 — Reusable workflows</span></dd></div>
+  <div class="entry"><dt>Hook</dt><dd>Shell command that fires at a lifecycle event (PreToolUse, PostToolUse, PreCommit…). The harness's enforcement layer.<span class="layer">Layer 5 — Lifecycle enforcement</span></dd></div>
+  <div class="entry"><dt>Memory</dt><dd>Files persisted between sessions. Written by Claude or you; injected into future sessions via <code>~/.claude/projects/.../memory/</code>.<span class="layer">Layer 6 — Cross-session state</span></dd></div>
+</dl>
+
+<div class="section-label">Four Context Strategies</div>
+<dl>
+  <div class="entry"><dt>Write</dt><dd>Persist information outside the context window so it can be retrieved later. CLAUDE.md, memory files, task files.</dd></div>
+  <div class="entry"><dt>Select</dt><dd>Choose which information to inject at inference time. Skills loaded only when triggered. RAG retrieval.</dd></div>
+  <div class="entry"><dt>Compress</dt><dd>Reduce token count without losing meaning. Context compaction. Summaries in memory instead of raw transcripts.</dd></div>
+  <div class="entry"><dt>Isolate</dt><dd>Run sub-tasks in separate agent contexts so they don't contaminate each other. Subagent spawning via <code>Agent()</code>.</dd></div>
+</dl>
+
+<div class="section-label">Context Engineering Concepts</div>
+<dl>
+  <div class="entry"><dt>Context window</dt><dd>The finite token buffer the model sees at inference time. Everything in here shapes the output — nothing outside it does.</dd></div>
+  <div class="entry"><dt>Context engineering</dt><dd>Deliberately designing what goes into the context window: what to include, exclude, compress, and when to retrieve it.</dd></div>
+  <div class="entry"><dt>Prompt engineering</dt><dd>Crafting the phrasing of a query. A subset of context engineering — upstream context often matters more than phrasing.</dd></div>
+  <div class="entry"><dt>RAG</dt><dd>Retrieval-Augmented Generation. Fetch relevant documents from external storage and inject them as context at query time.</dd></div>
+  <div class="entry"><dt>Ratchet principle</dt><dd>Every agent mistake → permanent harness rule. Treat failures as config signals, not model limitations. The harness only gets tighter.</dd></div>
+</dl>
+
+<div class="section-label">Tool-Agnostic Harness</div>
+<dl>
+  <div class="entry"><dt>AGENTS.md</dt><dd>Vendor-neutral, cross-tool project instructions file. Place at repo root. Read by Claude Code, Cursor, GitHub Copilot, Windsurf, Aider, and more. The portable equivalent of CLAUDE.md. Started as an OpenAI initiative (Aug 2025); now the de-facto cross-tool standard. <span class="layer">Lesson 12</span></dd></div>
+  <div class="entry"><dt>.cursor/rules/</dt><dd>Cursor's project rules directory. Each <code>.mdc</code> file has YAML frontmatter with <code>globs</code>, <code>alwaysApply</code>, and <code>description</code>. Glob-triggered rules only load for matching file types. Legacy <code>.cursorrules</code> at root still works. <span class="layer">Lesson 12</span></dd></div>
+  <div class="entry"><dt>copilot-instructions.md</dt><dd>GitHub Copilot's repo-wide instruction file at <code>.github/copilot-instructions.md</code>. Path-specific variants live at <code>.github/instructions/*.instructions.md</code>. Propagates from organization → repository → personal. <span class="layer">Lesson 12</span></dd></div>
+  <div class="entry"><dt>.windsurfrules</dt><dd>Windsurf (Cascade) project rules file. Plain text/Markdown at project root. Team-shared, version-controlled. Separate from Cascade Memories (which are automatic and local). <span class="layer">Lesson 12</span></dd></div>
+  <div class="entry"><dt>Cascade Memories</dt><dd>Windsurf's automatic cross-session memory. Cascade builds context as you work. Unlike Claude Code memory (manual write), Cascade Memories accumulate implicitly. Workspace-scoped, not version-controlled. <span class="layer">Lesson 12</span></dd></div>
+  <div class="entry"><dt>MCP config key variance</dt><dd>Critical gotcha: Claude Code and Cursor use <code>"mcpServers"</code> as the root key. VS Code / GitHub Copilot uses <code>"servers"</code> (in <code>.vscode/mcp.json</code>). Copilot MCP only works in Agent mode. <span class="layer">Lesson 12</span></dd></div>
+</dl>
+
+<div class="section-label">Loop Engineering</div>
+<dl>
+  <div class="entry"><dt>Loop engineering</dt><dd>Designing the system that prompts an agent on a schedule, instead of prompting it yourself. The leverage shifts from crafting individual prompts to designing the control system. Popularized by Addy Osmani, mid-2026. <span class="layer">Lesson 13</span></dd></div>
+  <div class="entry"><dt>Ralph Loop</dt><dd>The original pattern: <code>while true; do claude -p "prompt"; done</code> with state persisted to disk between iterations. Documented by Geoffrey Huntley, July 2025. <span class="layer">Lesson 9, 13</span></dd></div>
+  <div class="entry"><dt>Ralph Wiggum failure mode</dt><dd>A loop's agent emits its "done" signal early, on a half-finished job, and the loop exits declaring success on wrong work. Fixed with a separate checker sub-agent — never let the maker grade its own homework. <span class="layer">Lesson 13</span></dd></div>
+  <div class="entry"><dt>Maker/checker split</dt><dd>One agent (or context) does the work; a separate agent (or context) verifies it independently. The core defense against the Ralph Wiggum failure mode. <span class="layer">Lesson 13</span></dd></div>
+  <div class="entry"><dt>Six loop components</dt><dd>Automations (scheduling), Worktrees (isolation), Skills (project knowledge), Connectors (MCP), Sub-agents (maker/checker), State/Memory (persistence). Five of six map directly to harness layers from Lessons 1–12 — only Automations is new. <span class="layer">Lesson 13</span></dd></div>
+  <div class="entry"><dt>L1 / L2 / L3 rollout</dt><dd>Phased loop deployment: L1 = report only, zero changes. L2 = proposes changes via PR, human approves. L3 = unattended within a tight allowlist. Every new loop starts at L1, regardless of how low-risk the task seems. <span class="layer">Lesson 13</span></dd></div>
+  <div class="entry"><dt>Comprehension debt</dt><dd>Code shipped by a loop that no one on the team has read. Accumulates silently; becomes a liability the first time it needs to change. <span class="layer">Lesson 13</span></dd></div>
+  <div class="entry"><dt>Cognitive surrender</dt><dd>Accepting loop output without judgment because it's usually right. The loop amplifies whatever judgment (or lack of it) you bring to reviewing its output. <span class="layer">Lesson 13</span></dd></div>
+</dl>
+
+<div class="section-label">Token Compression Tools</div>
+<dl>
+  <div class="entry"><dt>RTK</dt><dd>Rust Token Killer. CLI proxy that intercepts shell command output and compresses it before Claude sees it. Install with <code>brew install rtk</code>, wire with <code>rtk init -g</code>. Saves 60–92% on git, test runners, ls, find, and 100+ other commands. <span class="layer">Lesson 11</span></dd></div>
+  <div class="entry"><dt>Graphify</dt><dd>Builds an AST-level knowledge graph of your codebase. Claude queries the graph instead of reading files. A BFS subgraph query returns ~2k tokens vs. ~50k–100k tokens for naive file reading on large repos. Run once with <code>npx graphify index</code>. <span class="layer">Lesson 11</span></dd></div>
+  <div class="entry"><dt>LLMLingua</dt><dd>Microsoft Research prompt compression. A small model scores each token by perplexity; low-score tokens are surgically removed. 4–20× compression on RAG-retrieved documents. Not summarization — the remaining text is the original tokens. <span class="layer">Lesson 11</span></dd></div>
+  <div class="entry"><dt>Repomix</dt><dd>Packs a repository into a single LLM-optimized Markdown or XML file. Strips binaries, node_modules, build artifacts. Used with the Isolate strategy: pack → subagent → summary. <span class="layer">Lesson 11</span></dd></div>
+  <div class="entry"><dt>Caveman mode</dt><dd>Built-in Claude Code skill (<code>/caveman</code>) that compresses Claude's output tokens ~75% by stripping grammatical overhead. Full technical accuracy preserved. Toggle per-session. <span class="layer">Lesson 11</span></dd></div>
+  <div class="entry"><dt>LSP</dt><dd>Language Server Protocol. Compiler-backed symbol navigation: go-to-definition, find-references, hover types. Replaces grep-and-read loops with single precise queries. 80–95% token savings on navigation tasks. <span class="layer">Lesson 11</span></dd></div>
+</dl>
+
+<div class="section-label">Claude Code Specifics</div>
+<dl>
+  <div class="entry"><dt>settings.json</dt><dd>The harness config file. Controls permissions, hooks, environment vars. Lives at <code>~/.claude/settings.json</code> (global) or <code>.claude/settings.json</code> (project).</dd></div>
+  <div class="entry"><dt>PreToolUse hook</dt><dd>Runs before any tool call. Can block the action by returning non-zero exit code. Used for safety gates.</dd></div>
+  <div class="entry"><dt>PostToolUse hook</dt><dd>Runs after a tool call completes. Used for side effects: logging, linting, running tests.</dd></div>
+  <div class="entry"><dt>Subagent</dt><dd>A child agent spawned via <code>Agent()</code>. Gets its own fresh context. The primary isolation primitive.</dd></div>
+  <div class="entry"><dt>Ralph Loop</dt><dd>Multi-session continuation pattern. Agent writes state to disk at end of session; resumes from that state in the next. Enables long-horizon work.</dd></div>
+</dl>
+
+</body>
+</html>

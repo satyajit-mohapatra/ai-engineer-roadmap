@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 9: Subagents & Isolation</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:780px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}.tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .prop{color:#a5b4fc}.string{color:#86efac}.comment{color:#4b5563}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.87rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  /* Orchestrator diagram */
+  .orch{display:flex;flex-direction:column;align-items:center;gap:.5rem;margin:1.5rem 0;font-size:.83rem}
+  .orch-main{padding:.7rem 2rem;border:1px solid var(--accent);border-radius:6px;background:var(--accent-dim);color:#a5b4fc;font-family:var(--mono);font-weight:600}
+  .orch-branches{display:flex;gap:1rem;align-items:flex-start}
+  .orch-branch{display:flex;flex-direction:column;align-items:center;gap:.3rem}
+  .orch-line{width:1px;height:20px;background:var(--border)}
+  .orch-sub{padding:.5rem .9rem;border:1px solid var(--green);border-radius:6px;background:var(--green-dim);color:#86efac;font-family:var(--mono);font-size:.78rem;text-align:center}
+  .orch-return{font-size:.72rem;color:var(--muted);text-align:center;margin-top:.25rem}
+  .orch-joiner{width:60%;height:1px;background:var(--border);margin:.5rem 0}
+  /* Quiz */
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+  .checklist{display:flex;flex-direction:column;gap:.5rem;margin:1rem 0 1.5rem}
+  .check-item{display:flex;gap:.75rem;align-items:flex-start;padding:.6rem .9rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:.87rem}
+  .check-icon{color:var(--green);font-size:1rem;flex-shrink:0;margin-top:.05rem}
+  .check-label{font-weight:600;margin-bottom:.15rem}
+  .check-desc{color:var(--muted);font-size:.82rem}
+</style>
+</head>
+<body>
+<div class="lesson-meta">
+  <span class="tag">Lesson 9</span>
+  <span class="tag green">Context Engineering</span>
+  <span class="tag yellow">~20 min</span>
+</div>
+<h1>Subagents &amp; Isolation</h1>
+<p class="subtitle">How to spawn, brief, and orchestrate subagents. The Isolate strategy made concrete.</p>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<h2>What a Subagent Is</h2>
+<p>A subagent is a child Claude instance spawned by the orchestrator (your main session). It runs with its own fresh context window, executes a focused task, and returns a result. From the orchestrator's perspective it's a single tool call that returns a string.</p>
+<p>In Claude Code's harness, subagents are spawned with the <code>Agent</code> tool. The system prompt you've been reading describes this explicitly — skills like <code>/teach</code> and <code>/daily-report</code> use subagents internally.</p>
+
+<div class="orch">
+  <div class="orch-main">Orchestrator (your session)</div>
+  <div class="orch-line"></div>
+  <div class="orch-branches">
+    <div class="orch-branch">
+      <div class="orch-sub">Subagent A<br><span style="font-size:.72rem;color:#4ade80">Explore agent</span></div>
+      <div class="orch-return">→ summary</div>
+    </div>
+    <div class="orch-branch">
+      <div class="orch-sub">Subagent B<br><span style="font-size:.72rem;color:#4ade80">Analysis agent</span></div>
+      <div class="orch-return">→ report</div>
+    </div>
+    <div class="orch-branch">
+      <div class="orch-sub">Subagent C<br><span style="font-size:.72rem;color:#4ade80">Review agent</span></div>
+      <div class="orch-return">→ findings</div>
+    </div>
+  </div>
+  <div class="orch-joiner"></div>
+  <div style="font-size:.8rem;color:var(--muted)">Orchestrator synthesizes results</div>
+</div>
+
+<div class="callout key">
+  <div class="callout-label">Why This Matters</div>
+  Each subagent starts with a <em>clean</em> context. It doesn't inherit the orchestrator's long conversation history, its tool results, or its accumulated context debt. It gets a focused prompt and returns a focused result. The Isolate strategy's core value is keeping the orchestrator's context clean while work gets done in parallel.
+</div>
+
+<h2>When to Spawn a Subagent</h2>
+<table>
+  <tr><th>Spawn when</th><th>Don't spawn when</th></tr>
+  <tr><td>The task would read many files or produce verbose output</td><td>The task is a single tool call that returns a small result</td></tr>
+  <tr><td>Multiple independent tasks can run in parallel</td><td>The task requires the full orchestrator conversation history</td></tr>
+  <tr><td>You want a second opinion (independent context = independent judgment)</td><td>The overhead outweighs the isolation benefit</td></tr>
+  <tr><td>The task is separable and its result can be summarized</td><td>The task is fast and simple</td></tr>
+</table>
+
+<h2>Briefing a Subagent</h2>
+<p>A subagent starts cold — no memory of this conversation. Its entire world is the prompt you give it. A bad brief produces a bad result. A good brief has four components:</p>
+
+<div class="checklist">
+  <div class="check-item">
+    <div class="check-icon">1</div>
+    <div>
+      <div class="check-label">Goal — what to produce</div>
+      <div class="check-desc">Be specific. "Summarize" is weak. "Return a bulleted list of the top 3 signals and their confidence scores" is actionable.</div>
+    </div>
+  </div>
+  <div class="check-item">
+    <div class="check-icon">2</div>
+    <div>
+      <div class="check-label">Context — what it needs to know</div>
+      <div class="check-desc">File paths, repo location, relevant constraints. The subagent can't read your conversation — include what it needs.</div>
+    </div>
+  </div>
+  <div class="check-item">
+    <div class="check-icon">3</div>
+    <div>
+      <div class="check-label">Constraints — what not to do</div>
+      <div class="check-desc">Tools it shouldn't use, files it shouldn't touch, scope limits. "Read-only — do not write any files."</div>
+    </div>
+  </div>
+  <div class="check-item">
+    <div class="check-icon">4</div>
+    <div>
+      <div class="check-label">Output format — how to return the result</div>
+      <div class="check-desc">Structure the return so the orchestrator can parse it without ambiguity. Tables, JSON, bulleted lists — be explicit.</div>
+    </div>
+  </div>
+</div>
+
+<h2>A Real Subagent Brief</h2>
+<p>This is the difference between a bad brief and a good one for a data-fetching workflow:</p>
+
+<pre>
+<span class="pre-label">WEAK BRIEF</span><span class="comment">Look at the options data files and tell me what you find.</span>
+</pre>
+
+<pre>
+<span class="pre-label">STRONG BRIEF</span><span class="comment">You are a read-only research agent. Your task:
+
+**Goal**: Identify the top 5 highest-IV tickers from the most recent
+options scan output.
+
+**Context**:
+- Project root: /path/to/your-project
+- Scan outputs are in output/options_*.csv, sorted by date descending
+- IV is in the column "impliedVolatility" (0–1 scale, multiply by 100 for %)
+
+**Constraints**:
+- Read files only — do not write, edit, or run any scripts
+- Use only the most recent output file (highest date in filename)
+
+**Output format**:
+Return a markdown table with columns: Ticker | IV% | Expiry | Strike
+Then one sentence: which sector dominates and why.
+
+Do not explain your process — just return the table and sentence.</span>
+</pre>
+
+<div class="callout insight">
+  <div class="callout-label">The Principle</div>
+  A subagent brief should be so complete that you could hand it to a colleague who doesn't know the project and they'd know exactly what to do. The subagent has no context beyond what you give it. Never delegate understanding — include what it needs.
+</div>
+
+<h2>Parallel vs. Sequential Agents</h2>
+<p>Subagents can run in parallel (independent tasks) or sequentially (each feeds the next). The pattern matters for both performance and correctness:</p>
+
+<table>
+  <tr><th>Pattern</th><th>When to use</th><th>Example</th></tr>
+  <tr><td><strong>Parallel</strong></td><td>Tasks are independent — no output of one feeds another</td><td>Fetch data for service-A AND run analysis on service-B simultaneously</td></tr>
+  <tr><td><strong>Sequential</strong></td><td>Each step needs the previous result</td><td>Explore → Plan → Implement → Review</td></tr>
+  <tr><td><strong>Fan-out / fan-in</strong></td><td>One input, many parallel analyses, then synthesis</td><td>Scan 10 tickers in parallel, synthesize results</td></tr>
+</table>
+
+<h2>The Explore / Plan / Code / Review Pattern</h2>
+<p>For complex implementation tasks, a four-agent pipeline produces better results than a single agent attempting everything:</p>
+<ol>
+  <li><strong>Explore agent</strong> — read-only, maps the codebase, returns a summary of relevant files and patterns</li>
+  <li><strong>Plan agent</strong> — takes the Explore summary, returns a step-by-step implementation plan</li>
+  <li><strong>Code agent</strong> — takes the plan, implements it, returns the diff</li>
+  <li><strong>Review agent</strong> — reads the diff independently, returns findings</li>
+</ol>
+<p>Each agent starts clean. The Review agent, in particular, benefits from not having seen the Code agent's reasoning — it gives a genuinely independent assessment.</p>
+
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">You want to analyze 5 microservices simultaneously — check each one's health status and return a report. Which agent pattern fits?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Sequential — analyze ticker 1, then pass the result to ticker 2's analysis, and so on</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Parallel fan-out — 5 independent subagents run simultaneously, orchestrator synthesizes results</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Single agent — loop through tickers in one context</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Sequential with shared state — each agent reads the previous one's output file</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Fan-out is ideal. Each service's analysis is completely independent — no output of one feeds another. Running 5 subagents in parallel is 5x faster than sequential and each gets a clean, focused context. The orchestrator receives 5 summaries and synthesizes the final report. </div>
+  <div class="quiz-feedback wrong" id="q1-wrong">The ticker analyses are independent — no output of one feeds another. Parallel fan-out is the right pattern: 5 subagents run simultaneously, each focused on one ticker, and the orchestrator synthesizes results. Sequential would be 5x slower with no benefit. A single agent looping through 5 tickers bloats one context with all the data.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">A subagent brief says: "Analyze the codebase and figure out what to do." What's the critical failure in this brief?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>It doesn't specify which model to use</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>It's missing goal, context, constraints, and output format — the subagent has nothing to work from</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>It doesn't give the subagent permission to read files</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>"Codebase" is too vague — it should say "repository"</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">All four components are missing. No goal (what to produce), no context (where the codebase is, what to look for), no constraints (scope, read-only vs. write), no output format (what to return). The subagent will do something — probably something generic and unhelpful — because it has no information to work from. Brief a subagent like a colleague who just walked in cold.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Every component of a good brief is missing: goal (what to produce), context (file paths, what matters), constraints (scope limits), and output format (how to return the result). A subagent starts with zero knowledge of your project — "figure out what to do" gives it nothing to work with.</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">Why does a Review agent produce better findings when it hasn't seen the Code agent's reasoning?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">A</div><div>The Review agent is a different model with different training</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">B</div><div>Review agents are faster without extra context</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">C</div><div>Independent context = independent judgment. Seeing the implementation reasoning primes the reviewer to rationalize rather than critique.</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">D</div><div>Shorter context means more attention to the diff itself</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">Isolation prevents anchoring bias. When you see someone else's reasoning first, you tend to evaluate the conclusion through their frame — you're more likely to validate than find flaws. An independent reviewer sees only the artifact (the diff), not the justification, and evaluates it on its own merits. This is why human code review works best when the reviewer hasn't heard the implementation rationale first.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">Isolation prevents anchoring. When a reviewer sees the implementation reasoning first, they tend to rationalize rather than critique — they evaluate the code through the implementer's frame. An independent context means an independent judgment: the reviewer sees the diff on its own merits, not filtered through "here's why I did it this way."</div>
+</div>
+
+<h2>What to Hold Onto</h2>
+<ol style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem">
+  <li><strong>Subagents start clean.</strong> Zero context from your session. Brief them completely — goal, context, constraints, output format.</li>
+  <li><strong>Parallel for independent tasks, sequential for dependent ones.</strong> Fan-out + synthesis for multi-target analysis.</li>
+  <li><strong>Return summaries, not transcripts.</strong> The orchestrator gets a compressed result. Don't let subagent verbosity bloat the main context.</li>
+  <li><strong>Independent context = independent judgment.</strong> Review agents, second opinions, and validation all work better in isolation.</li>
+</ol>
+
+<div class="callout" style="margin-top:2.5rem">
+  <div class="callout-label">Final Lesson</div>
+  <strong>Lesson 10: End-to-End Harness Design</strong><br>
+  <span style="color:var(--muted);font-size:.9rem">Everything from Lessons 1–9 applied to a complete workflow. Design a full harness for a real multi-step workflow from scratch.</span>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Describe a multi-step workflow from your own project and ask Claude to design the agent architecture — orchestrator, subagents, brief templates, and return format.</p>
+</div>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://addyosmani.com/blog/agent-harness-engineering/">Addy Osmani — Agent Harness Engineering (Ralph Loops, multi-agent coordination)</a></li>
+  <li><a href="https://arxiv.org/pdf/2603.09619">arXiv — Context Engineering: From Prompts to Multi-Agent Architecture</a></li>
+  <li><a href="https://mer.vin/2026/05/claude-code-architecture-explained-six-harness-layers-beyond-the-llm/">Mervin Praison — Six Harness Layers Beyond the LLM</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 9 of 10 · Context &amp; Harness Engineering</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+<script>
+const answered={};
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/3*100)+'%';
+}
+</script>
+</body>
+</html>

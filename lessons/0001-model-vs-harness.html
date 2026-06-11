@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1: Model vs. Harness — The Mental Model That Changes Everything</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --border: #2a2d3e;
+    --text: #e2e8f0;
+    --muted: #8892a4;
+    --accent: #6366f1;
+    --accent-dim: #1e1f3a;
+    --green: #22c55e;
+    --green-dim: #0d2b1a;
+    --red: #ef4444;
+    --red-dim: #2b0d0d;
+    --yellow: #f59e0b;
+    --yellow-dim: #2b1d0d;
+    --mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.7;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 6rem;
+  }
+
+  /* Header */
+  .lesson-meta {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+  .tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .tag.green { background: var(--green-dim); color: var(--green); border-color: var(--green); }
+  .tag.yellow { background: var(--yellow-dim); color: var(--yellow); border-color: var(--yellow); }
+
+  h1 {
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-bottom: 3rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 2.5rem 0 1rem;
+    color: var(--text);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  p { margin-bottom: 1rem; }
+
+  /* Callout boxes */
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+  }
+  .callout.key { border-left-color: var(--yellow); }
+  .callout.insight { border-left-color: var(--green); }
+  .callout.warning { border-left-color: var(--red); }
+  .callout-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+  .callout.key .callout-label { color: var(--yellow); }
+  .callout.insight .callout-label { color: var(--green); }
+  .callout.warning .callout-label { color: var(--red); }
+
+  /* Code */
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    color: #a5b4fc;
+  }
+  pre {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.5rem;
+    line-height: 1.6;
+    color: #c4cad8;
+  }
+  pre .comment { color: #4b5563; }
+  pre .key { color: #f59e0b; }
+  pre .val { color: #86efac; }
+  pre .str { color: #a5b4fc; }
+
+  /* Diagram */
+  .diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem 1.5rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+  }
+  .diagram-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.4rem 0;
+  }
+  .box {
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    border: 1px solid;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .box.model { background: #1e1f3a; border-color: #6366f1; color: #a5b4fc; }
+  .box.harness { background: #0d2b1a; border-color: #22c55e; color: #86efac; }
+  .box.harness-layer { background: #1a1d27; border-color: #4b5563; color: #8892a4; font-size: 0.75rem; }
+  .arrow { color: var(--muted); font-size: 1.1rem; }
+  .diagram-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.75rem;
+    font-family: var(--sans);
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  td {
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: var(--surface); }
+
+  /* Quiz */
+  .quiz {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+  .quiz-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .quiz-q {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .quiz-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg);
+  }
+  .quiz-option:hover { border-color: var(--accent); }
+  .quiz-option.correct { background: var(--green-dim); border-color: var(--green); }
+  .quiz-option.wrong { background: var(--red-dim); border-color: var(--red); }
+  .quiz-option.revealed { opacity: 0.5; }
+  .quiz-option-letter {
+    min-width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--mono);
+    flex-shrink: 0;
+  }
+  .quiz-feedback {
+    display: none;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  .quiz-feedback.correct { display: block; background: var(--green-dim); color: var(--green); }
+  .quiz-feedback.wrong { display: block; background: var(--red-dim); color: var(--red); }
+
+  /* Progress */
+  .progress-bar {
+    background: var(--border);
+    height: 3px;
+    border-radius: 2px;
+    margin-bottom: 2.5rem;
+  }
+  .progress-fill {
+    background: var(--accent);
+    height: 100%;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  /* Links */
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Citation */
+  .cite {
+    font-size: 0.8rem;
+    color: var(--muted);
+    vertical-align: super;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  /* Ask teacher */
+  .ask-teacher {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin: 3rem 0 1rem;
+  }
+  .ask-teacher-title {
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+  }
+  .ask-teacher p { color: var(--muted); font-size: 0.88rem; margin: 0; }
+
+  /* Pill list */
+  .pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.75rem 0 1rem;
+  }
+  .pill {
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+  }
+  .pill.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 1</span>
+  <span class="tag green">Foundations</span>
+  <span class="tag yellow">~15 min</span>
+</div>
+
+<h1>Model vs. Harness</h1>
+<p class="subtitle">The mental model that separates LLM users from LLM engineers.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- ── SECTION 1 ───────────────────────────────────────────── -->
+<h2>The Equation</h2>
+
+<p>Every AI agent — including every Claude Code session you've ever run — can be decomposed into exactly two things:</p>
+
+<div class="diagram">
+  <div class="diagram-row">
+    <div class="box harness">HARNESS</div>
+    <span class="arrow">+</span>
+    <div class="box model">MODEL</div>
+    <span class="arrow">=</span>
+    <div class="box" style="background:#0f1117;border-color:#6366f1;color:#e2e8f0;font-size:0.9rem;">AGENT</div>
+  </div>
+  <p class="diagram-label">Agent = Model + Harness &nbsp;·&nbsp; <a href="https://addyosmani.com/blog/agent-harness-engineering/">Addy Osmani, 2026</a></p>
+</div>
+
+<p>The <strong>model</strong> is the neural network. You can't change it (unless you fine-tune, which is out of scope here). What you <em>can</em> change — entirely — is the harness.</p>
+
+<div class="callout key">
+  <div class="callout-label">Key Insight</div>
+  A decent model with a great harness beats a great model with a bad harness. The bottleneck in most real Claude Code setups isn't the model — it's the harness.
+</div>
+
+<!-- ── SECTION 2 ───────────────────────────────────────────── -->
+<h2>What Is the Harness?</h2>
+
+<p>The harness is every layer of code, configuration, and convention that wraps around the model. Six layers, stacked:</p>
+
+<div class="diagram">
+  <div class="diagram-row"><div class="box harness-layer" style="width:380px;border-color:#6366f1;color:#a5b4fc;">1. System prompt / CLAUDE.md — what Claude knows about your project</div></div>
+  <div class="diagram-row"><div class="box harness-layer" style="width:340px;">2. Tool surface — what actions Claude can take (bash, read, write…)</div></div>
+  <div class="diagram-row"><div class="box harness-layer" style="width:300px;">3. MCP servers — external systems wired in (GitHub, Jira, APIs)</div></div>
+  <div class="diagram-row"><div class="box harness-layer" style="width:260px;">4. Skills — reusable, triggerable workflows</div></div>
+  <div class="diagram-row"><div class="box harness-layer" style="width:220px;">5. Hooks — lifecycle enforcement (pre/post)</div></div>
+  <div class="diagram-row"><div class="box harness-layer" style="width:180px;border-color:#6366f1;color:#a5b4fc;">6. Memory — what persists across sessions</div></div>
+  <div class="diagram-row"><div class="box model" style="width:140px;">MODEL</div></div>
+  <p class="diagram-label">Each layer shapes what the model sees, what it can do, and what it remembers.</p>
+</div>
+
+<p>Context engineering lives mostly in layers 1, 3, and 6 — what information reaches the model. Harness engineering is all six layers together.</p>
+
+<!-- ── SECTION 3 ───────────────────────────────────────────── -->
+<h2>Context Engineering vs. Prompt Engineering</h2>
+
+<p>You already write prompts. Here's how context engineering is different:</p>
+
+<table>
+  <tr>
+    <th>Dimension</th>
+    <th>Prompt Engineering</th>
+    <th>Context Engineering</th>
+  </tr>
+  <tr>
+    <td><strong>Scope</strong></td>
+    <td>One request, one query</td>
+    <td>All inputs: system msg, retrieved docs, tool outputs, memory, conversation history</td>
+  </tr>
+  <tr>
+    <td><strong>Timing</strong></td>
+    <td>Written once, reused as-is</td>
+    <td>Assembled dynamically at runtime per request</td>
+  </tr>
+  <tr>
+    <td><strong>Question it answers</strong></td>
+    <td>"How should I phrase this?"</td>
+    <td>"What does Claude need to know, right now, to do this?"</td>
+  </tr>
+  <tr>
+    <td><strong>Tools</strong></td>
+    <td>Text only</td>
+    <td>RAG, memory, tool descriptions, conversation compaction</td>
+  </tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-label">Insight</div>
+  Context engineering is <em>upstream</em> of prompting. A well-engineered context makes the prompt almost irrelevant — the model has what it needs before you even ask.
+</div>
+
+<!-- ── SECTION 4 ───────────────────────────────────────────── -->
+<h2>The Four Context Strategies</h2>
+
+<p>There are four operations you can perform on context. Every context engineering decision maps to one of these <a href="https://www.deepset.ai/blog/context-engineering-the-next-frontier-beyond-prompt-engineering">four strategies</a>:</p>
+
+<div class="pill-list">
+  <span class="pill active">Write</span>
+  <span class="pill active">Select</span>
+  <span class="pill active">Compress</span>
+  <span class="pill active">Isolate</span>
+</div>
+
+<h3>Write</h3>
+<p>Persist information <em>outside</em> the context window so it can be retrieved later. In Claude Code, this is your memory files (<code>~/.claude/projects/.../memory/</code>), CLAUDE.md, and any files Claude writes to disk.</p>
+
+<h3>Select</h3>
+<p>Choose <em>which</em> information to inject at inference time. Claude Code skills do this — they only load when triggered, rather than bloating every prompt. RAG systems do this with vector search.</p>
+
+<h3>Compress</h3>
+<p>Reduce token count without losing meaning. Claude Code does this automatically (context compaction). You can engineer this explicitly by writing good summaries in memory files instead of raw transcripts.</p>
+
+<h3>Isolate</h3>
+<p>Run sub-tasks in their own context so they don't contaminate each other. Subagents in Claude Code are isolation — each spawned <code>Agent()</code> call gets a fresh context. This is how long-horizon work stays coherent.</p>
+
+<div class="callout">
+  <div class="callout-label">Applied to Your Project</div>
+  Your <code>CLAUDE.md</code> is a Write operation — it injects project knowledge into every session. Your memory files at <code>~/.claude/projects/.../memory/</code> are also Write. If you spawned a subagent to do research, that's Isolate.
+</div>
+
+<!-- ── SECTION 5: QUIZ ──────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">You notice Claude keeps forgetting your preferred code style across sessions. Which layer of the harness is the problem?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this, 'q1', false)">
+      <div class="quiz-option-letter">A</div>
+      <div>Tool surface — Claude doesn't have the right tools to check style</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this, 'q1', true)">
+      <div class="quiz-option-letter">B</div>
+      <div>Memory / CLAUDE.md — the style preference isn't being persisted and injected</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this, 'q1', false)">
+      <div class="quiz-option-letter">C</div>
+      <div>The model — Claude Sonnet doesn't support style retention</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this, 'q1', false)">
+      <div class="quiz-option-letter">D</div>
+      <div>Hooks — no pre-commit hook is enforcing the style</div>
+    </div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. Memory is layer 6 of the harness. The fix is a Write operation: record the preference in CLAUDE.md or a memory file so it's injected into every session. The model isn't the problem.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Not quite. The model doesn't forget — it never knew, because nothing wrote the preference into a persistent context. Layer 6 (memory / CLAUDE.md) is the gap.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">You have a 40-step data pipeline and Claude starts making errors on step 30 because it "forgot" earlier decisions. Which context strategy fixes this?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this, 'q2', false)">
+      <div class="quiz-option-letter">A</div>
+      <div>Write — save every step's output to disk as you go</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this, 'q2', false)">
+      <div class="quiz-option-letter">B</div>
+      <div>Compress — summarize earlier steps before they scroll out of context</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this, 'q2', false)">
+      <div class="quiz-option-letter">C</div>
+      <div>Isolate — run each step in its own subagent context</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this, 'q2', true)">
+      <div class="quiz-option-letter">D</div>
+      <div>All three — Write state to disk, Compress the history, Isolate sub-tasks</div>
+    </div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Exactly right. Long-horizon work requires all three. Write checkpoints to disk so nothing is truly lost. Compress the growing history before it degrades the context. Isolate sub-tasks so each agent gets a clean, focused context.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Close, but partial solutions leave gaps. Write preserves state, Compress prevents degradation, Isolate keeps sub-tasks clean. Long-horizon work needs all three — you need the full answer here.</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">In the Agent = Model + Harness equation, what changes when you switch from Claude Sonnet 4.6 to Claude Opus 4.8?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this, 'q3', false)">
+      <div class="quiz-option-letter">A</div>
+      <div>The whole equation — both model and harness need to be rebuilt</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this, 'q3', true)">
+      <div class="quiz-option-letter">B</div>
+      <div>Only the model — the harness (CLAUDE.md, skills, hooks, MCP) is unchanged</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this, 'q3', false)">
+      <div class="quiz-option-letter">C</div>
+      <div>Only the harness — the model doesn't matter if the harness is good enough</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this, 'q3', false)">
+      <div class="quiz-option-letter">D</div>
+      <div>Neither — the agent behavior is determined at runtime, not configuration</div>
+    </div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">Correct. The harness is model-agnostic. Your CLAUDE.md, skills, hooks, and memory work the same regardless of which model is underneath. This is why harness investment compounds: build it once, use it with any model.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">The model changes, but the harness is the portable layer — CLAUDE.md, skills, hooks, memory all remain the same. This is the key leverage: harness investment is model-agnostic.</div>
+</div>
+
+<!-- ── SECTION 6: TAKEAWAYS ─────────────────────────────────── -->
+<h2>What to Hold Onto</h2>
+
+<p>Three things from this lesson to keep in mind going forward:</p>
+
+<ol style="padding-left:1.5rem;display:flex;flex-direction:column;gap:0.75rem;margin-top:0.5rem;">
+  <li><strong>Agent = Model + Harness.</strong> You control the harness entirely. The model is fixed. All engineering leverage lives on the harness side.</li>
+  <li><strong>Context engineering is about the right information at the right time.</strong> Not phrasing — information. What does Claude need to know, right now, to do this well?</li>
+  <li><strong>Four operations: Write, Select, Compress, Isolate.</strong> Every context decision is one of these. When something goes wrong, ask: which operation is missing?</li>
+</ol>
+
+<!-- ── NEXT LESSON ───────────────────────────────────────────── -->
+<div class="callout" style="margin-top:2.5rem;">
+  <div class="callout-label">Next Lesson</div>
+  <strong>Lesson 2: Hooks — Enforcement at the Lifecycle Level</strong><br>
+  <span style="color:var(--muted);font-size:0.9rem;">How to run shell commands at pre/post tool-call, pre-commit, and notification events. Build your first safety hook.</span>
+</div>
+
+<!-- ── ASK TEACHER ──────────────────────────────────────────── -->
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Anything unclear from this lesson — the diagram, the strategies, how any of this applies to your project — ask Claude Code directly. Just type your question. This lesson will stay in your <code>teaching/lessons/</code> folder for reference.</p>
+</div>
+
+<!-- ── SOURCES ──────────────────────────────────────────────── -->
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:0.4rem;font-size:0.88rem;color:var(--muted);">
+  <li><a href="https://addyosmani.com/blog/agent-harness-engineering/">Addy Osmani — Agent Harness Engineering (2026)</a></li>
+  <li><a href="https://www.deepset.ai/blog/context-engineering-the-next-frontier-beyond-prompt-engineering">deepset — Context Engineering: The Next Frontier Beyond Prompt Engineering</a></li>
+  <li><a href="https://arxiv.org/pdf/2603.09619">arXiv 2603.09619 — Context Engineering: From Prompts to Corporate Multi-Agent Architecture</a></li>
+  <li><a href="https://mer.vin/2026/05/claude-code-architecture-explained-six-harness-layers-beyond-the-llm/">Mervin Praison — Claude Code Architecture: Six Harness Layers Beyond the LLM</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 1 of N &nbsp;·&nbsp; Context & Harness Engineering</span>
+  <span><a href="../MISSION.md">Mission</a> &nbsp;·&nbsp; <a href="../RESOURCES.md">Resources</a></span>
+</div>
+
+<script>
+  const answered = {};
+
+  function answer(el, qid, isCorrect) {
+    if (answered[qid]) return;
+    answered[qid] = true;
+
+    const quiz = document.getElementById(qid);
+    const options = quiz.querySelectorAll('.quiz-option');
+    options.forEach(o => o.classList.add('revealed'));
+
+    if (isCorrect) {
+      el.classList.remove('revealed');
+      el.classList.add('correct');
+      document.getElementById(qid + '-correct').classList.remove('wrong');
+    } else {
+      el.classList.remove('revealed');
+      el.classList.add('wrong');
+      document.getElementById(qid + '-wrong').classList.remove('correct');
+    }
+
+    // update progress
+    const total = 3;
+    const done = Object.keys(answered).length;
+    document.getElementById('progress').style.width = (done / total * 100) + '%';
+  }
+</script>
+
+</body>
+</html>

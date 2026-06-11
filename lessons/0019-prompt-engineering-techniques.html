@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 19: Prompt Engineering Techniques</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 19</span>
+  <span class="tag green">Roadmap · Prompt Engineering</span>
+  <span class="tag orange">Technique</span>
+  <span class="tag yellow">~15 min</span>
+</div>
+
+<h1>Prompt Engineering Techniques</h1>
+<p class="subtitle">The named patterns: zero-shot, few-shot, chain-of-thought, ReAct. You know context engineering — these are the discrete tools inside it.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">Prompt vs context engineering</div>
+  <strong>Prompt engineering</strong> = crafting the wording of a single instruction. <strong>Context engineering</strong> (your Phase 1 depth) = managing <em>everything</em> in the window over time. Prompt techniques are the building blocks; context engineering is the architecture. This lesson sharpens the blocks.
+</div>
+
+<!-- ── ZERO / FEW SHOT ─────────────────────────────────────── -->
+<h2>Zero-shot vs Few-shot</h2>
+
+<ul>
+  <li><strong>Zero-shot</strong> — just ask. No examples. Works when the task is common and the instruction is clear. ("Classify this review as positive or negative.")</li>
+  <li><strong>Few-shot</strong> — include a handful of input→output <em>examples</em> in the prompt. The model infers the pattern. The single most reliable way to control format and edge-case handling without code.</li>
+</ul>
+
+<pre><span class="pre-label">few-shot — teaching a format by example</span>Classify the trade signal. Examples:
+Text: "RSI oversold, bouncing off support" -> Signal: BUY
+Text: "Breaking below 200ma on volume"     -> Signal: SELL
+Text: "Chopping sideways, no clear level"  -> Signal: HOLD
+
+Text: "MACD cross up, reclaiming VWAP"      -> Signal:</pre>
+
+<div class="callout insight">
+  <div class="callout-label">Why few-shot works</div>
+  The examples occupy the context window and self-attention (Lesson 15) lets the model pattern-match the new input against them. You're not training the model — you're <em>demonstrating</em> the task in-context. 2–5 well-chosen, diverse examples usually beat 20 redundant ones.
+</div>
+
+<!-- ── COT ─────────────────────────────────────────────────── -->
+<h2>Chain-of-Thought (CoT)</h2>
+<p>For multi-step reasoning, ask the model to <strong>show its work before answering</strong>. The classic trigger: "Let's think step by step." Reasoning in the output gives later tokens more relevant context to condition on (Wei et al., 2022).</p>
+
+<pre><span class="pre-label">CoT</span>Q: A spread costs $2.40 to open and the max value is $5.
+   What's the risk/reward? Think step by step, then state the ratio.</pre>
+
+<div class="callout warning">
+  <div class="callout-label">CoT in 2026</div>
+  Modern <em>reasoning models</em> (o-series, Claude extended thinking, DeepSeek-R1) do CoT internally — you often don't need to prompt for it, and forcing it can even hurt. Reserve explicit CoT for standard (non-reasoning) models, or when you want the reasoning <em>visible</em> for debugging/auditing.
+</div>
+
+<!-- ── REACT ───────────────────────────────────────────────── -->
+<h2>ReAct — Reason + Act</h2>
+<p><strong>ReAct</strong> (Yao et al., 2022) interleaves reasoning steps with <em>actions</em> (tool calls) and <em>observations</em> (tool results): <code>Thought → Action → Observation → Thought → …</code>. It's the prompting pattern underneath most agents — the model reasons about what to do, calls a tool, reads the result, and reasons again. You'll build on this directly in <a href="0025-agents-function-calling.html">Lesson 25</a>.</p>
+
+<!-- ── STRUCTURE ───────────────────────────────────────────── -->
+<h2>Structuring the prompt itself</h2>
+<table>
+  <tr><th>Lever</th><th>Effect</th></tr>
+  <tr><td><strong>Role</strong> ("You are a risk-averse options analyst")</td><td>Sets tone, vocabulary, and priorities</td></tr>
+  <tr><td><strong>System prompting</strong></td><td>Persistent rules that outrank the user turn (Lesson 4 / 18)</td></tr>
+  <tr><td><strong>Delimiters</strong> (XML tags, <code>###</code>, triple quotes)</td><td>Cleanly separate instructions from data — reduces injection &amp; confusion</td></tr>
+  <tr><td><strong>Output constraints</strong> ("Respond in ≤3 bullets, no preamble")</td><td>Controls shape and length</td></tr>
+  <tr><td><strong>Positive instructions</strong> ("Do X") over negative ("Don't do Y")</td><td>Models follow "do" more reliably than "don't"</td></tr>
+</table>
+
+<div class="callout key">
+  <div class="callout-label">Robust prompting = make it hard to misread</div>
+  Put instructions and untrusted data in clearly different sections (e.g. wrap user content in <code>&lt;data&gt;…&lt;/data&gt;</code>). This is both a quality and a <em>security</em> move — it's your first line of defense against prompt injection (next lesson).
+</div>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">You need the model to output trade signals in a very specific custom format it keeps getting slightly wrong with a plain instruction. What's the most reliable low-code fix?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Repeat the format rule five times in the system prompt until it sticks</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Add a few-shot block of 3 input→output examples in the exact target format</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Raise the temperature so the model varies until it lands on the right format</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Fine-tune the model on the format before using it for anything else</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. Few-shot examples are the highest-leverage, lowest-effort way to lock a format — the model pattern-matches the demonstrated shape. Repetition is weaker, higher temperature makes format <em>less</em> stable, and fine-tuning is heavy machinery for what 3 examples solve. (For machine-readable formats, also consider Structured Outputs from Lesson 18.)</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Few-shot examples (option B) are the reliable, low-code fix — demonstrate the exact format 3 times and the model matches it. Repetition is weak, higher temperature destabilizes format, and fine-tuning is overkill here.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">You're using a dedicated reasoning model (o-series style) for a hard multi-step math task. Should you append "Let's think step by step"?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Yes, always — explicit chain-of-thought improves every model on every task</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Usually not — reasoning models do CoT internally; forcing it can be redundant or hurt</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Yes, but only if you also set temperature above 1 to deepen the reasoning</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>It makes no difference at all on any modern model, reasoning or standard</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. Reasoning models already perform chain-of-thought internally, so the explicit trigger is redundant and can sometimes interfere. Reserve explicit CoT for standard models, or when you specifically need the reasoning visible for auditing/debugging. CoT is powerful but not universally beneficial in 2026.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Reasoning models do CoT internally, so explicitly prompting for it is usually redundant and can even hurt (option B). Explicit CoT is for standard models or when you need visible reasoning — not a universal "always add it" rule.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Bring me a prompt that's underperforming on a real task and I'll rewrite it applying these levers — role, delimiters, few-shot, output constraints — and explain each change. That's the fastest way to internalize the patterns.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://www.promptingguide.ai/">Prompt Engineering Guide (promptingguide.ai)</a> — the most thorough, citation-backed reference for every technique here, including the original CoT and ReAct papers.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — prompt engineering cluster (zero/few-shot, CoT, ReAct, system prompting)</a></li>
+  <li><a href="https://www.promptingguide.ai/">DAIR.AI — Prompt Engineering Guide</a></li>
+  <li><a href="https://arxiv.org/abs/2201.11903">Wei et al. — Chain-of-Thought Prompting (2022)</a> · <a href="https://arxiv.org/abs/2210.03629">Yao et al. — ReAct (2022)</a></li>
+  <li><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview">Anthropic — Prompt Engineering guide</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 19 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

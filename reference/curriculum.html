@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curriculum — AI Engineer Roadmap</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--yellow:#f59e0b;--purple:#c084fc;--mono:'JetBrains Mono','Fira Code',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 6rem;line-height:1.6}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;margin-bottom:.4rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:2.5rem}
+  h2{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:2.5rem 0 1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+  h2.phase1{color:var(--green)}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .row{display:flex;align-items:baseline;gap:.9rem;padding:.55rem .75rem;border-radius:6px;font-size:.92rem}
+  .row:hover{background:var(--surface)}
+  .num{font-family:var(--mono);font-size:.78rem;color:var(--muted);min-width:2.2rem;flex-shrink:0}
+  .ttl{font-weight:600;flex-shrink:0}
+  .desc{color:var(--muted);font-size:.83rem}
+  .done{color:var(--green);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--green);border-radius:4px;padding:.05rem .35rem;margin-left:auto;flex-shrink:0}
+  .new{color:var(--yellow);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--yellow);border-radius:4px;padding:.05rem .35rem;margin-left:auto;flex-shrink:0}
+  .intro{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin-bottom:2rem;font-size:.9rem;color:var(--muted)}
+  .footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.82rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<h1>Curriculum</h1>
+<p class="subtitle">The full <a href="https://roadmap.sh/ai-engineer">AI Engineer roadmap</a>, mapped to 29 lessons.</p>
+
+<div class="intro">
+  <strong>Two phases.</strong> Phase 1 (Lessons 1–13) is your original deep specialization in context &amp; harness engineering for Claude Code — kept intact, now the foundation. Phase 2 (Lessons 14–29) walks the rest of the AI Engineer roadmap as standalone subjects. Lessons cross-reference each other; later lessons lean on earlier ones.
+</div>
+
+<h2 class="phase1">Phase 1 · Context &amp; Harness Engineering</h2>
+<div class="row"><span class="num">01</span><a class="ttl" href="../lessons/0001-model-vs-harness.html">Model vs Harness</a><span class="desc">the mental model</span><span class="done">done</span></div>
+<div class="row"><span class="num">02</span><a class="ttl" href="../lessons/0002-hooks-lifecycle-enforcement.html">Hooks &amp; Lifecycle</a><span class="desc">enforcing quality gates</span><span class="done">done</span></div>
+<div class="row"><span class="num">03</span><a class="ttl" href="../lessons/0003-skills-reusable-workflows.html">Skills</a><span class="desc">reusable workflows</span><span class="done">done</span></div>
+<div class="row"><span class="num">04</span><a class="ttl" href="../lessons/0004-claude-md-project-knowledge.html">CLAUDE.md</a><span class="desc">project knowledge</span><span class="done">done</span></div>
+<div class="row"><span class="num">05</span><a class="ttl" href="../lessons/0005-memory-cross-session-persistence.html">Memory</a><span class="desc">cross-session persistence</span><span class="done">done</span></div>
+<div class="row"><span class="num">06</span><a class="ttl" href="../lessons/0006-mcp-servers-external-tools.html">MCP Servers</a><span class="desc">external tools</span><span class="done">done</span></div>
+<div class="row"><span class="num">07</span><a class="ttl" href="../lessons/0007-context-window-anatomy.html">Context Window Anatomy</a><span class="desc">what fills the window</span><span class="done">done</span></div>
+<div class="row"><span class="num">08</span><a class="ttl" href="../lessons/0008-four-strategies-deep-dive.html">Four Strategies</a><span class="desc">write / select / compress / isolate</span><span class="done">done</span></div>
+<div class="row"><span class="num">09</span><a class="ttl" href="../lessons/0009-subagents-and-isolation.html">Subagents &amp; Isolation</a><span class="desc">parallel context</span><span class="done">done</span></div>
+<div class="row"><span class="num">10</span><a class="ttl" href="../lessons/0010-end-to-end-harness-design.html">End-to-End Harness Design</a><span class="desc">putting it together</span><span class="done">done</span></div>
+<div class="row"><span class="num">11</span><a class="ttl" href="../lessons/0011-token-compression-tools.html">Token Compression Tools</a><span class="desc">RTK, Graphify, LLMLingua</span><span class="done">done</span></div>
+<div class="row"><span class="num">12</span><a class="ttl" href="../lessons/0012-tool-agnostic-harness.html">Tool-Agnostic Harness</a><span class="desc">Cursor, Copilot, Windsurf, AGENTS.md</span><span class="done">done</span></div>
+<div class="row"><span class="num">13</span><a class="ttl" href="../lessons/0013-loop-engineering.html">Loop Engineering</a><span class="desc">automation &amp; safeguards</span><span class="done">done</span></div>
+
+<h2>Phase 2 · Foundations</h2>
+<div class="row"><span class="num">14</span><a class="ttl" href="../lessons/0014-what-is-an-ai-engineer.html">What Is an AI Engineer</a><span class="desc">intro, AI eng vs ML eng, AI vs AGI</span><span class="new">new</span></div>
+<div class="row"><span class="num">15</span><a class="ttl" href="../lessons/0015-how-llms-work.html">How LLMs Work</a><span class="desc">tokens, transformers, training vs inference</span><span class="new">new</span></div>
+<div class="row"><span class="num">16</span><a class="ttl" href="../lessons/0016-choosing-models.html">Choosing the Right Model</a><span class="desc">open vs closed, decision framework</span><span class="new">new</span></div>
+<div class="row"><span class="num">17</span><a class="ttl" href="../lessons/0017-inference-parameters.html">Inference Parameters</a><span class="desc">temperature, top-p/k, tokens, penalties</span><span class="new">new</span></div>
+
+<h2>Phase 2 · APIs &amp; Prompting</h2>
+<div class="row"><span class="num">18</span><a class="ttl" href="../lessons/0018-openai-platform.html">The OpenAI Platform</a><span class="desc">chat/responses, streaming, structured output</span><span class="new">new</span></div>
+<div class="row"><span class="num">19</span><a class="ttl" href="../lessons/0019-prompt-engineering-techniques.html">Prompt Engineering Techniques</a><span class="desc">zero/few-shot, CoT, ReAct</span><span class="new">new</span></div>
+<div class="row"><span class="num">20</span><a class="ttl" href="../lessons/0020-ai-safety-ethics.html">AI Safety &amp; Ethics</a><span class="desc">prompt injection, moderation, bias, privacy</span><span class="new">new</span></div>
+
+<h2>Phase 2 · The RAG Stack</h2>
+<div class="row"><span class="num">21</span><a class="ttl" href="../lessons/0021-open-source-models.html">Open-Source &amp; Self-Hosted Models</a><span class="desc">Hugging Face, Ollama, LM Studio</span><span class="new">new</span></div>
+<div class="row"><span class="num">22</span><a class="ttl" href="../lessons/0022-embeddings.html">Embeddings</a><span class="desc">meaning as vectors, semantic search</span><span class="new">new</span></div>
+<div class="row"><span class="num">23</span><a class="ttl" href="../lessons/0023-vector-databases.html">Vector Databases</a><span class="desc">ANN, Pinecone/Chroma/Qdrant/FAISS</span><span class="new">new</span></div>
+<div class="row"><span class="num">24</span><a class="ttl" href="../lessons/0024-rag.html">Retrieval-Augmented Generation</a><span class="desc">chunk→embed→retrieve→generate (keystone)</span><span class="new">new</span></div>
+
+<h2>Phase 2 · Agents &amp; Beyond</h2>
+<div class="row"><span class="num">25</span><a class="ttl" href="../lessons/0025-agents-function-calling.html">AI Agents &amp; Function Calling</a><span class="desc">the agent loop, tools, multi-agent</span><span class="new">new</span></div>
+<div class="row"><span class="num">26</span><a class="ttl" href="../lessons/0026-multimodal-ai.html">Multimodal AI</a><span class="desc">vision, image gen, speech, video</span><span class="new">new</span></div>
+<div class="row"><span class="num">27</span><a class="ttl" href="../lessons/0027-model-provider-landscape.html">Model Provider Landscape</a><span class="desc">Anthropic, Google, open-weight, OpenRouter</span><span class="new">new</span></div>
+<div class="row"><span class="num">28</span><a class="ttl" href="../lessons/0028-fine-tuning.html">Fine-Tuning</a><span class="desc">when (and when not), LoRA</span><span class="new">new</span></div>
+<div class="row"><span class="num">29</span><a class="ttl" href="../lessons/0029-ai-development-tools.html">AI-Assisted Development Tools</a><span class="desc">Cursor, Codex, Windsurf — capstone</span><span class="new">new</span></div>
+
+<div class="footer">
+  29 lessons · Phase 1 (1–13) original harness specialization · Phase 2 (14–29) full roadmap coverage<br>
+  <a href="glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a> · <a href="https://roadmap.sh/ai-engineer">roadmap.sh/ai-engineer</a>
+</div>
+
+</body>
+</html>

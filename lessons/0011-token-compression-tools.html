@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 11: Token Compression Tools</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:780px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.prop{color:#a5b4fc}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  /* Tool cards */
+  .tool-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:1.5rem 0}
+  .tool-header{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+  .tool-icon{width:2.5rem;height:2.5rem;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;font-weight:700;font-family:var(--mono)}
+  .tool-icon.rtk{background:rgba(251,146,60,.15);color:var(--orange);border:1px solid var(--orange)}
+  .tool-icon.graphify{background:rgba(34,197,94,.12);color:var(--green);border:1px solid var(--green)}
+  .tool-icon.llmlingua{background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid var(--accent)}
+  .tool-icon.repomix{background:rgba(192,132,252,.15);color:var(--purple);border:1px solid var(--purple)}
+  .tool-icon.caveman{background:rgba(245,158,11,.12);color:var(--yellow);border:1px solid var(--yellow)}
+  .tool-icon.lsp{background:rgba(239,68,68,.12);color:var(--red);border:1px solid var(--red)}
+  .tool-name{font-size:1.05rem;font-weight:700;font-family:var(--mono)}
+  .tool-tagline{color:var(--muted);font-size:.83rem;margin-top:.1rem}
+  .tool-savings{margin-left:auto;text-align:right;font-family:var(--mono)}
+  .savings-num{font-size:1.2rem;font-weight:700;color:var(--green)}
+  .savings-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .tool-body{padding:1.1rem 1.25rem;background:var(--surface)}
+  .tool-body p{font-size:.88rem;margin-bottom:.85rem}
+  .tool-install{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.75rem 1rem;font-family:var(--mono);font-size:.8rem;color:#86efac;margin:.5rem 0 .85rem;display:flex;flex-direction:column;gap:.3rem}
+  .tool-install .label{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.2rem}
+  .tool-how{display:flex;gap:1rem;margin-top:.5rem;flex-wrap:wrap}
+  .how-chip{display:flex;align-items:center;gap:.4rem;padding:.3rem .7rem;border-radius:100px;font-size:.75rem;border:1px solid var(--border);color:var(--muted)}
+  .how-chip::before{content:'';width:6px;height:6px;border-radius:50%}
+  .how-chip.intercept::before{background:var(--orange)}.how-chip.graph::before{background:var(--green)}
+  .how-chip.compress::before{background:var(--accent)}.how-chip.pack::before{background:var(--purple)}
+  .how-chip.style::before{background:var(--yellow)}.how-chip.nav::before{background:var(--red)}
+  /* Before/after comparison */
+  .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0 1.5rem}
+  .ba-col{border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .ba-header{padding:.45rem .9rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)}
+  .ba-header.before{background:var(--red-dim);color:var(--red)}.ba-header.after{background:var(--green-dim);color:var(--green)}
+  .ba-body{padding:.75rem .9rem;font-family:var(--mono);font-size:.78rem;color:#c4cad8;line-height:1.6;white-space:pre;overflow-x:auto}
+  .ba-stat{padding:.45rem .9rem;background:var(--surface);border-top:1px solid var(--border);font-size:.75rem;font-family:var(--mono)}
+  .ba-stat.bad{color:var(--red)}.ba-stat.good{color:var(--green)}
+  /* Stack diagram */
+  .stack{display:flex;flex-direction:column;gap:.3rem;margin:1.5rem 0}
+  .stack-row{display:flex;align-items:center;gap:.75rem;padding:.55rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:.83rem}
+  .stack-step{width:1.5rem;height:1.5rem;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .stack-tool{font-family:var(--mono);font-size:.82rem;width:110px;flex-shrink:0}
+  .stack-desc{color:var(--muted);font-size:.82rem;flex:1}
+  .stack-saves{font-family:var(--mono);font-size:.75rem;color:var(--green);text-align:right}
+  .stack-arrow{color:var(--border);font-size:.85rem;text-align:center;padding:.1rem}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.87rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  /* Quiz */
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 11</span>
+  <span class="tag green">Context Engineering</span>
+  <span class="tag orange">Token Compression</span>
+  <span class="tag yellow">~25 min</span>
+</div>
+
+<h1>Token Compression Tools</h1>
+<p class="subtitle">Six tools that clean, compress, and repackage context before it ever reaches the model — saving 60–90% on token costs.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- ── WHY ─────────────────────────────────────────────────── -->
+<h2>The Problem</h2>
+<p>In Lesson 7 you learned that tool results are the biggest context consumer in most sessions. A <code>git status</code> that returns 200 lines dumps 1,500+ tokens into the window. A test run with 80 failures returns 10,000 tokens of stack traces. A recursive directory listing: 3,000 tokens of paths most of which are irrelevant.</p>
+<p>The Compress strategy from Lesson 8 says: <em>reduce token count without losing meaning, before information lands in the window</em>. These six tools operationalize that strategy — each attacking a different source of token bloat.</p>
+
+<div class="callout key">
+  <div class="callout-label">Key Framing</div>
+  These tools don't make the model smarter. They make the <strong>input smaller</strong> without making it less useful. A 30-minute Claude Code session typically uses 100k–150k tokens. With the right compression stack, the same session can run on 15k–30k tokens — same quality, 80% lower cost.
+</div>
+
+<!-- ── TOOL 1: RTK ──────────────────────────────────────────── -->
+<h2>The Tools</h2>
+
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon rtk">RTK</div>
+    <div>
+      <div class="tool-name">RTK — Rust Token Killer</div>
+      <div class="tool-tagline">CLI proxy that intercepts shell output and compresses it before Claude sees it</div>
+    </div>
+    <div class="tool-savings">
+      <div class="savings-num">60–92%</div>
+      <div class="savings-label">token reduction</div>
+    </div>
+  </div>
+  <div class="tool-body">
+    <p>RTK sits between your shell and Claude Code. When Claude runs a Bash command, RTK intercepts the output, applies four compression strategies (smart filtering, grouping, truncation, deduplication), and hands a compressed version to Claude. Claude never sees the raw output.</p>
+
+    <div class="tool-install">
+      <span class="label">Install &amp; Setup</span>
+      <span>brew install rtk</span>
+      <span>rtk init -g    <span class="comment"># auto-installs hooks into ~/.claude/settings.json</span></span>
+      <span class="comment"># Restart Claude Code — hooks rewrite Bash commands transparently</span>
+    </div>
+
+    <p><strong>What it compresses:</strong> <code>git status</code>, <code>git log</code>, <code>git diff</code>, <code>ls</code>, <code>find</code>, <code>cat</code>, <code>grep</code>, test runners (<code>pytest</code>, <code>cargo test</code>, <code>go test</code>), linters (ESLint, TypeScript), container logs, AWS CLI. Over 100 supported commands.</p>
+
+    <p><strong>How it works at each command:</strong></p>
+
+    <div class="ba-grid">
+      <div class="ba-col">
+        <div class="ba-header before">Before RTK — git status</div>
+        <div class="ba-body">On branch feature/auth
+Your branch is ahead of 'origin/feature/auth'
+by 3 commits.
+
+Changes not staged for commit:
+  (use "git add &lt;file&gt;..." to update)
+  (use "git restore &lt;file&gt;..." to discard)
+	modified:   src/auth/login.js
+	modified:   src/auth/session.js
+	modified:   tests/auth.test.js
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include)
+	src/auth/refresh.js
+
+no changes added to commit</div>
+        <div class="ba-stat bad">~180 tokens</div>
+      </div>
+      <div class="ba-col">
+        <div class="ba-header after">After RTK — same command</div>
+        <div class="ba-body">branch: feature/auth (+3 ahead)
+modified: src/auth/login.js
+          src/auth/session.js
+          tests/auth.test.js
+untracked: src/auth/refresh.js</div>
+        <div class="ba-stat good">~35 tokens (81% saved)</div>
+      </div>
+    </div>
+
+    <div class="tool-how">
+      <span class="how-chip intercept">Intercepts shell output</span>
+      <span class="how-chip intercept">Rewrites Bash commands via hook</span>
+      <span class="how-chip intercept">Track savings with <code>rtk gain</code></span>
+    </div>
+
+    <p style="margin-top:.85rem;font-size:.82rem;color:var(--muted)"><strong>Limitation:</strong> Claude Code's built-in Read/Grep tools bypass the hook — they don't auto-compress. For those, use Bash equivalents or call <code>rtk cat</code> / <code>rtk grep</code> explicitly.</p>
+  </div>
+</div>
+
+<!-- ── TOOL 2: GRAPHIFY ───────────────────────────────────── -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon graphify">G</div>
+    <div>
+      <div class="tool-name">Graphify</div>
+      <div class="tool-tagline">Indexes your codebase as a queryable knowledge graph — no more scanning raw files</div>
+    </div>
+    <div class="tool-savings">
+      <div class="savings-num">99%</div>
+      <div class="savings-label">on large codebases</div>
+    </div>
+  </div>
+  <div class="tool-body">
+    <p>Graphify runs a one-time AST analysis of your codebase and produces two artifacts: <code>GRAPH_REPORT.md</code> (a structured map of functions, classes, dependencies, and call sites) and <code>graph.json</code> (the queryable index). Claude reads the map first, then asks targeted questions against the graph instead of scanning files.</p>
+
+    <div class="tool-install">
+      <span class="label">Install &amp; Index</span>
+      <span>npx graphify index        <span class="comment"># run once in project root</span></span>
+      <span>                           <span class="comment"># produces GRAPH_REPORT.md + graph.json</span></span>
+      <span>npx graphify query "find all callers of validateSession"</span>
+    </div>
+
+    <p><strong>The compression math:</strong> On a 500k-token codebase (roughly 400k LOC), reading relevant files naively might load 50k–100k tokens per task. A Graphify BFS subgraph query for the same answer: ~2,000 tokens. The graph is built once and reused across sessions — it persists on disk.</p>
+
+    <p><strong>Add to CLAUDE.md:</strong></p>
+    <pre>
+<span class="comment">## Codebase Navigation
+A Graphify knowledge graph is at GRAPH_REPORT.md and graph.json.
+Before reading source files to understand architecture, query the graph first:
+  npx graphify query "&lt;your question&gt;"
+Only open individual files when the graph query points you to a specific location.</span></pre>
+
+    <div class="tool-how">
+      <span class="how-chip graph">AST-level code understanding</span>
+      <span class="how-chip graph">Persists across sessions</span>
+      <span class="how-chip graph">Re-run after major refactors</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOOL 3: LLMLINGUA ──────────────────────────────────── -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon llmlingua">LL</div>
+    <div>
+      <div class="tool-name">LLMLingua</div>
+      <div class="tool-tagline">Surgically removes low-value tokens from prompts using a smaller model's perplexity scores</div>
+    </div>
+    <div class="tool-savings">
+      <div class="savings-num">4–20×</div>
+      <div class="savings-label">prompt compression</div>
+    </div>
+  </div>
+  <div class="tool-body">
+    <p>LLMLingua (Microsoft Research) runs a small, cheap model over your prompt and identifies tokens that, if removed, wouldn't meaningfully change the large model's output. It's not summarization — it's surgical removal of low-perplexity tokens. The compressed prompt is semantically equivalent but much shorter.</p>
+
+    <div class="tool-install">
+      <span class="label">Install</span>
+      <span>pip install llmlingua</span>
+    </div>
+
+    <pre>
+<span class="pre-label">Python — basic usage</span><span class="keyword">from</span> llmlingua <span class="keyword">import</span> PromptCompressor
+
+compressor = PromptCompressor(
+    model_name=<span class="string">"microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank"</span>,
+    use_llmlingua2=<span class="keyword">True</span>
+)
+
+result = compressor.compress_prompt(
+    context=long_context,       <span class="comment"># your RAG docs, system prompt, etc.</span>
+    instruction=question,       <span class="comment"># the actual question</span>
+    target_token=<span class="string">200</span>,           <span class="comment"># target compressed length</span>
+    rank_method=<span class="string">"longllmlingua"</span>
+)
+
+compressed = result[<span class="string">"compressed_prompt"</span>]
+<span class="comment"># Pass `compressed` to Claude instead of the raw context</span></pre>
+
+    <p><strong>Best for:</strong> RAG pipelines where retrieved documents are long. Compressing retrieved context before injecting it can cut RAG overhead by 60–94% with minimal quality loss. Not recommended for short prompts or code — perplexity-based removal can strip important syntax.</p>
+
+    <div class="tool-how">
+      <span class="how-chip compress">Runs on CPU (small model)</span>
+      <span class="how-chip compress">Works on any text</span>
+      <span class="how-chip compress">LLMLingua-2 is 3–6× faster</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOOL 4: REPOMIX ────────────────────────────────────── -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon repomix">RM</div>
+    <div>
+      <div class="tool-name">Repomix</div>
+      <div class="tool-tagline">Packs an entire repository into one LLM-optimized file — with binary exclusion, ignore patterns, and structure maps</div>
+    </div>
+    <div class="tool-savings">
+      <div class="savings-num">~40%</div>
+      <div class="savings-label">vs. naive concatenation</div>
+    </div>
+  </div>
+  <div class="tool-body">
+    <p>Repomix converts a repo into a single Markdown file structured for LLM consumption: directory tree first, then each file's content with clear separators. It strips binaries, node_modules, build artifacts, and respects <code>.gitignore</code>. The result can be injected into a subagent's context for whole-codebase analysis tasks.</p>
+
+    <div class="tool-install">
+      <span class="label">Install &amp; Pack</span>
+      <span>npx repomix                          <span class="comment"># pack current repo → repomix-output.xml</span></span>
+      <span>npx repomix --include "src/**"        <span class="comment"># only src/</span></span>
+      <span>npx repomix --style markdown           <span class="comment"># output as markdown</span></span>
+      <span>npx repomix --output-show-line-numbers <span class="comment"># add line numbers for precise references</span></span>
+    </div>
+
+    <p><strong>Pattern:</strong> Pack the repo → inject into a subagent for a whole-codebase task → get a structured summary back. The subagent's context holds the entire codebase; your main session context holds only the result.</p>
+
+    <pre>
+<span class="pre-label">Pairing with Isolate strategy</span><span class="comment"># Pack relevant subdirectory
+npx repomix --include "src/auth/**" --style markdown > /tmp/auth-pack.md
+
+# Subagent brief includes the pack
+Brief: "The auth module code is in /tmp/auth-pack.md.
+Read it, then identify all places where session tokens
+are stored without expiry. Return a list of file:line references."</span></pre>
+
+    <div class="tool-how">
+      <span class="how-chip pack">Strips build artifacts</span>
+      <span class="how-chip pack">Respects .gitignore</span>
+      <span class="how-chip pack">Works with remote repos via URL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOOL 5: CAVEMAN ────────────────────────────────────── -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon caveman">CV</div>
+    <div>
+      <div class="tool-name">Caveman Mode</div>
+      <div class="tool-tagline">Ultra-compressed communication — strips filler, articles, and pleasantries from Claude's output</div>
+    </div>
+    <div class="tool-savings">
+      <div class="savings-num">~75%</div>
+      <div class="savings-label">output token reduction</div>
+    </div>
+  </div>
+  <div class="tool-body">
+    <p>Caveman compresses Claude's <em>responses</em>, not the context. It strips grammatical completeness and stylistic prose while preserving full technical accuracy. Useful when you're doing rapid iteration and don't need full sentences — you just need the facts.</p>
+
+    <div class="tool-install">
+      <span class="label">Invoke (it's a built-in Claude Code skill)</span>
+      <span>/caveman          <span class="comment"># activate for this session</span></span>
+      <span>/caveman off      <span class="comment"># return to normal mode</span></span>
+    </div>
+
+    <div class="ba-grid">
+      <div class="ba-col">
+        <div class="ba-header before">Normal output</div>
+        <div class="ba-body">I've reviewed the authentication
+module and found three issues
+that need attention. First,
+the session token is stored
+without an expiry time, which
+creates a security risk...</div>
+        <div class="ba-stat bad">~60 tokens</div>
+      </div>
+      <div class="ba-col">
+        <div class="ba-header after">Caveman output</div>
+        <div class="ba-body">auth issues:
+- token: no expiry → security risk
+- refresh: no rate limit
+- logout: doesn't invalidate
+  server-side</div>
+        <div class="ba-stat good">~20 tokens (67% saved)</div>
+      </div>
+    </div>
+
+    <p><strong>Best for:</strong> Exploratory sessions, debugging loops, rapid Q&amp;A where you want facts not prose. Switch off for final output — reports, documentation, PR descriptions — where full sentences matter.</p>
+
+    <div class="tool-how">
+      <span class="how-chip style">Reduces output tokens only</span>
+      <span class="how-chip style">Full technical accuracy preserved</span>
+      <span class="how-chip style">Toggle per-session</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOOL 6: LSP ────────────────────────────────────────── -->
+<div class="tool-card">
+  <div class="tool-header">
+    <div class="tool-icon lsp">LSP</div>
+    <div>
+      <div class="tool-name">LSP — Language Server Protocol</div>
+      <div class="tool-tagline">Compiler-backed symbol navigation instead of grep-and-read loops</div>
+    </div>
+    <div class="tool-savings">
+      <div class="savings-num">80–95%</div>
+      <div class="savings-label">vs. grep loops</div>
+    </div>
+  </div>
+  <div class="tool-body">
+    <p>When Claude wants to find where a function is defined or all its callers, the naive approach is: grep across the project, read matching files, scan for context. Each step dumps tokens. LSP replaces this with a single precise query: go-to-definition, find-references, hover type — one call, one result, no scanning.</p>
+    <p>Claude Code has LSP integration built in via the <code>mcp__lsp</code> MCP server (when configured). Alternatively, expose LSP queries through a shell wrapper Claude can call directly.</p>
+
+    <div class="tool-install">
+      <span class="label">Configure (example — TypeScript)</span>
+      <span>npm install -g typescript-language-server typescript</span>
+      <span class="comment"># Then wire as MCP server or expose via Bash wrapper:</span>
+      <span>npx typescript-language-server --stdio</span>
+    </div>
+
+    <div class="ba-grid">
+      <div class="ba-col">
+        <div class="ba-header before">Without LSP — grep loop</div>
+        <div class="ba-body">grep -r "validateSession" src/
+→ 12 files matched
+→ Read auth/middleware.js (800 tokens)
+→ Read auth/session.js (600 tokens)
+→ Read tests/auth.test.js (1200 tokens)
+...</div>
+        <div class="ba-stat bad">~5,000 tokens to find one def</div>
+      </div>
+      <div class="ba-col">
+        <div class="ba-header after">With LSP — one query</div>
+        <div class="ba-body">lsp definition validateSession
+→ src/auth/session.js:47
+
+lsp references validateSession
+→ middleware.js:23, router.js:89,
+  tests/auth.test.js:14 (3 refs)</div>
+        <div class="ba-stat good">~40 tokens. Done.</div>
+      </div>
+    </div>
+
+    <div class="tool-how">
+      <span class="how-chip nav">Compiler-accurate (not text search)</span>
+      <span class="how-chip nav">Works across renames &amp; imports</span>
+      <span class="how-chip nav">Built in to most language servers</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── THE STACK ───────────────────────────────────────────── -->
+<h2>Using Them Together: The Compression Stack</h2>
+<p>Each tool attacks a different source of bloat. Stack them for maximum effect:</p>
+
+<div class="stack">
+  <div class="stack-row">
+    <div class="stack-step" style="background:rgba(34,197,94,.15);color:var(--green)">1</div>
+    <div class="stack-tool" style="color:var(--green)">Graphify</div>
+    <div class="stack-desc">Build the codebase graph once. Claude queries it instead of opening files.</div>
+    <div class="stack-saves">~99% on arch tasks</div>
+  </div>
+  <div class="stack-arrow">↓</div>
+  <div class="stack-row">
+    <div class="stack-step" style="background:rgba(239,68,68,.15);color:var(--red)">2</div>
+    <div class="stack-tool" style="color:var(--red)">LSP</div>
+    <div class="stack-desc">For precise symbol lookups, use LSP queries instead of grep loops.</div>
+    <div class="stack-saves">80–95% on nav</div>
+  </div>
+  <div class="stack-arrow">↓</div>
+  <div class="stack-row">
+    <div class="stack-step" style="background:rgba(251,146,60,.15);color:var(--orange)">3</div>
+    <div class="stack-tool" style="color:var(--orange)">RTK</div>
+    <div class="stack-desc">All shell commands auto-compressed. Git, tests, linters, ls — all trimmed.</div>
+    <div class="stack-saves">60–92% on CLI</div>
+  </div>
+  <div class="stack-arrow">↓</div>
+  <div class="stack-row">
+    <div class="stack-step" style="background:rgba(192,132,252,.15);color:var(--purple)">4</div>
+    <div class="stack-tool" style="color:var(--purple)">Repomix</div>
+    <div class="stack-desc">For whole-codebase tasks, pack and isolate into a subagent. Summary returns.</div>
+    <div class="stack-saves">~40% vs. naive</div>
+  </div>
+  <div class="stack-arrow">↓</div>
+  <div class="stack-row">
+    <div class="stack-step" style="background:rgba(99,102,241,.15);color:var(--accent)">5</div>
+    <div class="stack-tool" style="color:#a5b4fc">LLMLingua</div>
+    <div class="stack-desc">For RAG or long retrieved docs, compress before injecting into context.</div>
+    <div class="stack-saves">4–20× on RAG</div>
+  </div>
+  <div class="stack-arrow">↓</div>
+  <div class="stack-row">
+    <div class="stack-step" style="background:rgba(245,158,11,.15);color:var(--yellow)">6</div>
+    <div class="stack-tool" style="color:var(--yellow)">Caveman</div>
+    <div class="stack-desc">During iteration, compress Claude's output tokens. Switch off for final deliverables.</div>
+    <div class="stack-saves">~75% output</div>
+  </div>
+</div>
+
+<div class="callout insight">
+  <div class="callout-label">The Compound Effect</div>
+  RTK alone on a 30-minute session: 118k → 24k tokens (80% saved). Add Graphify for codebase navigation and LSP for symbol lookups, and the same session might run on 8k–12k tokens. These savings aren't additive — they're multiplicative, because each tool prevents a category of bloat that would otherwise compound across turns.
+</div>
+
+<!-- ── TOOL SELECTION ──────────────────────────────────────── -->
+<h2>Choosing the Right Tool</h2>
+<table>
+  <tr><th>Your situation</th><th>Reach for</th></tr>
+  <tr><td>Shell commands dump verbose output into context</td><td><strong>RTK</strong> — install once, works everywhere</td></tr>
+  <tr><td>Claude keeps reading whole files to understand the codebase</td><td><strong>Graphify</strong> — index once, query always</td></tr>
+  <tr><td>Claude uses grep loops to find function definitions</td><td><strong>LSP</strong> — compiler-accurate, single query</td></tr>
+  <tr><td>RAG pipeline: retrieved docs are too long</td><td><strong>LLMLingua</strong> — surgical token removal</td></tr>
+  <tr><td>Whole-repo analysis task: would fill the main session</td><td><strong>Repomix</strong> + Isolate into a subagent</td></tr>
+  <tr><td>Iterating fast, don't need prose responses</td><td><strong>Caveman</strong> — toggle /caveman on</td></tr>
+  <tr><td>Cost is fine, but context runs out on long tasks</td><td><strong>RTK + Graphify</strong> — prevent context debt</td></tr>
+</table>
+
+<!-- ── QUIZ ──────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">Claude is running a test suite with 200 failing tests. The output floods the context (15,000 tokens of stack traces). You only need to know which tests failed and why. Which tool is the right first fix?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">A</div><div><strong>RTK</strong> — it compresses test runner output automatically, collapsing 200 failures to a grouped summary</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">B</div><div><strong>Graphify</strong> — index the test files so Claude can query which ones fail</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div><strong>LLMLingua</strong> — compress the test output with a small model</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div><strong>Repomix</strong> — pack the test files and analyze them in a subagent</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">RTK is built exactly for this. It intercepts test runner output (pytest, cargo test, go test, Jest) and compresses it using grouping and deduplication — similar failures are collapsed with a count. A 15,000-token output becomes a 500-token summary of unique failure types and affected tests. Install RTK once; it handles this automatically every time.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">RTK is the right tool here. It natively compresses test runner output — grouping similar failures, deduplicating stack traces, retaining only the distinct error messages. A 200-failure test run that would dump 15k tokens becomes a clean 500-token summary. Graphify indexes code structure, not runtime output; LLMLingua works on text but isn't a transparent proxy; Repomix packs files, not output.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">You're working on a 200k-LOC codebase. Every time you ask Claude to understand a module's dependencies, it reads 10–15 files (8,000+ tokens per task). What's the right fix?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div><strong>RTK</strong> — compress the file reads before they land in context</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">B</div><div><strong>Caveman mode</strong> — reduce Claude's response tokens so there's more room for file reads</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">C</div><div><strong>Graphify</strong> — index the codebase once; Claude queries the graph instead of reading files</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div><strong>LLMLingua</strong> — compress each file before Claude reads it</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Graphify solves the root cause: Claude reads many files because it has no map of the codebase. Graphify gives it a map — an AST-level knowledge graph it can query with natural language. A dependency question that required reading 10 files (8k tokens) becomes a graph query returning a precise subgraph (2k tokens). The graph is built once and persists across all sessions. RTK helps with CLI output, not file reads; Caveman only affects output tokens; LLMLingua isn't designed for per-file compression in a coding loop.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Graphify is the right fix. The root cause is Claude having no map of the codebase — it reads files because it has to explore. Graphify provides an AST-level knowledge graph. Claude queries the graph ("what does AuthModule depend on?") and gets a precise subgraph answer without reading any source files. Built once, used in every session.</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">You have a RAG pipeline that retrieves 5 long documentation pages per query (total ~20,000 tokens). Only ~3,000 tokens are actually relevant to the question. Which tool surgically removes the irrelevant parts?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">A</div><div><strong>RTK</strong> — it compresses document output like it compresses CLI output</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">B</div><div><strong>Repomix</strong> — pack the docs and analyze in a subagent</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">C</div><div><strong>LLMLingua</strong> — uses a small model to remove low-perplexity tokens, preserving meaning at 4–20× compression</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">D</div><div><strong>Graphify</strong> — index the docs as a knowledge graph first</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">LLMLingua is designed precisely for this. It runs a small model over the retrieved docs and identifies tokens that, if removed, wouldn't change the large model's answer. It's not summarization — the remaining tokens are the original tokens, just with the low-value ones surgically removed. 20k tokens of docs → 1k–5k tokens with the relevant content intact. In production RAG pipelines, LLMLingua has been shown to cut costs 60–94% with minimal quality loss.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">LLMLingua is the right tool for this specific scenario. It performs surgical token removal on text — guided by a small model's perplexity scores, not summarization rules. The result is a shorter version of the same docs with the low-value tokens deleted. RTK handles CLI output, not documents; Repomix packs codebases; Graphify indexes code structure. LLMLingua is the only tool in this list that performs information-theoretic compression on arbitrary text.</div>
+</div>
+
+<!-- ── WHAT TO HOLD ON TO ─────────────────────────────────── -->
+<h2>What to Hold Onto</h2>
+<ol style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem">
+  <li><strong>RTK</strong> — install it now and restart Claude Code. Immediate 60–90% savings on every CLI command, zero configuration needed beyond <code>rtk init -g</code>.</li>
+  <li><strong>Graphify</strong> — the highest-leverage tool for large codebases. One index run; every future session benefits. Add the query instruction to CLAUDE.md.</li>
+  <li><strong>LSP</strong> — replace grep loops with compiler-accurate symbol queries. 80–95% savings on navigation tasks.</li>
+  <li><strong>LLMLingua</strong> — purpose-built for RAG token bloat. Not useful outside retrieval pipelines, but essential inside them.</li>
+  <li><strong>Repomix</strong> — the right pairing with the Isolate strategy. Pack → subagent → summary. Never put a full repo in the main session.</li>
+  <li><strong>Caveman</strong> — a built-in skill. Use during fast iteration loops; turn off for any deliverable output.</li>
+</ol>
+
+<div class="callout" style="margin-top:2.5rem">
+  <div class="callout-label">Start Here</div>
+  The fastest ROI: <strong>install RTK first</strong> (<code>brew install rtk &amp;&amp; rtk init -g</code>), then run <strong>Graphify</strong> on your project (<code>npx graphify index</code>) and add the query instruction to your CLAUDE.md. These two changes alone will cut most sessions by 70–80%.
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want to see RTK compression on a specific command? Ask: "run <code>git log --oneline -20</code> with and without RTK so I can see the difference." Or ask which tool to reach for based on a specific context-bloat problem you're seeing.</p>
+</div>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://aalmada.github.io/posts/Reducing-Token-Usage-in-Code-Agents/">Antão Almada — Reducing Token Usage in Code Agents with RTK, Graphify, Caveman, and LSP</a></li>
+  <li><a href="https://github.com/rtk-ai/rtk">RTK — GitHub (CLI proxy, 60–90% token reduction)</a></li>
+  <li><a href="https://www.rtk-ai.app/">RTK official site — setup guide and command reference</a></li>
+  <li><a href="https://graphify.net/">Graphify — Open-Source Knowledge Graph for AI Coding Assistants</a></li>
+  <li><a href="https://tokenmix.ai/blog/llmlingua-prompt-compression-2026">TokenMix — LLMLingua 2026: 20x Prompt Compression</a></li>
+  <li><a href="https://techsy.io/en/blog/best-context-engineering-tools">techsy.io — Context Engineering 2026: 8 Tools to Stop Token Bloat</a></li>
+  <li><a href="https://arxiv.org/pdf/2310.06839">arXiv — LongLLMLingua: Accelerating LLMs in Long Context Scenarios</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 11 of 12 · Context &amp; Harness Engineering</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/3*100)+'%';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 13: Loop Engineering</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  /* Quote block */
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  /* Component cards */
+  .component-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+  .component-card{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .component-header{display:flex;align-items:center;gap:.6rem;padding:.7rem 1rem;border-bottom:1px solid var(--border);background:var(--surface)}
+  .component-num{width:1.6rem;height:1.6rem;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:700;flex-shrink:0;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .component-name{font-weight:700;font-size:.9rem}
+  .component-body{padding:.85rem 1rem;font-size:.83rem;color:var(--text)}
+  .component-maps{margin-top:.5rem;font-size:.75rem;color:var(--green);font-family:var(--mono)}
+  /* Loop anatomy diagram */
+  .loop-diagram{display:flex;flex-direction:column;gap:.3rem;margin:1.5rem 0}
+  .loop-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:.83rem}
+  .loop-icon{width:1.75rem;height:1.75rem;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;font-family:var(--mono);font-weight:700}
+  .loop-desc{color:var(--muted);font-size:.82rem;flex:1}
+  .loop-arrow{color:var(--border);font-size:.85rem;text-align:center;padding:.05rem}
+  /* Phased rollout */
+  .phase-track{display:flex;gap:.75rem;margin:1.5rem 0;flex-wrap:wrap}
+  .phase{flex:1;min-width:200px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .phase-header{padding:.6rem 1rem;font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:.5rem}
+  .phase.l1 .phase-header{background:var(--green-dim);color:var(--green)}
+  .phase.l2 .phase-header{background:var(--yellow-dim);color:var(--yellow)}
+  .phase.l3 .phase-header{background:var(--red-dim);color:var(--red)}
+  .phase-body{padding:.85rem 1rem;font-size:.82rem;color:var(--muted)}
+  /* Quiz */
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+  @media(max-width:640px){.component-grid,.phase-track{grid-template-columns:1fr;flex-direction:column}}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 13</span>
+  <span class="tag green">Loop Engineering</span>
+  <span class="tag orange">Automation</span>
+  <span class="tag yellow">~30 min</span>
+</div>
+
+<h1>Loop Engineering</h1>
+<p class="subtitle">The shift from writing prompts to designing the systems that write prompts for you.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- ── THE SHIFT ────────────────────────────────────────────── -->
+<h2>The Shift</h2>
+
+<p>Every lesson so far has assumed a human in the loop: you type a prompt, Claude responds, you read it, you type the next prompt. That's the unit of interaction this whole curriculum has been built around.</p>
+
+<p>Loop engineering is the name for what happens when you stop being that person. Instead of prompting the agent yourself, you design a system — a loop — that prompts the agent on a schedule, checks its work, and only surfaces results when something needs your judgment.</p>
+
+<div class="quote">
+  "I don't prompt Claude anymore. I have loops running that prompt Claude."
+  <span class="quote-attr">— Boris Cherny, Anthropic (Claude Code lead)</span>
+</div>
+
+<div class="quote">
+  "Build the loop. But build it like someone who intends to stay the engineer, not just the person who presses go."
+  <span class="quote-attr">— Addy Osmani, <a href="https://addyosmani.com/blog/loop-engineering/">Loop Engineering</a></span>
+</div>
+
+<p>The term was popularized in mid-2026 by Addy Osmani, echoing a line from Peter Steinberger: "you should be designing loops that prompt your agents." The leverage point moves from <em>crafting individual prompts</em> to <em>designing the control system that generates prompts over time</em>.</p>
+
+<!-- ── RALPH LOOP ORIGIN ───────────────────────────────────── -->
+<h2>Where It Started: The Ralph Loop</h2>
+
+<p>You met "Ralph Loops" briefly in Lesson 9 as a multi-session continuation pattern. The full story: in July 2025, engineer Geoffrey Huntley documented what he called the "Ralph Wiggum loop" — named after the <em>Simpsons</em> character known for confidently wrong answers.</p>
+
+<p>The pattern is deceptively simple: <code>while true; do claude -p "your prompt"; done</code> — a bash loop that keeps invoking an agent against the same goal, with state persisted to disk between iterations (since each invocation gets a fresh context).</p>
+
+<div class="callout warning">
+  <div class="callout-label">The Ralph Wiggum Failure Mode</div>
+  Huntley's namesake failure: an agent instructed to emit a "done" token only when the task is complete instead emits it early — on a half-finished job. The loop exits, declares victory, and the work is wrong. <strong>This is the central risk of all loop engineering</strong>: a loop that checks its own work using the same model that did the work will rubber-stamp itself. Every pattern below exists to prevent this.
+</div>
+
+<!-- ── SIX COMPONENTS ──────────────────────────────────────── -->
+<h2>The Six Components of a Loop</h2>
+
+<p>Osmani breaks a production loop into six parts. If this list feels familiar, it should — <strong>every component maps directly onto a harness layer or strategy you already know</strong>. Loop engineering doesn't introduce new primitives; it arranges the ones from Lessons 1–12 into a system that runs without you.</p>
+
+<div class="component-grid">
+  <div class="component-card">
+    <div class="component-header"><div class="component-num">1</div><div class="component-name">Automations</div></div>
+    <div class="component-body">
+      Scheduled tasks that discover and triage work independently — the "heartbeat" of the loop. Runs on a cadence (every 5 minutes, daily, hourly) without manual prompting.
+      <div class="component-maps">↳ Maps to: ScheduleWakeup / CronCreate / /loop</div>
+    </div>
+  </div>
+  <div class="component-card">
+    <div class="component-header"><div class="component-num">2</div><div class="component-name">Worktrees</div></div>
+    <div class="component-body">
+      Isolated working directories so parallel agents don't overwrite each other's changes. Solves "two agents writing the same file."
+      <div class="component-maps">↳ Maps to: Isolate strategy (Lesson 8/9)</div>
+    </div>
+  </div>
+  <div class="component-card">
+    <div class="component-header"><div class="component-num">3</div><div class="component-name">Skills</div></div>
+    <div class="component-body">
+      Reusable instruction sets (<code>SKILL.md</code>) encoding project knowledge, so the loop doesn't "re-derive your whole project from zero every cycle."
+      <div class="component-maps">↳ Maps to: Layer 4 — Skills (Lesson 3)</div>
+    </div>
+  </div>
+  <div class="component-card">
+    <div class="component-header"><div class="component-num">4</div><div class="component-name">Connectors</div></div>
+    <div class="component-body">
+      MCP-based integrations to issue trackers, databases, Slack, CI — letting loops "act inside your actual environment," not just read/write local files.
+      <div class="component-maps">↳ Maps to: Layer 3 — MCP servers (Lesson 6)</div>
+    </div>
+  </div>
+  <div class="component-card">
+    <div class="component-header"><div class="component-num">5</div><div class="component-name">Sub-agents</div></div>
+    <div class="component-body">
+      Separate agents with different instructions, splitting drafting from verification. Prevents "the model that wrote the code" from grading its own work — the direct fix for the Ralph Wiggum failure mode.
+      <div class="component-maps">↳ Maps to: Subagents / EPCR pattern (Lesson 9)</div>
+    </div>
+  </div>
+  <div class="component-card">
+    <div class="component-header"><div class="component-num">6</div><div class="component-name">State / Memory</div></div>
+    <div class="component-body">
+      Persistent markdown files (<code>STATE.md</code>) or external boards tracking progress across runs. "The model forgets, the repo doesn't."
+      <div class="component-maps">↳ Maps to: Layer 6 — Memory + Write strategy (Lesson 5)</div>
+    </div>
+  </div>
+</div>
+
+<div class="callout insight">
+  <div class="callout-label">Insight</div>
+  This is why Lessons 1–12 weren't wasted effort even if you never run an unattended loop. A loop is just these six harness components wired together with a scheduler. If any one of them is weak — vague skills, no isolation, no separate verifier — the loop inherits that weakness and runs it on autopilot, at scale, while you're not watching.
+</div>
+
+<!-- ── LOOP ANATOMY ────────────────────────────────────────── -->
+<h2>Anatomy of One Loop Iteration</h2>
+
+<div class="loop-diagram">
+  <div class="loop-row">
+    <div class="loop-icon" style="background:rgba(99,102,241,.15);color:var(--accent)">1</div>
+    <div><strong>Trigger fires</strong></div>
+    <div class="loop-desc">Cron schedule, /loop interval, or webhook from a connector (new PR, failed build)</div>
+  </div>
+  <div class="loop-arrow">↓</div>
+  <div class="loop-row">
+    <div class="loop-icon" style="background:rgba(34,197,94,.15);color:var(--green)">2</div>
+    <div><strong>Read state</strong></div>
+    <div class="loop-desc">Loop loads STATE.md / run log — what happened last time, what's still open</div>
+  </div>
+  <div class="loop-arrow">↓</div>
+  <div class="loop-row">
+    <div class="loop-icon" style="background:rgba(251,146,60,.15);color:var(--orange)">3</div>
+    <div><strong>Maker agent works</strong></div>
+    <div class="loop-desc">In an isolated worktree, using project skills, with MCP connectors for external actions</div>
+  </div>
+  <div class="loop-arrow">↓</div>
+  <div class="loop-row">
+    <div class="loop-icon" style="background:rgba(239,68,68,.15);color:var(--red)">4</div>
+    <div><strong>Checker agent verifies</strong></div>
+    <div class="loop-desc">A <em>different</em> agent (or different prompt/context) reviews the maker's output against the goal</div>
+  </div>
+  <div class="loop-arrow">↓</div>
+  <div class="loop-row">
+    <div class="loop-icon" style="background:rgba(192,132,252,.15);color:var(--purple)">5</div>
+    <div><strong>Write state, decide</strong></div>
+    <div class="loop-desc">Update STATE.md. If done → notify human / open PR. If not → loop again. If risky → human gate.</div>
+  </div>
+</div>
+
+<!-- ── SIX PATTERNS ────────────────────────────────────────── -->
+<h2>Six Production Patterns</h2>
+
+<p>From <a href="https://github.com/cobusgreyling/loop-engineering">cobusgreyling/loop-engineering</a> — a practical reference inspired by Osmani and Cherny. These are starting points, roughly ordered by cost and risk.</p>
+
+<table>
+  <tr>
+    <th>Pattern</th>
+    <th>Cadence</th>
+    <th>Cost</th>
+    <th>What it does</th>
+  </tr>
+  <tr>
+    <td><strong>Daily Triage</strong></td>
+    <td>Once/day</td>
+    <td>Low (L1, report-only)</td>
+    <td>Scans for new issues, failing tests, stale PRs. Produces a summary report — no changes made.</td>
+  </tr>
+  <tr>
+    <td><strong>PR Babysitter</strong></td>
+    <td>Every 5–15 min</td>
+    <td>Low–medium</td>
+    <td>Watches open PRs for CI failures or review comments, responds or fixes within scope.</td>
+  </tr>
+  <tr>
+    <td><strong>CI Sweeper</strong></td>
+    <td>On build failure</td>
+    <td>Very high</td>
+    <td>Diagnoses and fixes broken builds. High cost because failures can cascade into long debugging loops.</td>
+  </tr>
+  <tr>
+    <td><strong>Dependency Sweeper</strong></td>
+    <td>Weekly</td>
+    <td>Medium</td>
+    <td>Updates dependencies, patch-only by default for safety. Opens PRs for review.</td>
+  </tr>
+  <tr>
+    <td><strong>Changelog Drafter</strong></td>
+    <td>Per release</td>
+    <td>Low (L1, draft-only)</td>
+    <td>Generates release notes from merged PRs / commit history. Always human-reviewed before publishing.</td>
+  </tr>
+  <tr>
+    <td><strong>Post-Merge Cleanup</strong></td>
+    <td>Off-peak, daily</td>
+    <td>Low</td>
+    <td>Removes merged branches, updates local caches, housekeeping that doesn't touch source.</td>
+  </tr>
+</table>
+
+<!-- ── PHASED ROLLOUT ──────────────────────────────────────── -->
+<h2>The Phased Rollout: L1 → L2 → L3</h2>
+
+<p>Don't deploy a loop at full autonomy on day one. The recommended progression de-risks by building trust in stages:</p>
+
+<div class="phase-track">
+  <div class="phase l1">
+    <div class="phase-header">L1 — Report Only</div>
+    <div class="phase-body">The loop runs, investigates, and writes a report. It makes <strong>zero changes</strong>. You read the report and decide what (if anything) to act on. This is where every new loop starts.</div>
+  </div>
+  <div class="phase l2">
+    <div class="phase-header">L2 — Assisted Fixes</div>
+    <div class="phase-body">The loop proposes changes — opens a PR, drafts a fix — but does not merge or push to protected branches. A human reviews and approves before anything lands.</div>
+  </div>
+  <div class="phase l3">
+    <div class="phase-header">L3 — Unattended</div>
+    <div class="phase-body">The loop acts autonomously within a tightly scoped allowlist (e.g., patch-only dependency bumps, formatting fixes). Reserved for low-risk, high-confidence, narrow-scope tasks only — after L1/L2 have proven the loop's judgment.</div>
+  </div>
+</div>
+
+<div class="callout warning">
+  <div class="callout-label">Two Risks That Don't Go Away</div>
+  <ul style="margin-bottom:0">
+    <li><strong>Comprehension debt</strong> — code shipped by a loop that no one on the team has read. It accumulates silently and becomes a liability the first time it needs to change.</li>
+    <li><strong>Cognitive surrender</strong> — accepting loop output without judgment because it's usually right. The loop amplifies whatever judgment you bring to it, including the absence of judgment.</li>
+  </ul>
+</div>
+
+<!-- ── PRACTICAL: YOUR TOOLS ───────────────────────────────── -->
+<h2>Building a Loop With Your Current Tools</h2>
+
+<p>You don't need new infrastructure — the components map onto tools already available in this environment:</p>
+
+<table>
+  <tr>
+    <th>Component</th>
+    <th>Your tool</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td>Automation / scheduling</td>
+    <td><code>/loop</code> skill, <code>ScheduleWakeup</code>, <code>CronCreate</code></td>
+    <td><code>/loop 15m /check-prs</code> for fixed cadence; omit interval to let the model self-pace via ScheduleWakeup</td>
+  </tr>
+  <tr>
+    <td>Worktrees</td>
+    <td><code>Agent(isolation: "worktree")</code></td>
+    <td>Each spawned agent gets a clean git worktree, auto-cleaned if no changes made</td>
+  </tr>
+  <tr>
+    <td>Skills</td>
+    <td><code>.claude/skills/*.md</code></td>
+    <td>Encode the loop's repeatable procedure once, reference by name in the loop prompt</td>
+  </tr>
+  <tr>
+    <td>Connectors</td>
+    <td>MCP servers (GitHub, Linear, Slack, etc.)</td>
+    <td>Already configured in this session — <code>plugin_engineering_github</code>, <code>plugin_design_linear</code>, etc.</td>
+  </tr>
+  <tr>
+    <td>Sub-agents (maker/checker)</td>
+    <td><code>Agent</code> tool with different <code>subagent_type</code></td>
+    <td>e.g., <code>general-purpose</code> agent makes the change, separate <code>code-review</code> skill checks it</td>
+  </tr>
+  <tr>
+    <td>State / memory</td>
+    <td>A <code>STATE.md</code> in the project, or the memory system from Lesson 5</td>
+    <td>Write progress + open questions at the end of every iteration</td>
+  </tr>
+</table>
+
+<pre>
+<span class="pre-label">Example — minimal L1 daily triage loop</span><span class="comment"># Start it (self-paced, checks back when done):</span>
+/loop Check for new failing tests in tests/, write a one-paragraph
+summary to STATE.md, do NOT fix anything yet.
+
+<span class="comment"># Inside the loop, the agent should:</span>
+<span class="comment"># 1. Read STATE.md for what was true last run</span>
+<span class="comment"># 2. Run the test suite (compressed via RTK — Lesson 11)</span>
+<span class="comment"># 3. Diff against last run's failures</span>
+<span class="comment"># 4. Append findings to STATE.md</span>
+<span class="comment"># 5. ScheduleWakeup for the next check (1200-1800s for idle ticks)</span></pre>
+
+<div class="callout key">
+  <div class="callout-label">Start at L1, always</div>
+  Your first loop should write a report and do nothing else — even if the fix looks trivial. The point of L1 isn't the report; it's building a track record you can point to before you grant the loop write access. Every "L3 unattended" loop in production started as an L1 that ran for weeks first.
+</div>
+
+<!-- ── QUIZ ──────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">A loop is supposed to fix failing tests and exit only when all tests pass. Instead, it exits after one iteration, claiming success — but 12 tests still fail. What's this called, and what's the standard fix?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>"Comprehension debt" — the fix is to read the code more carefully before merging</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>The "Ralph Wiggum failure mode" — the fix is a separate checker sub-agent that verifies completion independently of the maker agent</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>"Cognitive surrender" — the fix is to stop using loops for test fixes entirely</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>A worktree collision — the fix is to isolate the loop in its own worktree</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. This is the namesake failure from Geoffrey Huntley's original Ralph Wiggum loop: the agent emits its "done" signal early, on a half-finished job, and the loop exits declaring victory on wrong work. The fix is structural, not about trying harder: a separate sub-agent (the "checker") verifies the maker's work using its own pass over the test suite, independent of whatever the maker agent claims. The model that wrote the code should never be the sole judge of whether it's done.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">This is the Ralph Wiggum failure mode — named after Huntley's original bash-loop agent that emitted a "done" token on a half-finished job. Comprehension debt and cognitive surrender are real risks but describe different problems (unread shipped code, and uncritical acceptance of correct-looking output). The fix here is structural: a separate checker sub-agent that independently verifies completion, so the maker can't grade its own homework.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">You want to set up a "Dependency Sweeper" loop that runs weekly. Per the phased rollout (L1 → L2 → L3), what should it do on its first run?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Update all dependencies to latest and run the test suite — if green, merge automatically</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">B</div><div>Open a PR with patch-level updates only, and wait for human approval before merging</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">C</div><div>Scan for available updates and write a report — make zero changes to any files</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Skip straight to L3 since dependency bumps are listed as a "low-risk" pattern</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct — every new loop starts at L1, regardless of how low-risk the pattern category seems. The first run should scan for available updates and write a report with zero file changes. This builds a track record: you see what the loop *would* do across several runs before granting it any write access. Only after L1 has run cleanly do you move to L2 (PR with human approval), and only after L2 has proven reliable do you consider L3 (patch-only, unattended) — and even then, "low-risk pattern" doesn't mean "skip the rollout," it means "this pattern is a *candidate* for eventually reaching L3."</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Every new loop starts at L1 — report only, zero changes — no matter how low-risk the pattern looks on paper. Dependency Sweeper being "medium cost / patch-only at L3" describes where it can *eventually* land, not where it starts. The first run should produce a report of available updates with no file changes, building a track record before any write access is granted.</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">Which of the six loop components did you NOT need to learn about in this lesson, because it was already fully covered by an earlier lesson's harness layer?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">A</div><div>Automations — this is new, covered by /loop and ScheduleWakeup</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">B</div><div>Skills, Connectors, Sub-agents, Worktrees, and State/Memory — these are Layer 4, Layer 3, Lesson 9's subagents, the Isolate strategy, and Layer 6/Write strategy respectively</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">C</div><div>None — all six components are entirely new concepts specific to loop engineering</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">D</div><div>Sub-agents only — the others are loop-specific infrastructure</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">Correct — five of the six components are direct applications of concepts from Lessons 1–12: Skills (Layer 4), Connectors (Layer 3 / MCP), Sub-agents (Lesson 9's maker/checker pattern), Worktrees (the Isolate strategy), and State/Memory (Layer 6 + Write strategy). The only genuinely new piece is Automations — the scheduling layer that turns a one-shot harness into a recurring one. Loop engineering's contribution isn't new primitives; it's the realization that a well-built harness, given a heartbeat, becomes a system that runs without you.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">Five of the six components — Skills, Connectors, Sub-agents, Worktrees, State/Memory — map directly onto harness layers and strategies from Lessons 1–12. Only Automations (the scheduling/heartbeat layer) is new. This is the core insight of the lesson: loop engineering doesn't require new primitives, just a scheduler wrapped around a harness you already know how to build.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want to design a real loop for this project? Ask: "help me design an L1 daily-triage loop for [your repo] — what should it check, and what should STATE.md look like?" Or ask: "walk through what a maker/checker sub-agent split would look like for [a specific task]."</p>
+</div>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://addyosmani.com/blog/loop-engineering/">Addy Osmani — Loop Engineering</a></li>
+  <li><a href="https://addyo.substack.com/p/loop-engineering">Addy Osmani — Loop Engineering (Substack/Elevate)</a></li>
+  <li><a href="https://github.com/cobusgreyling/loop-engineering">cobusgreyling/loop-engineering — practical patterns, starters, and checklists</a></li>
+  <li><a href="https://cobusgreyling.medium.com/loop-engineering-playbook-4460e01e88d8">Cobus Greyling — Loop Engineering Playbook</a></li>
+  <li><a href="https://lushbinary.com/blog/loop-engineering-ai-coding-agents-guide/">Lushbinary — Loop Engineering: The Guide for AI Agents</a></li>
+  <li><a href="https://explainx.ai/blog/loop-engineering-coding-agents-claude-code-guide-2026">explainx.ai — Loop Engineering: Coding Agent Loops That Run While You Sleep</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 13 of 13 · Context &amp; Harness Engineering</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/3*100)+'%';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 4: CLAUDE.md — The Project Knowledge Layer</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:780px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}.tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .prop{color:#a5b4fc}.string{color:#86efac}.comment{color:#4b5563}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.87rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  .good-bad{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0 1.5rem}
+  .good-bad-col{border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .good-bad-header{padding:.5rem 1rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+  .good-bad-header.good{background:var(--green-dim);color:var(--green)}.good-bad-header.bad{background:var(--red-dim);color:var(--red)}
+  .good-bad-body{padding:.75rem 1rem;font-size:.85rem;color:var(--muted);display:flex;flex-direction:column;gap:.4rem}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+<div class="lesson-meta">
+  <span class="tag">Lesson 4</span>
+  <span class="tag green">Harness Layer 1</span>
+  <span class="tag yellow">~15 min</span>
+</div>
+<h1>CLAUDE.md</h1>
+<p class="subtitle">The always-loaded project knowledge layer. What to put in, what to leave out, and how to write it well.</p>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<h2>What CLAUDE.md Is</h2>
+<p>CLAUDE.md is a Markdown file that Claude Code reads at the start of every session. It's layer 1 of the harness — the foundation of project-specific knowledge. Everything in it lands in Claude's context window before you type your first message.</p>
+<p>It's the <strong>Write strategy</strong> applied to project rules: you write the knowledge once, the harness injects it every session.</p>
+
+<div class="callout key">
+  <div class="callout-label">Key Distinction</div>
+  CLAUDE.md is for knowledge Claude <em>can't derive</em> from reading the code — your WHY, your constraints, your conventions, your workflow commands. Don't use it to describe what's already obvious from the files.
+</div>
+
+<h2>Where Claude Looks</h2>
+<p>Claude Code loads CLAUDE.md files from multiple locations, stacking them:</p>
+<table>
+  <tr><th>Location</th><th>Scope</th><th>Use for</th></tr>
+  <tr><td><code>~/.claude/CLAUDE.md</code></td><td>Global — every project</td><td>Your personal preferences, always-true rules, identity</td></tr>
+  <tr><td><code>/project/CLAUDE.md</code></td><td>Project root</td><td>Project structure, commands, conventions, team rules</td></tr>
+  <tr><td><code>/project/src/CLAUDE.md</code></td><td>Subdirectory</td><td>Rules specific to one subsystem (e.g. "this dir is read-only")</td></tr>
+</table>
+<p>They're all loaded and concatenated. More specific files (deeper in the directory tree) can override or extend the root file.</p>
+
+<h2>What Belongs in CLAUDE.md</h2>
+<p>Your existing CLAUDE.md is a strong example. Here's the principle behind each section type:</p>
+
+<div class="good-bad">
+  <div class="good-bad-col">
+    <div class="good-bad-header good">Include</div>
+    <div class="good-bad-body">
+      <span>Run commands (<code>npm start</code>, <code>npm test</code>)</span>
+      <span>Project structure that's non-obvious from files</span>
+      <span>Naming conventions (camelCase, UPPER_CASE)</span>
+      <span>Security rules ("never commit .env")</span>
+      <span>Architectural constraints ("use CommonJS, not ESM")</span>
+      <span>Workflow steps (branch → test → lint → push)</span>
+      <span>External docs links (framework docs, test runner docs)</span>
+      <span>What NOT to do (anti-patterns specific to this codebase)</span>
+    </div>
+  </div>
+  <div class="good-bad-col">
+    <div class="good-bad-header bad">Exclude</div>
+    <div class="good-bad-body">
+      <span>Things derivable from reading the code</span>
+      <span>Git history / recent changes</span>
+      <span>In-progress task state</span>
+      <span>Long lists of every file and what it does</span>
+      <span>Generic best practices Claude already knows</span>
+      <span>Things that change frequently (put those in memory)</span>
+    </div>
+  </div>
+</div>
+
+<h2>Token Cost Is Real</h2>
+<p>Every byte of CLAUDE.md costs tokens on every message. A 500-token CLAUDE.md injected into a 50-session project costs 25,000 tokens just in overhead — before any actual work. This is why you should:</p>
+<ul>
+  <li>Keep CLAUDE.md focused and scannable</li>
+  <li>Move project-state information to memory files (they're selected, not always-loaded)</li>
+  <li>Use subdirectory CLAUDE.md files to scope rules that only apply in one area</li>
+</ul>
+
+<div class="callout insight">
+  <div class="callout-label">Insight: CLAUDE.md is a Write + Select Tradeoff</div>
+  CLAUDE.md is a pure Write operation — it's always injected. Memory files are Write + Select — written once, loaded only when relevant. For stable, always-needed rules: CLAUDE.md. For project state that changes: memory.
+</div>
+
+<h2>A Well-Structured CLAUDE.md Section</h2>
+<p>Compare these two ways of describing the same thing:</p>
+
+<pre>
+<span class="pre-label">WEAK — too vague</span><span class="comment">## Code Style
+Use good naming conventions and follow best practices.
+Make sure tests pass before committing.</span>
+</pre>
+
+<pre>
+<span class="pre-label">STRONG — specific and actionable</span><span class="comment">## Code Style
+- Files: camelCase.js  |  Functions: camelCase()  |  Constants: UPPER_CASE  |  Classes: PascalCase
+- No comments unless the WHY is non-obvious — never describe WHAT the code does
+- No trailing console.log() or debug statements in committed code
+
+## Before Every Commit
+Run in order: npm run lint && npm run test
+Both must pass. If either fails, fix before committing — never use --no-verify.</span>
+</pre>
+
+<p>The strong version gives Claude exact rules to follow. Claude can check against them. The weak version gives Claude room to guess — and guessing leads to inconsistency.</p>
+
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">Your project is moving from CommonJS (<code>require()</code>) to ESM (<code>import</code>). Where should you document this migration plan?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>CLAUDE.md — update the module format rule immediately</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Memory file (project type) — it's an ongoing project state, not a stable rule</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>A skill file — make a <code>/migrate-esm</code> skill</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>A comment in package.json</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">A migration is project state — it has a beginning, middle, and end. Memory files are right for this: they capture current state, can be updated as the migration progresses, and won't bloat CLAUDE.md with something temporary. Once migration is done, update CLAUDE.md to say "use ESM" and delete the memory entry.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Migrations are temporary project state — they belong in a memory file, not CLAUDE.md. CLAUDE.md is for stable, long-term rules. Memory files track current state and can be updated or deleted when things change.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">You have a complex authentication module at <code>src/auth/</code> with unusual invariants Claude keeps violating. What's the most targeted fix?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Add a long explanation to the root CLAUDE.md</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Create <code>src/auth/CLAUDE.md</code> with rules specific to that module</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Write a PreToolUse hook that fires whenever Claude touches auth files</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Repeat the rules in every prompt you send</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Subdirectory CLAUDE.md files scope rules to where they're relevant. Claude loads src/auth/CLAUDE.md when working in that directory, and only then — keeping the root CLAUDE.md clean and focused. This is the Isolate strategy applied to context: only load auth-specific rules when working on auth.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">A subdirectory CLAUDE.md at src/auth/CLAUDE.md is the right tool. It scopes auth-specific rules to just that module. The root CLAUDE.md doesn't get bloated, and Claude only loads the auth rules when actually working in that directory.</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">CLAUDE.md says "always use camelCase for function names." Claude writes a function called <code>calculate_rsi_score</code>. Which is most likely true?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">A</div><div>CLAUDE.md was not loaded — the rule wasn't injected</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">B</div><div>The model doesn't follow CLAUDE.md rules reliably enough to trust</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">C</div><div>CLAUDE.md is too long — the rule got buried and lost weight in the context window</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">D</div><div>The rule was ambiguous and Claude interpreted it differently</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">Context window attention degrades for information buried in long documents — the "lost in the middle" problem. If CLAUDE.md is bloated with non-essential content, important rules lose weight. The fix: keep CLAUDE.md focused and short so every rule stays salient. Long CLAUDE.md files are often worse than short ones.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">This is likely the "lost in the middle" problem — when CLAUDE.md gets long, rules buried in the middle lose attention weight. The model loaded it, but the rule didn't stay salient. Keep CLAUDE.md short and focused so every rule carries weight.</div>
+</div>
+
+<h2>What to Hold Onto</h2>
+<ol style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem">
+  <li><strong>CLAUDE.md = always-loaded Write operation.</strong> Every token costs. Keep it focused on what's non-derivable and stable.</li>
+  <li><strong>Three levels: global → project root → subdirectory.</strong> Use subdirectory CLAUDE.md files to scope rules to where they matter.</li>
+  <li><strong>Specific beats vague.</strong> Give Claude exact rules it can check against, not principles it has to interpret.</li>
+  <li><strong>Short beats long.</strong> A 200-token CLAUDE.md where every rule is salient beats a 2000-token one where important rules get lost.</li>
+</ol>
+
+<div class="callout" style="margin-top:2.5rem">
+  <div class="callout-label">Next Lesson</div>
+  <strong>Lesson 5: Memory — Cross-Session Persistence</strong><br>
+  <span style="color:var(--muted);font-size:.9rem">The memory file system: types, structure, when to write, when not to. How to make Claude remember things that matter across sessions.</span>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want feedback on your existing CLAUDE.md? Ask Claude to review it against the criteria in this lesson. Or ask what's missing that would make it more effective.</p>
+</div>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://hidekazu-konishi.com/entry/claude_code_features_settings_reference_2026.html">hidekazu-konishi — Claude Code Features and Settings Reference 2026</a></li>
+  <li><a href="https://addyosmani.com/blog/agent-harness-engineering/">Addy Osmani — Agent Harness Engineering</a></li>
+  <li><a href="https://blog.logrocket.com/llm-context-problem-strategies-2026/">LogRocket — The LLM context problem: strategies for 2026</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 4 of 10 · Context &amp; Harness Engineering</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/3*100)+'%';
+}
+</script>
+</body>
+</html>

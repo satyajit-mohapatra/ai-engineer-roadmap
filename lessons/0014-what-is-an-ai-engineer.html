@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 14: What Is an AI Engineer</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .component-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+  .component-card{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .component-header{display:flex;align-items:center;gap:.6rem;padding:.7rem 1rem;border-bottom:1px solid var(--border);background:var(--surface)}
+  .component-num{width:1.6rem;height:1.6rem;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:700;flex-shrink:0;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .component-name{font-weight:700;font-size:.9rem}
+  .component-body{padding:.85rem 1rem;font-size:.83rem;color:var(--text)}
+  .component-maps{margin-top:.5rem;font-size:.75rem;color:var(--green);font-family:var(--mono)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+  @media(max-width:640px){.component-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 14</span>
+  <span class="tag green">Roadmap · Introduction</span>
+  <span class="tag orange">Foundations</span>
+  <span class="tag yellow">~12 min</span>
+</div>
+
+<h1>What Is an AI Engineer?</h1>
+<p class="subtitle">The first node of the roadmap — and the one that defines every lesson after it. Phase 2 of your curriculum starts here.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">Where you are</div>
+  Lessons 1–13 made you a <strong>harness engineer</strong> — you can make an AI agent reliable. From here, the <a href="https://roadmap.sh/ai-engineer">AI Engineer roadmap</a> widens the lens: you'll learn to <em>build AI-powered applications</em> against any model. This lesson is the map's legend.
+</div>
+
+<!-- ── DEFINITION ──────────────────────────────────────────── -->
+<h2>The Definition</h2>
+
+<p>An <strong>AI Engineer</strong> builds applications on top of <em>pre-trained</em> foundation models — they don't train the models from scratch. The job is to take a model someone else trained (GPT, Claude, Gemini, Llama) and turn it into a working product feature: a chatbot, a search system, an agent, a document summarizer.</p>
+
+<div class="quote">
+  "An AI Engineer uses pre-trained models and existing AI tools to improve products and solve real-world problems — rather than building models from the ground up."
+  <span class="quote-attr">— <a href="https://roadmap.sh/ai-engineer">roadmap.sh/ai-engineer</a></span>
+</div>
+
+<p>This is a relatively new role, made possible by the API era of LLMs. Before ~2023, "doing AI" meant collecting data, choosing architectures, and training. Now the capability is a phone call away — an HTTP request — and the hard part is <em>everything around the model</em>: prompts, context, retrieval, tools, evaluation, safety, cost.</p>
+
+<!-- ── AI ENG vs ML ENG ────────────────────────────────────── -->
+<h2>AI Engineer vs ML Engineer</h2>
+
+<table>
+  <tr><th>Dimension</th><th>AI Engineer</th><th>ML Engineer</th></tr>
+  <tr><td>Starts with</td><td>A pre-trained model + an API key</td><td>A dataset + a problem</td></tr>
+  <tr><td>Core work</td><td>Prompting, RAG, agents, tool use, evals, integration</td><td>Data pipelines, model architecture, training, tuning</td></tr>
+  <tr><td>Math depth</td><td>Conceptual — knows what embeddings <em>are</em></td><td>Deep — gradients, loss functions, optimization</td></tr>
+  <tr><td>Ships</td><td>AI <em>features</em> inside products</td><td>Models and the systems that train/serve them</td></tr>
+  <tr><td>Typical tool</td><td>OpenAI/Anthropic SDK, LangChain, a vector DB</td><td>PyTorch, scikit-learn, MLflow</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-label">The key distinction</div>
+  The ML Engineer asks <em>"how do I make a model that's good at X?"</em> The AI Engineer asks <em>"given models that are already good at many things, how do I compose them into a reliable product?"</em> You are firmly on the second path — and you've already mastered its hardest sub-discipline (the harness).
+</div>
+
+<!-- ── AI vs AGI ───────────────────────────────────────────── -->
+<h2>AI vs AGI — and why it matters to your job</h2>
+
+<p>Today's models are <strong>narrow AI</strong>: extraordinarily capable within the distribution of their training, but without genuine general reasoning or goals. <strong>AGI</strong> (Artificial General Intelligence) — a system that matches human flexibility across <em>any</em> task — does not exist as of 2026.</p>
+
+<p>Why this matters practically: every engineering decision you make assumes a model that is <em>powerful but bounded</em>. It will hallucinate, it has a knowledge cutoff, it has a context limit, it has no persistent memory unless you give it one. The entire discipline of AI engineering — RAG, tools, evals, the harness you already know — exists to <strong>work around the gap between narrow AI and AGI</strong>.</p>
+
+<!-- ── WHAT YOU'LL LEARN ───────────────────────────────────── -->
+<h2>The Roadmap Ahead (Phase 2)</h2>
+
+<p>The rest of this curriculum walks the roadmap's major branches. Here's the territory:</p>
+
+<div class="component-grid">
+  <div class="component-card"><div class="component-header"><div class="component-num">15</div><div class="component-name">How LLMs Work</div></div><div class="component-body">Tokens, transformers, training vs inference — the mental model under everything.</div></div>
+  <div class="component-card"><div class="component-header"><div class="component-num">16</div><div class="component-name">Choosing Models</div></div><div class="component-body">Open vs closed, model types, picking the right one for a task.</div></div>
+  <div class="component-card"><div class="component-header"><div class="component-num">17–18</div><div class="component-name">APIs &amp; Params</div></div><div class="component-body">Inference parameters; the OpenAI platform; calling models directly.</div></div>
+  <div class="component-card"><div class="component-header"><div class="component-num">19–20</div><div class="component-name">Prompting &amp; Safety</div></div><div class="component-body">Prompt-engineering techniques; AI safety, ethics, prompt injection.</div></div>
+  <div class="component-card"><div class="component-header"><div class="component-num">21–24</div><div class="component-name">The RAG Stack</div></div><div class="component-body">Open-source models, embeddings, vector DBs, retrieval-augmented generation.</div></div>
+  <div class="component-card"><div class="component-header"><div class="component-num">25–29</div><div class="component-name">Agents &amp; Beyond</div></div><div class="component-body">Agents/function-calling, multimodal AI, the provider landscape, fine-tuning, dev tools.</div></div>
+</div>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">A teammate says "we need an AI Engineer to improve our search." What is that person <em>most</em> likely to actually do, per the roadmap definition?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Collect a labeled dataset and train a new ranking model from scratch on it</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Wire an existing embedding model and vector store into the product to power semantic search</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Derive the transformer attention equations to optimize the search model's gradients</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Build a GPU training cluster and a data-labeling pipeline before writing any product code</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. The AI Engineer starts from pre-trained capabilities (an embedding model, a vector DB) and composes them into a feature. Options A, C, and D describe ML Engineering / research work — training and optimizing models, which is explicitly <em>not</em> the AI Engineer's primary job.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">The AI Engineer builds <em>on top of</em> pre-trained models. A, C, and D all describe ML Engineering — collecting data, deriving math, training models. The AI Engineer instead takes an existing embedding model + vector store and wires them into the product (option B).</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">Why does the fact that AGI doesn't exist yet directly shape the AI Engineer's daily work?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>It means models can be trusted to self-correct, so guardrails are unnecessary overhead</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Models are powerful but bounded — RAG, tools, memory, and evals exist to patch those bounds</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>It means AI Engineering is a temporary role that disappears the moment AGI arrives</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>It has no practical effect; AGI is a philosophy debate unrelated to shipping features</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. Today's narrow AI hallucinates, has a knowledge cutoff, a fixed context limit, and no built-in memory. Nearly every AI-engineering technique — retrieval, tool use, persistent memory, evaluation — is a deliberate workaround for one of those bounds. Knowing the bound tells you which technique to reach for.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">The practical link is that today's models are <em>bounded</em> — they hallucinate, have cutoffs, limited context, no memory. The whole AI-engineering toolkit (RAG, tools, memory, evals) exists to work around those bounds. That's option B; the others either over-trust the model or dismiss the connection.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Curious where your trading-analysis work fits on the AI Engineer vs ML Engineer split? Or want me to reorder the upcoming lessons around a specific goal (e.g. "I want to build RAG over my Pine Script docs first")? Just ask — I can resequence the curriculum to your zone of proximal development.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://roadmap.sh/ai-engineer">roadmap.sh/ai-engineer</a> — read the "Introduction" cluster (What is an AI Engineer, AI Engineer vs ML Engineer, AI vs AGI). It's a 10-minute read and the canonical reference for this whole curriculum.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — AI Engineer Roadmap</a></li>
+  <li><a href="https://www.turingcollege.com/blog/ai-engineer-roadmap-how-to-become-an-ai-engineer">Turing College — How to Become an AI Engineer in 2026</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 14 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

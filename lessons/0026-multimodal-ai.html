@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 26: Multimodal AI</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 26</span>
+  <span class="tag green">Roadmap · Multimodal AI</span>
+  <span class="tag orange">Capabilities</span>
+  <span class="tag yellow">~14 min</span>
+</div>
+
+<h1>Multimodal AI</h1>
+<p class="subtitle">Models that see, hear, and create — not just read and write. The same API shape you know, now with images and audio flowing through it.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">The mental shift</div>
+  "Multimodal" = a model that handles more than text — images, audio, sometimes video — as <em>input</em>, <em>output</em>, or both. Under the hood, other modalities get converted into tokens the same transformer processes (Lesson 15). For you, the API is mostly unchanged: you just attach an image or audio file.
+</div>
+
+<!-- ── MAP ─────────────────────────────────────────────────── -->
+<h2>The capability map</h2>
+<table>
+  <tr><th>Direction</th><th>Capability</th><th>Example APIs</th></tr>
+  <tr><td>Image → text</td><td><strong>Image understanding / vision</strong> — describe, OCR, analyze a chart</td><td>OpenAI Vision, Claude vision, Gemini</td></tr>
+  <tr><td>Text → image</td><td><strong>Image generation</strong></td><td>DALL·E API, Imagen, "Nano Banana", Stable Diffusion</td></tr>
+  <tr><td>Audio → text</td><td><strong>Speech-to-text (ASR)</strong> / transcription</td><td>Whisper API, Gemini audio</td></tr>
+  <tr><td>Text → audio</td><td><strong>Text-to-speech (TTS)</strong></td><td>OpenAI TTS, ElevenLabs</td></tr>
+  <tr><td>Video → text</td><td><strong>Video understanding</strong></td><td>Gemini, frame-sampling pipelines</td></tr>
+</table>
+
+<!-- ── VISION ──────────────────────────────────────────────── -->
+<h2>Image understanding (the most useful for you)</h2>
+<p>A vision-capable model can read a chart, a screenshot, a scanned PDF, or a handwritten note. The call is the familiar messages format — you just add an image part:</p>
+<pre><span class="pre-label">python — analyze a chart screenshot</span>resp = client.chat.completions.create(model=<span class="string">"gpt-5"</span>, messages=[{
+  <span class="string">"role"</span>:<span class="string">"user"</span>, <span class="string">"content"</span>:[
+    {<span class="string">"type"</span>:<span class="string">"text"</span>, <span class="string">"text"</span>:<span class="string">"What pattern is forming on this chart?"</span>},
+    {<span class="string">"type"</span>:<span class="string">"image_url"</span>,
+     <span class="string">"image_url"</span>:{<span class="string">"url"</span>:<span class="string">"data:image/png;base64,..."</span>}}]}])</pre>
+
+<div class="callout insight">
+  <div class="callout-label">A real tie to your work</div>
+  Vision is genuinely useful in trading workflows: feed a chart screenshot and ask the model to describe the setup, extract numbers from a broker statement (OCR), or read a table from a PDF report into structured data (combine with Structured Outputs, Lesson 18). It's not a trading oracle — but it's a strong "read this image into text/JSON" tool.
+</div>
+
+<!-- ── AUDIO / GEN ─────────────────────────────────────────── -->
+<h2>Speech &amp; generation</h2>
+<ul>
+  <li><strong>Whisper / STT</strong> — transcribe audio to text. One API call: send the file, get the transcript. Good for meeting notes, voice commands, podcast indexing.</li>
+  <li><strong>TTS</strong> — turn text into natural speech. Pick a voice, send text, get audio. Powers voice assistants and accessibility.</li>
+  <li><strong>Image generation</strong> — DALL·E and friends turn a text prompt into an image. Quality is prompt-sensitive; iterate like you would any prompt.</li>
+</ul>
+
+<!-- ── FRAMEWORKS ──────────────────────────────────────────── -->
+<h2>Orchestrating multimodal apps</h2>
+<p>For apps that chain modalities (e.g. transcribe → summarize → generate an image), frameworks like <strong>LangChain</strong> and <strong>LlamaIndex</strong> have multimodal modules so you don't hand-wire every step. But each individual call is still the simple "attach the media" pattern above — don't let frameworks obscure that.</p>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">You want to extract the strike prices and expiry dates from a scanned PDF options statement into clean JSON. Which combination of capabilities does this need?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Text-to-speech plus image generation, to read the file aloud and redraw it</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Image understanding (vision/OCR) plus structured output to enforce the JSON shape</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Speech-to-text plus a reranker, since PDFs are processed as audio streams</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Video understanding, because a multi-page PDF counts as a sequence of frames</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. A scanned PDF is an image, so you need image understanding / OCR to read the values, then Structured Outputs (Lesson 18) to force them into a strict JSON schema. This image→text→structured combination is one of the most practical multimodal patterns. The other options mix in unrelated modalities (audio, video, generation).</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">A scanned PDF is an <em>image</em>: use vision/OCR to read it, then Structured Outputs to enforce JSON (option B). TTS, STT, video, and image generation don't apply to reading values out of a scanned document.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">How does sending an image to a vision model differ, at the API level, from a normal text chat call?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Completely different — vision requires a separate protocol and its own SDK</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Largely the same — you use the messages format and add an image content part</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>You must first convert the image to text yourself before the model can read it</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Images can only be sent to fine-tuned models, never to standard hosted ones</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. It's the same Chat Completions / messages shape you learned in Lesson 18 — you just include an image content part alongside the text. The model handles converting the image into tokens internally. That continuity is why mastering the base API pays off across every modality.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">It's the same messages format with an added image part (option B) — no separate protocol, no manual image-to-text step, and no fine-tuning requirement. The model tokenizes the image internally.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want a practical build? Ask: "give me a script that sends a chart screenshot and returns a structured description," or "how would I transcribe a market-recap audio clip with Whisper?" I'll tailor it to a real workflow you have.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://platform.openai.com/docs/guides/vision">OpenAI — Vision guide</a> and <a href="https://platform.openai.com/docs/guides/speech-to-text">Speech-to-text (Whisper) guide</a>. Both have copy-paste examples; Gemini's <a href="https://ai.google.dev/gemini-api/docs/vision">multimodal docs</a> are a strong cross-reference.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — multimodal AI cluster (image gen/understanding, audio, STT/TTS, video, vision APIs)</a></li>
+  <li><a href="https://platform.openai.com/docs/guides/vision">OpenAI — Vision</a> · <a href="https://platform.openai.com/docs/guides/speech-to-text">Whisper / STT</a> · <a href="https://platform.openai.com/docs/guides/images">DALL·E / image generation</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 26 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

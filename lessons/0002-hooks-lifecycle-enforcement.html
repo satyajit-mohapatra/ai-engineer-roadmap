@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2: Hooks — Lifecycle Enforcement</title>
+<style>
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --border: #2a2d3e;
+    --text: #e2e8f0; --muted: #8892a4; --accent: #6366f1;
+    --accent-dim: #1e1f3a; --green: #22c55e; --green-dim: #0d2b1a;
+    --red: #ef4444; --red-dim: #2b0d0d; --yellow: #f59e0b; --yellow-dim: #2b1d0d;
+    --mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans);
+    max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem 6rem; line-height: 1.7; }
+
+  .lesson-meta { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 2.5rem; }
+  .tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.25rem 0.6rem; border-radius: 4px; background: var(--accent-dim);
+    color: var(--accent); border: 1px solid var(--accent); }
+  .tag.green { background: var(--green-dim); color: var(--green); border-color: var(--green); }
+  .tag.yellow { background: var(--yellow-dim); color: var(--yellow); border-color: var(--yellow); }
+  .tag.red { background: var(--red-dim); color: var(--red); border-color: var(--red); }
+
+  h1 { font-size: 2.1rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 0.5rem; }
+  .subtitle { color: var(--muted); font-size: 1.05rem; margin-bottom: 3rem; }
+  h2 { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.01em; margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); margin: 1.5rem 0 0.5rem; }
+  p { margin-bottom: 1rem; }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.35rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .callout { background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 6px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+  .callout.key { border-left-color: var(--yellow); }
+  .callout.insight { border-left-color: var(--green); }
+  .callout.warning { border-left-color: var(--red); }
+  .callout.exercise { border-left-color: var(--green); background: var(--green-dim); }
+  .callout-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+  .callout.key .callout-label { color: var(--yellow); }
+  .callout.insight .callout-label { color: var(--green); }
+  .callout.warning .callout-label { color: var(--red); }
+  .callout.exercise .callout-label { color: var(--green); }
+
+  code { font-family: var(--mono); font-size: 0.85em; background: var(--surface);
+    border: 1px solid var(--border); padding: 0.1em 0.4em; border-radius: 3px; color: #a5b4fc; }
+  pre { font-family: var(--mono); font-size: 0.82rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem; overflow-x: auto;
+    margin: 1rem 0 1.5rem; line-height: 1.65; color: #c4cad8; position: relative; }
+  pre .comment { color: #4b5563; }
+  pre .key { color: #f59e0b; }
+  pre .string { color: #86efac; }
+  pre .prop { color: #a5b4fc; }
+  pre .num { color: #fb923c; }
+  pre .keyword { color: #c084fc; }
+  pre .event { color: #f59e0b; font-weight: 600; }
+  .pre-label { position: absolute; top: 0.6rem; right: 0.75rem;
+    font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+
+  .progress-bar { background: var(--border); height: 3px; border-radius: 2px; margin-bottom: 2.5rem; }
+  .progress-fill { background: var(--accent); height: 100%; border-radius: 2px; width: 0%; transition: width 0.4s ease; }
+
+  /* Lifecycle diagram */
+  .lifecycle { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; }
+  .lc-event { display: flex; align-items: stretch; }
+  .lc-line { width: 2px; background: var(--border); margin: 0 1.25rem; flex-shrink: 0; position: relative; }
+  .lc-line::before { content: ''; position: absolute; top: 0; left: -4px; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--border); }
+  .lc-line.active::before { background: var(--accent); }
+  .lc-line.block::before { background: var(--red); }
+  .lc-line.side::before { background: var(--green); }
+  .lc-content { padding: 0.6rem 0 0.75rem; flex: 1; }
+  .lc-name { font-family: var(--mono); font-size: 0.82rem; font-weight: 600; color: var(--accent); }
+  .lc-name.block { color: var(--red); }
+  .lc-name.side { color: var(--green); }
+  .lc-desc { font-size: 0.85rem; color: var(--muted); margin-top: 0.15rem; }
+
+  /* Event table */
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.87rem; }
+  th { text-align: left; padding: 0.5rem 0.9rem; background: var(--surface);
+    border: 1px solid var(--border); color: var(--muted); font-size: 0.73rem;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  td { padding: 0.65rem 0.9rem; border: 1px solid var(--border); vertical-align: top; }
+  td:first-child { font-family: var(--mono); font-size: 0.8rem; color: #a5b4fc; white-space: nowrap; }
+  tr:nth-child(even) td { background: #13151f; }
+  .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem;
+    font-weight: 600; font-family: var(--mono); }
+  .badge.block { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); }
+  .badge.side { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
+  .badge.info { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); }
+
+  /* Quiz */
+  .quiz { background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+  .quiz-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+  .quiz-q { font-weight: 600; margin-bottom: 1rem; font-size: 0.95rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+  .quiz-option { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem;
+    border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+    transition: all 0.15s; background: var(--bg); }
+  .quiz-option:hover { border-color: var(--accent); }
+  .quiz-option.correct { background: var(--green-dim); border-color: var(--green); }
+  .quiz-option.wrong { background: var(--red-dim); border-color: var(--red); }
+  .quiz-option.revealed { opacity: 0.45; cursor: default; }
+  .quiz-option-letter { min-width: 1.5rem; height: 1.5rem; display: flex; align-items: center;
+    justify-content: center; border: 1px solid var(--border); border-radius: 4px;
+    font-size: 0.75rem; font-weight: 700; font-family: var(--mono); flex-shrink: 0; }
+  .quiz-feedback { display: none; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.9rem; margin-top: 0.5rem; }
+  .quiz-feedback.correct { display: block; background: var(--green-dim); color: var(--green); }
+  .quiz-feedback.wrong { display: block; background: var(--red-dim); color: var(--red); }
+
+  .footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.82rem; color: var(--muted); }
+  .ask-teacher { background: var(--accent-dim); border: 1px solid var(--accent);
+    border-radius: 8px; padding: 1.25rem 1.5rem; margin: 3rem 0 1rem; }
+  .ask-teacher-title { font-weight: 600; color: var(--accent); margin-bottom: 0.4rem; font-size: 0.9rem; }
+  .ask-teacher p { color: var(--muted); font-size: 0.88rem; margin: 0; }
+
+  /* Stdin anatomy */
+  .json-anatomy { background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1rem 0 1.5rem; font-family: var(--mono); font-size: 0.82rem; line-height: 1.8; }
+  .json-anatomy .ann { color: var(--muted); font-family: var(--sans); font-size: 0.78rem; }
+  .json-anatomy .highlight { background: rgba(99,102,241,0.12); border-radius: 3px; padding: 0 0.25rem; }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; gap: 0; margin: 1rem 0 1.5rem; }
+  .step { display: flex; gap: 1.25rem; align-items: flex-start; padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border); }
+  .step:last-child { border-bottom: none; }
+  .step-num { width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--accent-dim);
+    border: 1px solid var(--accent); color: var(--accent); display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700; font-family: var(--mono); flex-shrink: 0; margin-top: 0.1rem; }
+  .step-body { flex: 1; }
+  .step-title { font-weight: 600; font-size: 0.92rem; margin-bottom: 0.25rem; }
+  .step-desc { font-size: 0.85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 2</span>
+  <span class="tag green">Harness Layer 5</span>
+  <span class="tag yellow">~20 min</span>
+</div>
+
+<h1>Hooks</h1>
+<p class="subtitle">Run shell commands at lifecycle events. Block actions before they happen. Enforce quality automatically.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- ── SECTION 1 ─────────────────────────────────────────── -->
+<h2>What Hooks Are</h2>
+
+<p>A hook is a shell command configured in <code>settings.json</code> that Claude Code fires at a specific <strong>lifecycle event</strong>. Every time Claude takes an action — edits a file, runs a command, finishes a task — the harness emits events. Hooks intercept them.</p>
+
+<div class="callout key">
+  <div class="callout-label">Key Insight</div>
+  You already have hooks. Your global <code>~/.claude/settings.json</code> has hooks on every event — they're all async monitoring hooks that post JSON to the claude-view live monitor. That's a harness in action. This lesson teaches you to write hooks that <em>enforce</em>, not just observe.
+</div>
+
+<p>There are two fundamentally different kinds of hook:</p>
+
+<table>
+  <tr><th>Kind</th><th>How it works</th><th>Use for</th></tr>
+  <tr>
+    <td><span class="badge block">Blocking</span></td>
+    <td>Exit code <code>1</code> cancels the action before it runs. Claude sees your <code>stdout</code> as an error message.</td>
+    <td>Safety gates: block dangerous git commands, prevent committing secrets, enforce naming rules</td>
+  </tr>
+  <tr>
+    <td><span class="badge side">Side-effect</span></td>
+    <td>Runs after the action. Exit code ignored. Can be async.</td>
+    <td>Automation: run linting after JS edits, notify Slack on session end, log all tool calls</td>
+  </tr>
+</table>
+
+<!-- ── SECTION 2: LIFECYCLE ───────────────────────────────── -->
+<h2>The Event Lifecycle</h2>
+
+<p>Every Claude Code session fires these events in order. The events marked <span class="badge block">can block</span> support blocking; the rest are side-effect only.</p>
+
+<table>
+  <tr><th>Event</th><th>When it fires</th><th>Type</th></tr>
+  <tr><td>SessionStart</td><td>Session opens</td><td><span class="badge info">info</span></td></tr>
+  <tr><td>UserPromptSubmit</td><td>User sends a message</td><td><span class="badge block">can block</span></td></tr>
+  <tr><td>PreToolUse</td><td>Before any tool call (Bash, Edit, Write, Agent…)</td><td><span class="badge block">can block</span></td></tr>
+  <tr><td>PostToolUse</td><td>After any tool call completes</td><td><span class="badge side">side-effect</span></td></tr>
+  <tr><td>PostToolUseFailure</td><td>After a tool call errors</td><td><span class="badge side">side-effect</span></td></tr>
+  <tr><td>Notification</td><td>Claude sends a notification to the user</td><td><span class="badge side">side-effect</span></td></tr>
+  <tr><td>Stop</td><td>Claude finishes a turn</td><td><span class="badge side">side-effect</span></td></tr>
+  <tr><td>PreCompact</td><td>Before context is compacted</td><td><span class="badge side">side-effect</span></td></tr>
+  <tr><td>PostCompact</td><td>After context compaction</td><td><span class="badge side">side-effect</span></td></tr>
+  <tr><td>SessionEnd</td><td>Session closes</td><td><span class="badge side">side-effect</span></td></tr>
+  <tr><td>SubagentStart / SubagentStop</td><td>Child agent spawns or ends</td><td><span class="badge info">info</span></td></tr>
+</table>
+
+<p>The two events you'll use 90% of the time are <code>PreToolUse</code> (for blocking) and <code>PostToolUse</code> (for automation).</p>
+
+<!-- ── SECTION 3: STDIN ───────────────────────────────────── -->
+<h2>The stdin/stdout/exit Protocol</h2>
+
+<p>When a hook fires, Claude Code sends a JSON payload to your command's <strong>stdin</strong>. Your command reads it, decides what to do, and communicates back via <strong>stdout</strong> and <strong>exit code</strong>.</p>
+
+<h3>What arrives on stdin (PreToolUse example)</h3>
+
+<div class="json-anatomy">
+<span style="color:#4b5563">{</span><br>
+&nbsp;&nbsp;<span class="prop">"tool_name"</span>: <span class="string">"Bash"</span>,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ann">← which tool Claude wants to run</span><br>
+&nbsp;&nbsp;<span class="prop">"tool_input"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop">"command"</span>: <span class="string highlight">"git push --force origin main"</span>,&nbsp;&nbsp;<span class="ann">← the exact command string</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="prop">"description"</span>: <span class="string">"Force push to main"</span><br>
+&nbsp;&nbsp;}<br>
+<span style="color:#4b5563">}</span>
+</div>
+
+<p>For an <code>Edit</code> tool call, <code>tool_input</code> contains <code>file_path</code>, <code>old_string</code>, <code>new_string</code>. For <code>Write</code>, it contains <code>file_path</code> and <code>content</code>. The structure matches the tool's parameter schema exactly.</p>
+
+<h3>How you respond</h3>
+
+<table>
+  <tr><th>Exit code</th><th>Stdout</th><th>Effect</th></tr>
+  <tr><td><code>0</code></td><td>anything</td><td>Action proceeds normally</td></tr>
+  <tr><td><code>1</code></td><td>error message</td><td><strong>Action blocked.</strong> Claude sees your stdout as an explanation of why.</td></tr>
+  <tr><td><code>2</code></td><td>anything</td><td>Hook failed — action proceeds anyway (hook errors don't block)</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-label">Why This Design Is Clever</div>
+  When you exit 1 and print a message, Claude reads that message as context and can try a different approach. You're not just blocking — you're <em>teaching the agent what to do instead</em>. The hook output goes directly into the agent's context window.
+</div>
+
+<!-- ── SECTION 4: SETTINGS.JSON ──────────────────────────── -->
+<h2>The settings.json Schema</h2>
+
+<p>Hooks are configured in <code>~/.claude/settings.json</code> (global, all projects) or <code>.claude/settings.json</code> / <code>.claude/settings.local.json</code> (project-only). The structure:</p>
+
+<pre style="position:relative">
+<span class="pre-label">settings.json</span><span class="comment">{
+  "hooks": {
+    </span><span class="event">"PreToolUse"</span><span class="comment">: [          </span><span class="comment">// event name</span>
+      {
+        <span class="prop">"matcher"</span>: <span class="string">"Bash"</span>,      <span class="comment">// optional: only fire for this tool</span>
+        <span class="prop">"hooks"</span>: [
+          {
+            <span class="prop">"type"</span>: <span class="string">"command"</span>,
+            <span class="prop">"command"</span>: <span class="string">"bash /path/to/hook.sh"</span>,
+            <span class="prop">"statusMessage"</span>: <span class="string">"Running safety check"</span>,  <span class="comment">// shown in UI</span>
+            <span class="prop">"async"</span>: <span class="keyword">false</span>               <span class="comment">// false = blocking, true = side-effect</span>
+          }
+        ]
+      }
+    ]
+  }
+}</pre>
+
+<p>Key fields:</p>
+<ul>
+  <li><strong>matcher</strong> — optional tool name filter (<code>"Bash"</code>, <code>"Edit"</code>, <code>"Write"</code>…). Omit to match all tools.</li>
+  <li><strong>async: false</strong> — Claude waits for the hook. This is how you block.</li>
+  <li><strong>async: true</strong> — Claude doesn't wait. Good for logging and notifications (like your claude-view hooks).</li>
+  <li><strong>statusMessage</strong> — shown in the Claude Code UI while the hook runs.</li>
+</ul>
+
+<!-- ── SECTION 5: REAL EXAMPLES ──────────────────────────── -->
+<h2>Two Real Hooks for This Project</h2>
+
+<h3>Hook 1 — Block force-push to main (PreToolUse, blocking)</h3>
+
+<p>This protects your <code>main</code> branch from being force-pushed by Claude. Create this file:</p>
+
+<pre>
+<span class="pre-label">~/.claude/hooks/guard-git.sh</span><span class="comment">#!/usr/bin/env bash
+# Read the PreToolUse JSON from stdin
+INPUT=$(cat)
+
+TOOL=$(echo "$INPUT" | jq -r '.tool_name')
+CMD=$(echo "$INPUT"  | jq -r '.tool_input.command // empty')
+
+# Only inspect Bash tool calls
+[ "$TOOL" != "Bash" ] && exit 0
+
+# Block: git push --force to main/master
+if echo "$CMD" | grep -qE 'git push.*(--force|-f).*(main|master)'; then
+  echo "BLOCKED: Force-pushing to main is not allowed."
+  echo "Use a feature branch and open a PR instead."
+  exit 1
+fi
+
+exit 0</span></pre>
+
+<p>Then wire it in <code>.claude/settings.json</code> (project level):</p>
+
+<pre>
+<span class="pre-label">.claude/settings.json</span>{
+  <span class="prop">"hooks"</span>: {
+    <span class="event">"PreToolUse"</span>: [
+      {
+        <span class="prop">"matcher"</span>: <span class="string">"Bash"</span>,
+        <span class="prop">"hooks"</span>: [{
+          <span class="prop">"type"</span>: <span class="string">"command"</span>,
+          <span class="prop">"command"</span>: <span class="string">"bash ~/.claude/hooks/guard-git.sh"</span>,
+          <span class="prop">"statusMessage"</span>: <span class="string">"Git safety check"</span>,
+          <span class="prop">"async"</span>: <span class="keyword">false</span>
+        }]
+      }
+    ]
+  }
+}</pre>
+
+<h3>Hook 2 — Auto-lint JS files after edits (PostToolUse, side-effect)</h3>
+
+<p>After Claude edits any <code>.js</code> file in your project, run ESLint automatically (adjust the file extension and linter command for your stack):</p>
+
+<pre>
+<span class="pre-label">~/.claude/hooks/auto-lint.sh</span><span class="comment">#!/usr/bin/env bash
+INPUT=$(cat)
+
+TOOL=$(echo "$INPUT" | jq -r '.tool_name')
+FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+
+# Only fire for Edit/Write tools on .js files
+[[ "$TOOL" != "Edit" && "$TOOL" != "Write" ]] && exit 0
+[[ "$FILE" != *.js ]] && exit 0
+
+cd /path/to/your-project
+npx eslint --fix "$FILE" 2>&1
+exit 0  </span><span class="comment"># PostToolUse exit code doesn't block</span></pre>
+
+<pre>
+<span class="pre-label">.claude/settings.json (add to existing hooks)</span>{
+  <span class="prop">"hooks"</span>: {
+    <span class="event">"PostToolUse"</span>: [
+      {
+        <span class="prop">"hooks"</span>: [{
+          <span class="prop">"type"</span>: <span class="string">"command"</span>,
+          <span class="prop">"command"</span>: <span class="string">"bash ~/.claude/hooks/auto-lint.sh"</span>,
+          <span class="prop">"statusMessage"</span>: <span class="string">"Auto-lint"</span>,
+          <span class="prop">"async"</span>: <span class="keyword">true</span>
+        }]
+      }
+    ]
+  }
+}</pre>
+
+<!-- ── SECTION 6: EXERCISE ─────────────────────────────── -->
+<h2>Hands-On: Install Your First Hook</h2>
+
+<p>Follow these steps to install the git safety hook. Each step takes under a minute.</p>
+
+<div class="steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <div class="step-title">Create the hooks directory</div>
+      <div class="step-desc"><code>mkdir -p ~/.claude/hooks</code></div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <div class="step-title">Create the guard script</div>
+      <div class="step-desc">Copy the <code>guard-git.sh</code> script from the "Hook 1" section above into <code>~/.claude/hooks/guard-git.sh</code>. Make it executable: <code>chmod +x ~/.claude/hooks/guard-git.sh</code></div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-title">Test it manually</div>
+      <div class="step-desc">Run: <code>echo '{"tool_name":"Bash","tool_input":{"command":"git push --force origin main"}}' | bash ~/.claude/hooks/guard-git.sh</code><br>You should see the BLOCKED message and exit code 1.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <div class="step-title">Add to .claude/settings.json</div>
+      <div class="step-desc">Create <code>/path/to/your-project/.claude/settings.json</code> with the PreToolUse hook config from the example above. (Your existing <code>settings.local.json</code> has permissions — put hooks in the shared <code>settings.json</code>.)</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <div class="step-title">Verify in Claude Code</div>
+      <div class="step-desc">Start a new session. Ask Claude to run: <code>git push --force origin main</code>. It should be blocked with your error message before Claude can execute it.</div>
+    </div>
+  </div>
+</div>
+
+<div class="callout exercise">
+  <div class="callout-label">Exercise Complete When:</div>
+  The force-push command is blocked by your hook and Claude receives the "Use a feature branch" message. Ask Claude to try it — then watch the hook intercept the call.
+</div>
+
+<!-- ── SECTION 7: QUIZ ─────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">You want Claude to automatically run <code>npm test</code> every time it edits a <code>.test.js</code> file. Which hook event and <code>async</code> value should you use?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)">
+      <div class="quiz-option-letter">A</div>
+      <div><code>PreToolUse</code>, <code>async: false</code> — run tests before the edit lands</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)">
+      <div class="quiz-option-letter">B</div>
+      <div><code>PostToolUse</code>, <code>async: true</code> — run tests after the edit, without blocking</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)">
+      <div class="quiz-option-letter">C</div>
+      <div><code>PostToolUse</code>, <code>async: false</code> — run tests after the edit, blocking Claude until done</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)">
+      <div class="quiz-option-letter">D</div>
+      <div><code>Stop</code>, <code>async: true</code> — run tests when Claude finishes the whole turn</div>
+    </div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. PostToolUse fires after the edit is written. async: true lets Claude continue working while tests run in the background — better UX. If you wanted Claude to see the test results before continuing, async: false would make sense, but for automation, async is preferred.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Think about timing and blocking. You want the tests to run after the file is written (not before), and you don't want to block Claude's next action while tests run. PostToolUse + async: true is the right combination.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">Your PreToolUse hook prints "File is read-only" to stdout and exits with code <code>1</code>. What happens next?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)">
+      <div class="quiz-option-letter">A</div>
+      <div>The action proceeds anyway — exit code 1 just means the hook had an error</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)">
+      <div class="quiz-option-letter">B</div>
+      <div>The action is blocked. Claude sees "File is read-only" as context and may try a different approach</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)">
+      <div class="quiz-option-letter">C</div>
+      <div>Claude Code crashes</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)">
+      <div class="quiz-option-letter">D</div>
+      <div>The action is blocked silently — Claude gets no information about why</div>
+    </div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Exactly. Exit 1 blocks the action AND your stdout message goes into Claude's context window. This is what makes hooks powerful: you're not just saying "no" — you're giving the agent information to work with. A good block message often leads Claude to a correct alternative on its own.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Exit code 1 from a PreToolUse hook blocks the action and feeds your stdout to Claude as an error message. Exit code 2 would be "hook failed, proceed anyway." Exit code 0 is "allowed."</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">You want a hook that fires specifically when Claude uses the <code>Write</code> tool, but not <code>Edit</code> or <code>Bash</code>. What field controls this?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q3',false)">
+      <div class="quiz-option-letter">A</div>
+      <div>The <code>"type"</code> field in the hook object</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)">
+      <div class="quiz-option-letter">B</div>
+      <div>The <code>"matcher"</code> field on the hook entry — set it to <code>"Write"</code></div>
+    </div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)">
+      <div class="quiz-option-letter">C</div>
+      <div>Read <code>tool_name</code> from stdin and filter inside your script</div>
+    </div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)">
+      <div class="quiz-option-letter">D</div>
+      <div>Both B and C work — they're equivalent</div>
+    </div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">The matcher field is the right answer — it filters at the harness level before your script even runs. That said, C also works (checking tool_name in your script), and is necessary for more complex conditions. But for a simple per-tool filter, matcher is cleaner and more explicit in the config.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">The matcher field filters by tool name before your hook script even runs. You can also filter inside the script by checking tool_name from stdin — both work — but matcher is the declarative, config-level approach. D is partially right but matcher is simpler for this case.</div>
+</div>
+
+<!-- ── WHAT TO HOLD ONTO ──────────────────────────────────── -->
+<h2>What to Hold Onto</h2>
+
+<ol style="padding-left:1.5rem;display:flex;flex-direction:column;gap:0.75rem;margin-top:0.5rem;">
+  <li><strong>Hooks are the harness's enforcement layer.</strong> They run at lifecycle events. PreToolUse can block. PostToolUse runs side effects.</li>
+  <li><strong>Exit 0 = allow, exit 1 = block + message to Claude, exit 2 = hook error (proceed).</strong> Your stdout on exit 1 goes directly into Claude's context.</li>
+  <li><strong>async: false means Claude waits. async: true means Claude continues.</strong> Use false for gates, true for automation.</li>
+  <li><strong>The ratchet principle in action:</strong> every time Claude does something wrong, a hook can permanently prevent it. The harness only gets tighter.</li>
+</ol>
+
+<!-- ── NEXT ──────────────────────────────────────────────── -->
+<div class="callout" style="margin-top:2.5rem;">
+  <div class="callout-label">Next Lesson</div>
+  <strong>Lesson 3: Skills — Reusable, Triggerable Workflows</strong><br>
+  <span style="color:var(--muted);font-size:0.9rem;">Write a skill that Claude invokes on demand. Connect it to any repeated workflow — for example, a <code>/daily-report</code> skill that runs a data pipeline and formats the output.</span>
+</div>
+
+<!-- ── ASK TEACHER ──────────────────────────────────────────── -->
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Unclear on the stdin format? Want to see a different hook example? Ask Claude Code directly — just type your question. Your lesson files are in <code>teaching/lessons/</code>.</p>
+</div>
+
+<!-- ── SOURCES ──────────────────────────────────────────────── -->
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:0.4rem;font-size:0.88rem;color:var(--muted);">
+  <li><a href="https://addyosmani.com/blog/agent-harness-engineering/">Addy Osmani — Agent Harness Engineering (2026)</a></li>
+  <li><a href="https://okhlopkov.com/claude-code-setup-mcp-hooks-skills-2026/">okhlopkov — My Claude Code Setup: MCP, Hooks, Skills (2026)</a></li>
+  <li><a href="https://hidekazu-konishi.com/entry/claude_code_harness_and_environment_engineering_guide.html">hidekazu-konishi — Claude Code Harness and Environment Engineering</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 2 of N &nbsp;·&nbsp; Context & Harness Engineering</span>
+  <span><a href="../MISSION.md">Mission</a> &nbsp;·&nbsp; <a href="../reference/glossary.html">Glossary</a></span>
+</div>
+
+<script>
+  const answered = {};
+  function answer(el, qid, isCorrect) {
+    if (answered[qid]) return;
+    answered[qid] = true;
+    const quiz = document.getElementById(qid);
+    quiz.querySelectorAll('.quiz-option').forEach(o => o.classList.add('revealed'));
+    el.classList.remove('revealed');
+    el.classList.add(isCorrect ? 'correct' : 'wrong');
+    const feedbackId = qid + (isCorrect ? '-correct' : '-wrong');
+    document.getElementById(feedbackId).classList.add(isCorrect ? 'correct' : 'wrong');
+    const total = 3, done = Object.keys(answered).length;
+    document.getElementById('progress').style.width = (done / total * 100) + '%';
+  }
+</script>
+
+</body>
+</html>

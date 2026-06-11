@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 16: Choosing the Right Model</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 16</span>
+  <span class="tag green">Roadmap · Pre-trained Models</span>
+  <span class="tag orange">Decision-making</span>
+  <span class="tag yellow">~14 min</span>
+</div>
+
+<h1>Choosing the Right Model</h1>
+<p class="subtitle">Open vs closed, big vs small, generalist vs specialist — a decision framework instead of brand loyalty.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">The skill</div>
+  Model choice is an <em>engineering decision with trade-offs</em>, not a popularity contest. By the end you should be able to defend a pick on four axes: capability, cost, latency, and control (privacy/hosting).
+</div>
+
+<!-- ── PRE-TRAINED ─────────────────────────────────────────── -->
+<h2>What "pre-trained" buys you (and its limits)</h2>
+
+<p>A pre-trained foundation model arrives knowing a vast amount about language, code, and the world up to its <strong>knowledge cutoff</strong>. You get that capability instantly, for the price of an API call. But the same model has fixed limitations every AI Engineer plans around:</p>
+
+<table>
+  <tr><th>Benefit</th><th>Matching limitation</th></tr>
+  <tr><td>Broad knowledge out of the box</td><td>Frozen at a cutoff date — no current events</td></tr>
+  <tr><td>No training cost or data needed</td><td>Knows nothing private/proprietary to you (→ RAG, Lesson 24)</td></tr>
+  <tr><td>Strong general reasoning</td><td>Hallucinates confidently outside what it knows</td></tr>
+  <tr><td>One model, many tasks</td><td>Generic — may underperform a specialist on a narrow task</td></tr>
+</table>
+
+<!-- ── OPEN vs CLOSED ──────────────────────────────────────── -->
+<h2>Closed vs Open-Source Models</h2>
+
+<table>
+  <tr><th></th><th>Closed (API)</th><th>Open-weight</th></tr>
+  <tr><td>Examples</td><td>GPT-5, Claude Opus, Gemini</td><td>Llama, Mistral, Qwen, DeepSeek, Gemma</td></tr>
+  <tr><td>Access</td><td>HTTP API, you rent it</td><td>Download weights, run anywhere</td></tr>
+  <tr><td>Top capability</td><td>Usually the frontier</td><td>Close behind, gap narrowing fast</td></tr>
+  <tr><td>Data privacy</td><td>Data leaves your perimeter (read the terms)</td><td>Fully self-hosted — data never leaves</td></tr>
+  <tr><td>Cost model</td><td>Per-token, zero ops</td><td>Free weights, but you pay for GPUs + ops</td></tr>
+  <tr><td>Customization</td><td>Limited (prompts, some fine-tuning)</td><td>Full — fine-tune, quantize, modify</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-label">For your trading work specifically</div>
+  If options/positions data is sensitive, an open-weight model running locally (via Ollama — Lesson 21) keeps it on your machine. If you just need the best reasoning on public market concepts, a closed frontier model via API is simpler and stronger. The privacy axis often decides this before capability does.
+</div>
+
+<!-- ── DECISION FRAMEWORK ──────────────────────────────────── -->
+<h2>A four-axis decision framework</h2>
+
+<ol>
+  <li><strong>Capability</strong> — Does it pass <em>your</em> eval on <em>your</em> task? (Public benchmarks ≠ your use case. Build a tiny eval set — Lesson 19/20 touch on this.)</li>
+  <li><strong>Cost</strong> — Price per million input/output tokens × your volume. A 10× cheaper model that's "good enough" often wins at scale.</li>
+  <li><strong>Latency</strong> — Smaller/distilled models respond faster. Interactive UX vs batch jobs have different tolerances.</li>
+  <li><strong>Control</strong> — Privacy, data residency, ability to self-host or fine-tune.</li>
+</ol>
+
+<div class="callout key">
+  <div class="callout-label">The practitioner's move: tiered routing</div>
+  Don't pick one model for everything. Route: a small/cheap model for easy/high-volume calls (classification, extraction), a frontier model for hard reasoning. <a href="https://openrouter.ai">OpenRouter</a> (Lesson 27) lets you switch providers behind one API to do exactly this.
+</div>
+
+<h2>Reasoning vs standard models</h2>
+<p>A 2024–2026 split worth knowing: <strong>reasoning models</strong> (OpenAI o-series, Claude with extended thinking, DeepSeek-R1) spend extra inference compute "thinking" before answering — better at math, code, multi-step logic, but slower and pricier. <strong>Standard models</strong> answer directly — faster, cheaper, fine for most generation and chat. Match the model class to the task's reasoning depth.</p>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">You must classify 5 million support tickets per month into 8 categories, accuracy-critical but not reasoning-heavy. Which choice best fits the four-axis framework?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>The largest frontier reasoning model, because more capability is always safer here</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>A small cheap model validated on your own eval set, since volume makes cost dominate</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Whichever model is highest on the public MMLU leaderboard this week</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>An open-weight model self-hosted, regardless of whether you have GPU ops capacity</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. At 5M calls/month, cost and latency dominate, and the task isn't reasoning-heavy — a small cheap model is the right class. The discipline is validating it on <em>your</em> eval set, not a public leaderboard. A frontier reasoning model would be massive overspend; self-hosting only makes sense if you have the ops capacity and a privacy reason.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">High volume + low reasoning depth means cost is the dominant axis — a small, cheap model validated on your own eval set (option B). Frontier reasoning models overspend here; public leaderboards don't reflect your task; self-hosting needs ops capacity you may not have.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">Your app must reason over confidential client portfolios that legally cannot leave your infrastructure. Which axis decides the model choice <em>first</em>?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Capability — pick the smartest model and worry about the data terms afterward</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">B</div><div>Latency — the fastest model wins because users hate waiting on portfolio data</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">C</div><div>Control — a self-hostable open-weight model, because the data can't leave the perimeter</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Cost — the cheapest API wins since all providers handle confidential data the same way</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. A hard data-residency constraint collapses the decision: you need a model you can self-host (open-weight), so the Control axis is decisive before capability, latency, or cost even enter. Constraints that are legal/contractual usually rank first because they're non-negotiable.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">A legal "data can't leave our infrastructure" rule is a hard constraint, so Control decides first — you need a self-hostable open-weight model (option C). Capability, latency, and cost only matter <em>among</em> the models that satisfy the residency requirement.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want help building a tiny eval set to compare two models on a real task from your repo? Ask: "help me make a 10-example eval to compare model A and model B for summarizing my options reports." That's the single highest-leverage habit in model selection.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://artificialanalysis.ai/">Artificial Analysis</a> — independent, continuously-updated benchmarks comparing models on quality, speed, and price across providers. The best single dashboard for the capability/cost/latency trade-off.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — "Choosing the Right Model" &amp; "Open vs Closed Source" nodes</a></li>
+  <li><a href="https://artificialanalysis.ai/">Artificial Analysis — model comparison dashboard</a></li>
+  <li><a href="https://lmarena.ai/">LMArena (Chatbot Arena) — human-preference leaderboard</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 16 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

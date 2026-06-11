@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10: End-to-End Harness Design</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:780px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}.tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}.tag.gold{background:rgba(245,158,11,.15);color:var(--yellow);border-color:var(--yellow)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}.callout.gold{border-left-color:var(--yellow);background:rgba(245,158,11,.05)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}.callout.gold .callout-label{color:var(--yellow)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .prop{color:#a5b4fc}.string{color:#86efac}.comment{color:#4b5563}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:100%;transition:width .4s ease}
+  /* Harness map */
+  .harness-map{display:flex;flex-direction:column;gap:.4rem;margin:1.5rem 0}
+  .hm-row{display:flex;align-items:center;gap:1rem;padding:.7rem 1rem;border:1px solid var(--border);border-radius:6px;background:var(--surface)}
+  .hm-layer{width:1.8rem;height:1.8rem;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .hm-name{font-family:var(--mono);font-size:.82rem;color:#a5b4fc;width:120px;flex-shrink:0}
+  .hm-what{font-size:.83rem;color:var(--muted);flex:1}
+  .hm-strategy{font-size:.7rem;font-family:var(--mono);padding:.15rem .5rem;border-radius:4px;flex-shrink:0}
+  .s-write{background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid rgba(99,102,241,.3)}
+  .s-select{background:rgba(34,197,94,.1);color:#86efac;border:1px solid rgba(34,197,94,.2)}
+  .s-compress{background:rgba(245,158,11,.1);color:#fcd34d;border:1px solid rgba(245,158,11,.2)}
+  .s-isolate{background:rgba(192,132,252,.1);color:#d8b4fe;border:1px solid rgba(192,132,252,.2)}
+  /* Diagnosis table */
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.87rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  /* Synthesis exercise */
+  .exercise{background:var(--surface);border:2px solid var(--accent);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .exercise-title{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .ex-step{display:flex;gap:1rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+  .ex-step:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+  .ex-num{width:2rem;height:2rem;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .ex-body{flex:1}
+  .ex-title{font-weight:600;margin-bottom:.3rem}
+  .ex-desc{font-size:.85rem;color:var(--muted)}
+  /* Completion */
+  .completion{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(34,197,94,.08));border:1px solid var(--accent);border-radius:12px;padding:2rem;margin:2.5rem 0;text-align:center}
+  .completion-icon{font-size:2.5rem;margin-bottom:1rem}
+  .completion-title{font-size:1.4rem;font-weight:700;margin-bottom:.5rem}
+  .completion-sub{color:var(--muted);font-size:.9rem;margin-bottom:1.5rem}
+  .completion-stats{display:flex;justify-content:center;gap:2rem;font-size:.85rem}
+  .stat{display:flex;flex-direction:column;align-items:center;gap:.2rem}
+  .stat-num{font-size:1.4rem;font-weight:700;color:var(--accent);font-family:var(--mono)}
+  .stat-label{color:var(--muted);font-size:.78rem}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+<div class="lesson-meta">
+  <span class="tag">Lesson 10</span>
+  <span class="tag gold">Synthesis</span>
+  <span class="tag yellow">~25 min</span>
+</div>
+<h1>End-to-End Harness Design</h1>
+<p class="subtitle">Every concept from Lessons 1–9, applied to a complete workflow. Design a full harness from scratch.</p>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<h2>The Full Picture</h2>
+<p>You've now covered all six harness layers and the two engineering disciplines that shape what goes in the context window. Before designing a harness, the complete map:</p>
+
+<div class="harness-map">
+  <div class="hm-row">
+    <div class="hm-layer" style="background:rgba(99,102,241,.2);color:#a5b4fc">1</div>
+    <div class="hm-name">CLAUDE.md</div>
+    <div class="hm-what">Project rules, commands, conventions — always loaded, stable</div>
+    <div class="hm-strategy s-write">Write</div>
+  </div>
+  <div class="hm-row">
+    <div class="hm-layer" style="background:rgba(251,146,60,.2);color:#fb923c">2</div>
+    <div class="hm-name">Tool surface</div>
+    <div class="hm-what">Bash, Read, Edit, Write, Agent, WebFetch — built-in actions</div>
+    <div class="hm-strategy s-select">Select</div>
+  </div>
+  <div class="hm-row">
+    <div class="hm-layer" style="background:rgba(34,197,94,.15);color:#86efac">3</div>
+    <div class="hm-name">MCP servers</div>
+    <div class="hm-what">External systems as structured tools — GitHub, APIs, databases</div>
+    <div class="hm-strategy s-select">Select</div>
+  </div>
+  <div class="hm-row">
+    <div class="hm-layer" style="background:rgba(192,132,252,.15);color:#d8b4fe">4</div>
+    <div class="hm-name">Skills</div>
+    <div class="hm-what">Reusable workflows — triggered on demand with /skill-name</div>
+    <div class="hm-strategy s-select">Select</div>
+  </div>
+  <div class="hm-row">
+    <div class="hm-layer" style="background:rgba(239,68,68,.15);color:#f87171">5</div>
+    <div class="hm-name">Hooks</div>
+    <div class="hm-what">Lifecycle enforcement — blocks, automation, side effects</div>
+    <div class="hm-strategy s-compress">Compress</div>
+  </div>
+  <div class="hm-row">
+    <div class="hm-layer" style="background:rgba(245,158,11,.15);color:#fcd34d">6</div>
+    <div class="hm-name">Memory</div>
+    <div class="hm-what">Cross-session state — user, feedback, project, reference</div>
+    <div class="hm-strategy s-write">Write</div>
+  </div>
+</div>
+
+<h2>Case Study: Daily Report Pipeline</h2>
+<p>Let's design a complete harness for a common workflow: a daily report that fetches data from multiple sources, filters by criteria, and produces a formatted output file.</p>
+
+<h3>Step 1 — Define the workflow</h3>
+<p>What needs to happen, in order:</p>
+<ol>
+  <li>Fetch data from N sources in parallel (each source is independent)</li>
+  <li>Filter by project-specific criteria</li>
+  <li>Score and rank results</li>
+  <li>Format as a structured report</li>
+  <li>Save to <code>output/daily-report-YYYY-MM-DD.md</code></li>
+</ol>
+
+<h3>Step 2 — Assign harness layers</h3>
+
+<pre>
+<span class="pre-label">HARNESS DESIGN</span><span class="comment"># Layer 1 — CLAUDE.md
+Add to project CLAUDE.md:
+  - Report config lives in src/config/reportConfig.js
+  - Output directory: output/  (always writable)
+  - Date format for filenames: YYYY-MM-DD
+
+# Layer 4 — Skill: /daily-report
+Trigger: user types /daily-report
+Body:
+  1. Read source list from data/sources.txt
+  2. Spawn parallel subagents (one per source) — each fetches
+     data and returns top results as JSON
+  3. Collect results, filter by criteria, rank by score desc
+  4. Write formatted report to output/daily-report-{date}.md
+  5. Print summary table to console
+
+# Layer 5 — Hooks
+PostToolUse on Write tool:
+  If file matches output/daily-report-*.md → run validation script
+  Validates: file exists, has content, no empty required fields
+  async: true — log result but don't block
+
+# Layer 6 — Memory
+Feedback memory: "User prefers reports sorted by score descending,
+not alphabetically. Confirmed when reviewing first output."
+Reference memory: "Source list is at data/sources.txt"</span>
+</pre>
+
+<h3>Step 3 — Design the subagent brief template</h3>
+
+<pre>
+<span class="pre-label">SUBAGENT BRIEF TEMPLATE (one per source)</span><span class="comment">You are a read-only data fetching agent.
+
+**Goal**: Fetch data for {SOURCE} and return the top 3 results
+matching our criteria.
+
+**Context**:
+- Project: /path/to/your-project
+- Fetch using: the fetch script at scripts/fetch.sh {SOURCE}
+- Filter criteria: score ≥ threshold defined in src/config/reportConfig.js
+
+**Constraints**:
+- Run only the fetch script — no other commands
+- Do not write any files
+
+**Output** (return exactly this JSON, no prose):
+{
+  "source": "{SOURCE}",
+  "results": [
+    {"id": "...", "score": N, "label": "...", "fetched_at": "ISO timestamp"}
+  ]
+}</span>
+</pre>
+
+<h3>Step 4 — Apply the four strategies</h3>
+<table>
+  <tr><th>Decision</th><th>Strategy</th><th>Implementation</th></tr>
+  <tr><td>Filter criteria persist across sessions</td><td>Write</td><td>Add to CLAUDE.md or a config file</td></tr>
+  <tr><td>N sources scanned independently</td><td>Isolate</td><td>N parallel subagents, one per source</td></tr>
+  <tr><td>Each subagent returns JSON not transcript</td><td>Compress</td><td>Explicit output format in brief</td></tr>
+  <tr><td>Skill only loads when /daily-report invoked</td><td>Select</td><td>Skill file — not in CLAUDE.md</td></tr>
+  <tr><td>Sort preference saved for future sessions</td><td>Write</td><td>Feedback memory file</td></tr>
+</table>
+
+<h2>The Diagnosis Framework</h2>
+<p>When a harness isn't working, use this sequence:</p>
+<table>
+  <tr><th>Symptom</th><th>Layer to check</th><th>Strategy</th></tr>
+  <tr><td>Claude forgets rules between sessions</td><td>Layer 1 or 6 — CLAUDE.md or memory</td><td>Write missing</td></tr>
+  <tr><td>Context fills up, quality degrades mid-session</td><td>Tool results, conversation length</td><td>Compress or Isolate missing</td></tr>
+  <tr><td>Claude uses wrong tools or ignores available ones</td><td>Layer 3 or 4 — MCP or skills</td><td>Select guidance missing in CLAUDE.md</td></tr>
+  <tr><td>Claude does something dangerous (force-push, secret leak)</td><td>Layer 5 — hooks</td><td>PreToolUse block hook missing</td></tr>
+  <tr><td>Subagent returns irrelevant or verbose result</td><td>Brief quality</td><td>Output format not specified</td></tr>
+  <tr><td>Same mistake repeated across sessions</td><td>Layer 6 — memory</td><td>Feedback memory not written</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-label">The Ratchet in Full</div>
+  Every time you diagnose a failure and fix a harness layer, the agent gets permanently better. CLAUDE.md gets one cleaner rule. A hook blocks one more edge case. A feedback memory prevents one repeat mistake. A subagent brief gets one more constraint. This compounds — a harness you've been maintaining for 3 months is dramatically more reliable than a fresh one. The ratchet only tightens.
+</div>
+
+<h2>Synthesis Exercise: Design Your Own</h2>
+
+<div class="exercise">
+  <div class="exercise-title">Your Turn — Design a Harness</div>
+  <p style="font-size:.87rem;color:var(--muted);margin-bottom:1.25rem">Pick one workflow from your own project that Claude currently handles poorly or inconsistently. Work through each step.</p>
+
+  <div class="ex-step">
+    <div class="ex-num">1</div>
+    <div class="ex-body">
+      <div class="ex-title">Name the workflow</div>
+      <div class="ex-desc">What does it do? What's the trigger? What's the expected output? (e.g. "Run a data pipeline, validate the output, and produce a formatted report")</div>
+    </div>
+  </div>
+  <div class="ex-step">
+    <div class="ex-num">2</div>
+    <div class="ex-body">
+      <div class="ex-title">List what goes wrong today</div>
+      <div class="ex-desc">Where does Claude fail, forget, or produce inconsistent output? List 3–5 concrete failures.</div>
+    </div>
+  </div>
+  <div class="ex-step">
+    <div class="ex-num">3</div>
+    <div class="ex-body">
+      <div class="ex-title">Map each failure to a layer + strategy</div>
+      <div class="ex-desc">For each failure: which harness layer is missing or wrong? Which strategy is absent? Use the diagnosis table above.</div>
+    </div>
+  </div>
+  <div class="ex-step">
+    <div class="ex-num">4</div>
+    <div class="ex-body">
+      <div class="ex-title">Design the fix for each layer</div>
+      <div class="ex-desc">Write the CLAUDE.md addition, the skill body, the hook script, or the memory file that addresses each failure. Be specific — no "add a rule" without the actual rule text.</div>
+    </div>
+  </div>
+  <div class="ex-step">
+    <div class="ex-num">5</div>
+    <div class="ex-body">
+      <div class="ex-title">Implement one layer this session</div>
+      <div class="ex-desc">Pick the highest-leverage fix and implement it now. Ask Claude to help. The ratchet starts with the first commit.</div>
+    </div>
+  </div>
+</div>
+
+<h2>What You Now Know</h2>
+
+<div class="completion">
+  <div class="completion-icon">⬡</div>
+  <div class="completion-title">Context &amp; Harness Engineering</div>
+  <div class="completion-sub">Ten lessons completed. One more on token compression tools in Lesson 11.</div>
+  <div class="completion-stats">
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Harness layers</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Context strategies</div></div>
+    <div class="stat"><div class="stat-num">10</div><div class="stat-label">Lessons here</div></div>
+    <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Ratchet clicks</div></div>
+  </div>
+</div>
+
+<p>The central insight that should stick: <strong>Agent = Model + Harness.</strong> You don't control the model. You control the harness entirely. Every inconsistency Claude has in your project is a harness problem — a missing Write, a missing block hook, an unbriefed subagent, a CLAUDE.md rule that got buried. The tools to fix it are all in your hands now.</p>
+
+<h2>Where to Go From Here</h2>
+<ul>
+  <li><strong>Build one harness from the synthesis exercise</strong> — implement it layer by layer, starting with the highest-leverage fix</li>
+  <li><strong>Read the sources</strong> — Addy Osmani's harness engineering post and the arxiv context engineering paper are both worth a full read</li>
+  <li><strong>Community</strong> — <a href="https://www.reddit.com/r/ClaudeAI/">r/ClaudeAI</a> and the Anthropic Discord have practitioners sharing real harness setups</li>
+  <li><strong>Keep a feedback log</strong> — every time Claude gets something wrong, write a feedback memory. The ratchet compounds.</li>
+</ul>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">You finished the curriculum — now apply it.</div>
+  <p>Pick a workflow from your own project and ask Claude to help design the harness for it, step by step. Or ask: "review my current CLAUDE.md against the criteria from Lesson 4 and tell me what to cut and what to add." The lessons stay in <code>teaching/lessons/</code> for reference.</p>
+</div>
+
+<h2>Sources — Full Curriculum</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://addyosmani.com/blog/agent-harness-engineering/">Addy Osmani — Agent Harness Engineering (2026)</a></li>
+  <li><a href="https://www.deepset.ai/blog/context-engineering-the-next-frontier-beyond-prompt-engineering">deepset — Context Engineering: The Next Frontier</a></li>
+  <li><a href="https://arxiv.org/pdf/2603.09619">arXiv 2603.09619 — Context Engineering: From Prompts to Multi-Agent Architecture</a></li>
+  <li><a href="https://mer.vin/2026/05/claude-code-architecture-explained-six-harness-layers-beyond-the-llm/">Mervin Praison — Six Harness Layers Beyond the LLM</a></li>
+  <li><a href="https://hidekazu-konishi.com/entry/claude_code_harness_and_environment_engineering_guide.html">hidekazu-konishi — Harness and Environment Engineering Guide</a></li>
+  <li><a href="https://okhlopkov.com/claude-code-setup-mcp-hooks-skills-2026/">okhlopkov — Claude Code Setup: MCP, Hooks, Skills (2026)</a></li>
+  <li><a href="https://blog.logrocket.com/llm-context-problem-strategies-2026/">LogRocket — LLM context strategies: memory, relevance, scale</a></li>
+  <li><a href="https://www.paradime.io/guides/claude-code-skills-plugins-rules-guide">Paradime — Complete Guide to Claude Code Skills &amp; MCP</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 10 of 12 · Context &amp; Harness Engineering</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+</body>
+</html>

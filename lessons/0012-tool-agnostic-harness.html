@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 12: Tool-Agnostic Harness Engineering</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  /* Layer diagram */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+  .col-card{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .col-header{padding:.6rem 1rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)}
+  .col-header.universal{background:var(--green-dim);color:var(--green)}
+  .col-header.specific{background:var(--accent-dim);color:var(--accent)}
+  .col-body{padding:.9rem 1rem;font-size:.85rem;display:flex;flex-direction:column;gap:.5rem}
+  .col-item{display:flex;align-items:center;gap:.5rem}
+  .col-item::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+  .col-item.u::before{background:var(--green)}.col-item.s::before{background:var(--accent)}
+  /* Tool grid */
+  .tool-row{display:grid;grid-template-columns:140px 1fr 1fr 1fr 1fr;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:.5rem 0}
+  .tool-row.header{background:var(--surface)}
+  .tool-cell{padding:.55rem .8rem;font-size:.8rem;border-right:1px solid var(--border)}
+  .tool-cell:last-child{border-right:none}
+  .tool-cell.label{font-family:var(--mono);font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+  .tool-name-cell{padding:.55rem .8rem;font-size:.78rem;font-weight:700;border-right:1px solid var(--border);background:var(--surface)}
+  .check{color:var(--green);font-weight:700}.partial{color:var(--yellow)}.cross{color:var(--red)}
+  /* Agents.md feature */
+  .agents-card{border:1px solid var(--green);border-radius:8px;overflow:hidden;margin:1.5rem 0}
+  .agents-header{background:var(--green-dim);padding:.75rem 1.25rem;display:flex;align-items:center;gap:.75rem}
+  .agents-icon{font-family:var(--mono);font-size:.85rem;font-weight:700;background:var(--green);color:#000;padding:.2rem .5rem;border-radius:4px}
+  .agents-title{font-weight:700;color:var(--green)}
+  .agents-sub{color:var(--muted);font-size:.82rem;margin-left:auto}
+  .agents-body{padding:1.1rem 1.25rem;background:var(--surface);font-size:.88rem}
+  /* Compression agnostic split */
+  .split-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0 1.5rem}
+  .split-col{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .split-header{padding:.55rem 1rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)}
+  .split-header.agnostic{background:var(--green-dim);color:var(--green)}
+  .split-header.locked{background:var(--accent-dim);color:var(--accent)}
+  .split-body{padding:.9rem 1rem;display:flex;flex-direction:column;gap:.6rem;font-size:.85rem}
+  .split-item{display:flex;flex-direction:column;gap:.15rem}
+  .split-item-name{font-family:var(--mono);font-size:.8rem;font-weight:700}
+  .split-item-desc{font-size:.78rem;color:var(--muted)}
+  /* portable harness template */
+  .template-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:1.5rem 0}
+  .template-header{padding:.65rem 1.1rem;border-bottom:1px solid var(--border);font-size:.8rem;font-family:var(--mono);color:var(--muted);display:flex;align-items:center;gap:.6rem}
+  .template-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+  .template-body{padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:1rem}
+  .template-step{display:flex;gap:.85rem}
+  .template-num{min-width:1.75rem;height:1.75rem;border-radius:6px;background:var(--accent-dim);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--accent);flex-shrink:0;margin-top:.05rem}
+  .template-content{flex:1}
+  .template-title{font-weight:600;font-size:.9rem;margin-bottom:.25rem}
+  .template-desc{font-size:.82rem;color:var(--muted)}
+  /* Quiz */
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+  @media(max-width:640px){.two-col,.split-grid{grid-template-columns:1fr}.tool-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 12</span>
+  <span class="tag green">Tool-Agnostic</span>
+  <span class="tag orange">Harness Engineering</span>
+  <span class="tag yellow">~30 min</span>
+</div>
+
+<h1>Tool-Agnostic Harness Engineering</h1>
+<p class="subtitle">The four context strategies are universal. The six harness layers are Claude Code's implementation. Every major AI coding tool has equivalents — here's the map.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- ── THE CORE INSIGHT ────────────────────────────────────── -->
+<h2>Strategies vs. Layers</h2>
+
+<p>Lessons 1–10 taught you two things that look the same but aren't:</p>
+<ul>
+  <li><strong>Strategies</strong> — Write, Select, Compress, Isolate. These are <em>concepts</em>. They apply to any system that takes a context window as input.</li>
+  <li><strong>Harness layers</strong> — CLAUDE.md, hooks, skills, memory, MCP. These are <em>Claude Code's implementation</em> of those strategies.</li>
+</ul>
+<p>If you switch tools, the strategies survive intact. The layer names change. This lesson maps what carries over and what you need to relearn.</p>
+
+<div class="two-col">
+  <div class="col-card">
+    <div class="col-header universal">Survives any tool switch</div>
+    <div class="col-body">
+      <div class="col-item u">Write strategy — externalize knowledge to disk</div>
+      <div class="col-item u">Select strategy — inject only what's relevant</div>
+      <div class="col-item u">Compress strategy — reduce tokens before injection</div>
+      <div class="col-item u">Isolate strategy — separate concerns into separate contexts</div>
+      <div class="col-item u">Ratchet principle — every mistake → permanent rule</div>
+      <div class="col-item u">Headroom discipline — protect the context window</div>
+      <div class="col-item u">Compression tools (Repomix, LLMLingua, Graphify, LSP)</div>
+    </div>
+  </div>
+  <div class="col-card">
+    <div class="col-header specific">Claude Code-specific — relearn per tool</div>
+    <div class="col-body">
+      <div class="col-item s">CLAUDE.md (Layer 1 — project knowledge file)</div>
+      <div class="col-item s">Hooks (Layer 5 — PreToolUse / PostToolUse)</div>
+      <div class="col-item s">Skills / slash commands (Layer 4)</div>
+      <div class="col-item s">Memory file format (Layer 6)</div>
+      <div class="col-item s">MCP config key: <code>mcpServers</code> in <code>settings.json</code></div>
+      <div class="col-item s">RTK — hooks into Claude Code's Bash tool</div>
+      <div class="col-item s">Caveman — a Claude Code skill (<code>/caveman</code>)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LAYER 1 ACROSS TOOLS ───────────────────────────────── -->
+<h2>Layer 1: The Project Knowledge File</h2>
+
+<p>Every major AI coding tool has a "always-loaded instructions" file at the project level. This is the Write strategy in action — you persist rules to disk so they don't have to be re-stated each session.</p>
+
+<table>
+  <tr>
+    <th>Tool</th>
+    <th>File / Location</th>
+    <th>Format</th>
+    <th>Scope options</th>
+  </tr>
+  <tr>
+    <td><strong>Claude Code</strong></td>
+    <td><code>CLAUDE.md</code> (project root)</td>
+    <td>Markdown</td>
+    <td>Global (<code>~/.claude/</code>), project root, subdirectory</td>
+  </tr>
+  <tr>
+    <td><strong>Cursor</strong></td>
+    <td><code>.cursor/rules/*.mdc</code></td>
+    <td>Markdown + YAML frontmatter (<code>globs</code>, <code>alwaysApply</code>, <code>description</code>)</td>
+    <td>Always-on, glob-triggered, agent-requested. Legacy <code>.cursorrules</code> still works.</td>
+  </tr>
+  <tr>
+    <td><strong>GitHub Copilot</strong></td>
+    <td><code>.github/copilot-instructions.md</code> (repo-wide) <br><code>.github/instructions/*.instructions.md</code> (path-scoped)</td>
+    <td>Markdown</td>
+    <td>Organization → repository → personal (highest priority)</td>
+  </tr>
+  <tr>
+    <td><strong>Windsurf</strong></td>
+    <td><code>.windsurfrules</code> (project root) <br><code>.devin/rules/</code> or <code>.windsurf/rules/</code></td>
+    <td>Plain text / Markdown</td>
+    <td>Global (Cascade settings panel) or project-level</td>
+  </tr>
+  <tr>
+    <td><strong>Aider</strong></td>
+    <td><code>CONVENTIONS.md</code> (loaded via <code>--read</code>), configured in <code>.aider.conf.yml</code></td>
+    <td>Markdown</td>
+    <td>Single file, any name — specify with <code>--conventions-file</code></td>
+  </tr>
+</table>
+
+<div class="callout key">
+  <div class="callout-label">Token cost applies everywhere</div>
+  Every tool loads the project rules file on every request. The same rule from Lesson 4 holds: short beats long, specific beats vague, "always-on" rules eat headroom on every turn. Keep the global rules file tight; move verbose guidance into scoped/conditional rules.
+</div>
+
+<!-- ── AGENTS.MD ───────────────────────────────────────────── -->
+<div class="agents-card">
+  <div class="agents-header">
+    <span class="agents-icon">AGENTS.md</span>
+    <div>
+      <div class="agents-title">The Emerging Cross-Tool Standard</div>
+    </div>
+    <div class="agents-sub">Supported by Cursor, Copilot, Aider, Windsurf, Tabnine and more</div>
+  </div>
+  <div class="agents-body">
+    <p>AGENTS.md started as an OpenAI initiative (August 2025) and has become the closest thing the ecosystem has to a vendor-neutral, cross-tool configuration standard. Place it at the project root. Every major tool reads it.</p>
+    <p><strong>What belongs in AGENTS.md:</strong> build commands, test commands, code style conventions, architectural decisions, framework-specific constraints — everything an agent needs to work in the codebase without asking.</p>
+    <p><strong>Relationship to tool-specific files:</strong> Use AGENTS.md for the portable core. Use tool-specific files (<code>.cursor/rules/</code>, <code>.github/copilot-instructions.md</code>) for tool-specific overrides or features (like Cursor's glob triggers or Copilot's path-specific instructions).</p>
+    <p><strong>Where Aider fits:</strong> Aider's docs explicitly recommend AGENTS.md as an alternative to CONVENTIONS.md for interoperability. Use <code>aider --read AGENTS.md</code> or add <code>read: AGENTS.md</code> to <code>.aider.conf.yml</code>.</p>
+    <p style="margin-bottom:0"><strong>Sources:</strong> <a href="https://www.augmentcode.com/guides/how-to-build-agents-md">Augment Code AGENTS.md guide</a> · <a href="https://vibecoding.app/blog/agents-md-guide">vibecoding.app cross-tool guide</a> · <a href="https://codersera.com/blog/agents-md-complete-guide-2026/">codersera complete guide</a></p>
+  </div>
+</div>
+
+<!-- ── LAYER 3: MCP ────────────────────────────────────────── -->
+<h2>Layer 3: MCP Across Tools</h2>
+
+<p>MCP (Model Context Protocol) has become the de-facto standard for extending AI tool surfaces. Support is broad, but the config format varies per tool.</p>
+
+<table>
+  <tr>
+    <th>Tool</th>
+    <th>Config file</th>
+    <th>Root key</th>
+    <th>Activation scope</th>
+  </tr>
+  <tr>
+    <td><strong>Claude Code</strong></td>
+    <td><code>~/.claude/settings.json</code></td>
+    <td><code>mcpServers</code></td>
+    <td>Global or project-level <code>.claude/settings.json</code></td>
+  </tr>
+  <tr>
+    <td><strong>Cursor</strong></td>
+    <td>JSON config file (project or global)</td>
+    <td><code>mcpServers</code></td>
+    <td>Project or global</td>
+  </tr>
+  <tr>
+    <td><strong>VS Code / GitHub Copilot</strong></td>
+    <td><code>.vscode/mcp.json</code></td>
+    <td><code>servers</code> (not <code>mcpServers</code>)</td>
+    <td>Agent mode only. Not available in inline completion.</td>
+  </tr>
+  <tr>
+    <td><strong>Windsurf</strong></td>
+    <td>MCP Marketplace (GUI) or config file</td>
+    <td>varies</td>
+    <td>Global — Cascade panel → MCP Marketplace</td>
+  </tr>
+  <tr>
+    <td><strong>Aider</strong></td>
+    <td>No native MCP support (as of 2026)</td>
+    <td>—</td>
+    <td>Use shell wrapper scripts for external tools</td>
+  </tr>
+</table>
+
+<div class="callout warning">
+  <div class="callout-label">VS Code gotcha</div>
+  Copilot uses <code>"servers"</code> as the root key, not <code>"mcpServers"</code>. This is the single most common copy-paste mistake when migrating an MCP config from Claude Code or Cursor. Also: MCP tools only work in Copilot's Agent mode — they don't appear in inline completions or chat.
+</div>
+
+<!-- ── LAYER 5: HOOKS ─────────────────────────────────────── -->
+<h2>Layer 5: Hooks — The Claude Code Moat</h2>
+
+<p>The Pre/PostToolUse hook system from Lesson 2 is Claude Code-specific. No other major tool has an equivalent as of 2026. This is the biggest architectural gap when switching away from Claude Code.</p>
+
+<table>
+  <tr>
+    <th>Capability</th>
+    <th>Claude Code</th>
+    <th>Cursor</th>
+    <th>Copilot</th>
+    <th>Windsurf</th>
+    <th>Aider</th>
+  </tr>
+  <tr>
+    <td>Block a tool call before it runs</td>
+    <td><span class="check">✓</span> PreToolUse (exit 1)</td>
+    <td><span class="cross">✗</span></td>
+    <td><span class="cross">✗</span></td>
+    <td><span class="cross">✗</span></td>
+    <td><span class="cross">✗</span></td>
+  </tr>
+  <tr>
+    <td>Run automation after a tool call</td>
+    <td><span class="check">✓</span> PostToolUse</td>
+    <td><span class="cross">✗</span></td>
+    <td><span class="cross">✗</span></td>
+    <td><span class="cross">✗</span></td>
+    <td><span class="partial">~</span> shell wrappers</td>
+  </tr>
+  <tr>
+    <td>React to session lifecycle events</td>
+    <td><span class="check">✓</span> SessionStart, Stop, etc.</td>
+    <td><span class="cross">✗</span></td>
+    <td><span class="cross">✗</span></td>
+    <td><span class="cross">✗</span></td>
+    <td><span class="cross">✗</span></td>
+  </tr>
+  <tr>
+    <td>CI/pre-commit wrappers (rough substitute)</td>
+    <td><span class="check">✓</span> (in addition to hooks)</td>
+    <td><span class="partial">~</span></td>
+    <td><span class="partial">~</span></td>
+    <td><span class="partial">~</span></td>
+    <td><span class="partial">~</span></td>
+  </tr>
+</table>
+
+<p><strong>Workarounds for other tools:</strong> The patterns hooks implement (safety gates, auto-linting, logging) can be partially replicated using pre-commit hooks, CI pipelines, and shell scripts that wrap the tool's CLI. But they're not equivalent — they can't inspect or block individual AI tool calls in real-time.</p>
+
+<!-- ── LAYER 4 & 6 ─────────────────────────────────────────── -->
+<h2>Skills and Memory — Concept Equivalents</h2>
+
+<table>
+  <tr>
+    <th>Claude Code concept</th>
+    <th>What it does</th>
+    <th>Nearest cross-tool equivalent</th>
+  </tr>
+  <tr>
+    <td><strong>Skills</strong> (Layer 4) — <code>.claude/skills/*.md</code></td>
+    <td>Reusable, slash-command-triggered workflows that inject a full task brief into context</td>
+    <td>Cursor: <code>.cursor/rules/</code> with <code>alwaysApply: false</code> (agent-requested) · Copilot: no direct equivalent · Aider: aliases in <code>.aider.conf.yml</code></td>
+  </tr>
+  <tr>
+    <td><strong>Memory</strong> (Layer 6) — <code>.claude/memory/*.md</code></td>
+    <td>Persistent cross-session facts injected into future sessions via MEMORY.md index</td>
+    <td>Windsurf: Cascade Memories (automatic, workspace-scoped) · Cursor: rules that accumulate knowledge · Others: manually maintained <code>AGENTS.md</code> sections</td>
+  </tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-label">Insight</div>
+  The underlying <em>pattern</em> for memory is the same everywhere: write durable facts to disk, inject them selectively at the start of future sessions. Only Claude Code automates this end-to-end. In other tools, you do the same thing manually — keep a <code>CONTEXT.md</code> or add a section to your <code>AGENTS.md</code> that you update as the project evolves.
+</div>
+
+<!-- ── COMPRESSION TOOLS SPLIT ────────────────────────────── -->
+<h2>Compression Tools: What Travels, What Doesn't</h2>
+
+<div class="split-grid">
+  <div class="split-col">
+    <div class="split-header agnostic">Tool-agnostic — works everywhere</div>
+    <div class="split-body">
+      <div class="split-item">
+        <span class="split-item-name">Repomix</span>
+        <span class="split-item-desc">Packs a repo into a single file you inject into any tool. <code>npx repomix</code></span>
+      </div>
+      <div class="split-item">
+        <span class="split-item-name">LLMLingua</span>
+        <span class="split-item-desc">Pre-processes retrieved docs before you paste them into any tool. Python library.</span>
+      </div>
+      <div class="split-item">
+        <span class="split-item-name">Graphify</span>
+        <span class="split-item-desc">Produces <code>GRAPH_REPORT.md</code> you include in any tool's context. <code>npx graphify query</code></span>
+      </div>
+      <div class="split-item">
+        <span class="split-item-name">LSP</span>
+        <span class="split-item-desc">Compiler-backed symbol navigation. Supported in VS Code, Cursor, Zed, any IDE with LSP.</span>
+      </div>
+    </div>
+  </div>
+  <div class="split-col">
+    <div class="split-header locked">Claude Code-specific — needs a substitute</div>
+    <div class="split-body">
+      <div class="split-item">
+        <span class="split-item-name">RTK</span>
+        <span class="split-item-desc">Hooks into Claude Code's Bash tool via PreToolUse. No hook system = no RTK. <em>Substitute:</em> manually pass compressed output, or use Repomix for file context.</span>
+      </div>
+      <div class="split-item">
+        <span class="split-item-name">Caveman mode</span>
+        <span class="split-item-desc">A Claude Code skill (<code>/caveman</code>). <em>Substitute:</em> add an output style rule to your project rules file: "Be terse. Bullet points only. No prose."</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PORTABLE HARNESS ───────────────────────────────────── -->
+<h2>The Portable Harness: A Tool-Agnostic Template</h2>
+<p>This five-layer structure implements all four strategies without depending on Claude Code primitives. Drop it into any tool.</p>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-dot"></div>
+    Portable harness template — works with Claude Code, Cursor, Copilot, Windsurf, Aider
+  </div>
+  <div class="template-body">
+    <div class="template-step">
+      <div class="template-num">1</div>
+      <div class="template-content">
+        <div class="template-title">Write layer — <code>AGENTS.md</code> at project root <span style="color:var(--green);font-size:.75rem;margin-left:.4rem">↳ Write strategy</span></div>
+        <div class="template-desc">Project conventions, build commands, test commands, architectural constraints. Keep it under 400 words. Every tool reads it. This is your portable CLAUDE.md.</div>
+      </div>
+    </div>
+    <div class="template-step">
+      <div class="template-num">2</div>
+      <div class="template-content">
+        <div class="template-title">Write layer — <code>CONTEXT.md</code> (maintained manually) <span style="color:var(--green);font-size:.75rem;margin-left:.4rem">↳ Write + Select strategy</span></div>
+        <div class="template-desc">Cross-session facts: decisions made, constraints discovered, things the tool got wrong. Update it yourself at the end of each session. Include it explicitly when it's relevant. This is your portable memory system.</div>
+      </div>
+    </div>
+    <div class="template-step">
+      <div class="template-num">3</div>
+      <div class="template-content">
+        <div class="template-title">Compress layer — Graphify + Repomix <span style="color:var(--orange);font-size:.75rem;margin-left:.4rem">↳ Compress strategy</span></div>
+        <div class="template-desc">Run <code>npx graphify index</code> once. Add a query instruction to AGENTS.md. For whole-codebase tasks, pack with Repomix and hand to a subagent or separate chat session. Replaces RTK for the file/architecture sources of token bloat.</div>
+      </div>
+    </div>
+    <div class="template-step">
+      <div class="template-num">4</div>
+      <div class="template-content">
+        <div class="template-title">Isolate layer — separate sessions per concern <span style="color:var(--purple);font-size:.75rem;margin-left:.4rem">↳ Isolate strategy</span></div>
+        <div class="template-desc">Don't mix an architecture discussion with an implementation sprint in the same session. Start fresh chat sessions for different concerns. Pass only the relevant subset of context (a Repomix pack, a Graphify subgraph, a CONTEXT.md excerpt) — never the whole history.</div>
+      </div>
+    </div>
+    <div class="template-step">
+      <div class="template-num">5</div>
+      <div class="template-content">
+        <div class="template-title">Ratchet layer — append to <code>AGENTS.md</code> on every mistake <span style="color:var(--yellow);font-size:.75rem;margin-left:.4rem">↳ Ratchet principle</span></div>
+        <div class="template-desc">Every time the tool does something wrong, add a rule. "Never use default exports." "Always check for null before accessing .data." "Tests go in tests/unit/, not next to the source." The harness only tightens.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<pre>
+<span class="pre-label">AGENTS.md — minimal portable template</span><span class="comment"># Project: [Name]
+
+## Commands
+- Build: `npm run build`
+- Test: `npm test`
+- Lint: `npm run lint` (fix before every commit)
+
+## Architecture
+[2-3 sentences on how the project is structured]
+
+## Conventions
+- [Convention 1]
+- [Convention 2]
+
+## Codebase Navigation
+A Graphify knowledge graph is at GRAPH_REPORT.md.
+Query it first: `npx graphify query "[your question]"`
+
+## Rules (append when tool violates these)
+- [Rule added after first incident]
+- [Rule added after second incident]</span></pre>
+
+<!-- ── WHEN TO SWITCH ──────────────────────────────────────── -->
+<h2>Choosing Your Primary Tool</h2>
+
+<table>
+  <tr>
+    <th>If you need…</th>
+    <th>Reach for</th>
+  </tr>
+  <tr>
+    <td>Hook-based safety gates, blocking bad tool calls</td>
+    <td><strong>Claude Code</strong> — only tool with PreToolUse/PostToolUse</td>
+  </tr>
+  <tr>
+    <td>Per-file-type rules (different rules for React vs. API files)</td>
+    <td><strong>Cursor</strong> — glob-triggered <code>.mdc</code> rules are uniquely powerful</td>
+  </tr>
+  <tr>
+    <td>Org-level governance, team shared instructions</td>
+    <td><strong>GitHub Copilot</strong> — organization-level instructions propagate to all repos</td>
+  </tr>
+  <tr>
+    <td>Automatic session memory without manual upkeep</td>
+    <td><strong>Windsurf</strong> — Cascade Memories accumulate context automatically</td>
+  </tr>
+  <tr>
+    <td>Model-agnostic, works with any LLM API</td>
+    <td><strong>Aider</strong> — plugs into any OpenAI-compatible endpoint</td>
+  </tr>
+  <tr>
+    <td>Portability — must work across multiple tools / team with mixed preferences</td>
+    <td><strong>AGENTS.md-first</strong> — write your harness in AGENTS.md, use tool-specific files only for overrides</td>
+  </tr>
+</table>
+
+<!-- ── QUIZ ──────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">You're moving a project from Claude Code to Cursor. You had a PreToolUse hook that blocked any <code>git push</code> to main without confirmation. How do you replicate this in Cursor?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Add a <code>.cursor/rules/git.mdc</code> file with <code>alwaysApply: true</code> that says "never push to main"</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">B</div><div>Configure an MCP server that intercepts git commands</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">C</div><div>You can't replicate it exactly — Cursor has no hook system. Closest substitute: a git pre-push hook (shell-level) plus a rule telling the AI never to push to main directly</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Use Cursor's MCP Marketplace to find a git safety extension</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. The PreToolUse hook is Claude Code-specific and has no direct equivalent in Cursor, Copilot, Windsurf, or Aider as of 2026. The closest you can do is: a shell-level git pre-push hook (which fires before any push at the OS level, regardless of what tool invoked git) plus a rule in your project rules file that instructs the AI never to run that command. It's weaker than a real-time hook — it can't block the AI mid-turn — but it's the best available substitute.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Cursor has no hook system. The PreToolUse/PostToolUse architecture is unique to Claude Code. A rules file instruction ("never push to main") guides the model but doesn't technically block the tool call. The practical answer is: a shell-level git pre-push hook combined with a project rule. Accept that this harness layer is weaker outside Claude Code.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">Your team has engineers using Claude Code, Cursor, and GitHub Copilot. You want one set of project instructions that all three tools read. What's the right approach?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Maintain three separate files: <code>CLAUDE.md</code>, <code>.cursorrules</code>, and <code>.github/copilot-instructions.md</code> — one per tool</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Write the shared conventions in <code>AGENTS.md</code> (cross-tool standard), then add thin tool-specific override files for features unique to each tool</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Put everything in <code>.github/copilot-instructions.md</code> since GitHub is the source of truth for the repo anyway</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Use MCP to serve the instructions — all tools support MCP so they'll all pick it up</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">AGENTS.md is the right spine. It's the vendor-neutral standard that Cursor, Copilot, Aider, Windsurf, and Claude Code all read. Write the shared conventions there — build commands, test commands, architecture, the ratchet rules. Then add tool-specific files only where you need tool-specific features: <code>.cursor/rules/</code> for Cursor's glob triggers, <code>.github/copilot-instructions.md</code> for Copilot's org-level propagation, <code>CLAUDE.md</code> for Claude Code's subdirectory scoping or hooks-related context. The portable core stays in one place.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">AGENTS.md is the right answer. It's the cross-tool standard that all three tools (Claude Code, Cursor, Copilot) read. Maintaining three separate files means three places to update when a rule changes — and they drift. The right structure: shared conventions in AGENTS.md, tool-specific features in tool-specific override files. MCP doesn't carry project instructions; it extends tool surfaces with external capabilities.</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">You switch from Claude Code to Windsurf. You had RTK installed for shell command compression, saving ~80% per Bash call. What's the right substitute strategy in Windsurf?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">A</div><div>Install RTK in Windsurf — it works with any tool via MCP</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">B</div><div>RTK installs as a Windsurf extension from the MCP Marketplace</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">C</div><div>RTK won't work — it relies on Claude Code's hook system. Substitute: use Repomix to pack file context, run LLMLingua on long retrieved docs, and add terse-output rules to <code>.windsurfrules</code></div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">D</div><div>Switch back to Claude Code for any project that needs token compression</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">RTK requires Claude Code's PreToolUse hook to intercept Bash output before it lands in context. No hook system means no RTK. The best substitute stack in Windsurf: Graphify (query the graph instead of reading files — the biggest win), Repomix (for whole-codebase tasks), LLMLingua (for long retrieved docs), and an explicit rule in <code>.windsurfrules</code> asking for terse output (the manual version of Caveman mode). You lose the automatic shell-output interception, but you can eliminate most of the underlying causes of token bloat through the other tools.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">RTK is Claude Code-specific. It intercepts Bash output using Claude Code's PreToolUse hook — without that hook, RTK has nothing to intercept. The portable substitutes are: Graphify (avoid reading files at all), Repomix (controlled file packing), LLMLingua (doc compression), and terse-output rules in your project rules file. You lose automatic shell compression, but the other tools address the root causes.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want to see a full AGENTS.md for a specific project type? Ask: "give me an AGENTS.md template for a Node.js REST API with Jest tests." Or ask about a specific migration: "what do I lose moving from Claude Code to Cursor, and what's the workaround for each gap?"</p>
+</div>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://cursor.com/docs/context/rules">Cursor Docs — Rules (.cursor/rules, .mdc format)</a></li>
+  <li><a href="https://techsy.io/en/blog/cursor-rules-guide">TECHSY — Cursor Rules: Write .cursor/rules That Work (2026)</a></li>
+  <li><a href="https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot">GitHub Docs — Adding repository custom instructions for GitHub Copilot</a></li>
+  <li><a href="https://code.visualstudio.com/docs/agent-customization/custom-instructions">VS Code Docs — Use custom instructions</a></li>
+  <li><a href="https://docs.windsurf.com/windsurf/cascade/memories">Windsurf Docs — Cascade Memories</a></li>
+  <li><a href="https://thepromptshelf.dev/blog/windsurfrules-complete-guide-2026/">.windsurfrules Complete Guide 2026 — The Prompt Shelf</a></li>
+  <li><a href="https://aider.chat/docs/usage/conventions.html">Aider Docs — Specifying coding conventions</a></li>
+  <li><a href="https://aider.chat/docs/config/aider_conf.html">Aider Docs — YAML config file (.aider.conf.yml)</a></li>
+  <li><a href="https://www.augmentcode.com/guides/how-to-build-agents-md">Augment Code — How to Build Your AGENTS.md (2026)</a></li>
+  <li><a href="https://vibecoding.app/blog/agents-md-guide">vibecoding.app — AGENTS.md Guide: Copilot, Cursor &amp; More</a></li>
+  <li><a href="https://www.remoet.dev/blog/how-to-set-up-mcp-server-claude-cursor-windsurf">remoet.dev — Set Up MCP in Claude, Cursor, Windsurf (2026)</a></li>
+  <li><a href="https://lushbinary.com/blog/ai-coding-agents-comparison-cursor-windsurf-claude-copilot-kiro-2026/">Lushbinary — AI Coding Agents 2026: Feature Comparison</a></li>
+  <li><a href="https://arxiv.org/pdf/2602.14690">arXiv — Configuring Agentic AI Coding Tools: An Exploratory Study</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 12 of 13 · Context &amp; Harness Engineering</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/3*100)+'%';
+}
+</script>
+</body>
+</html>

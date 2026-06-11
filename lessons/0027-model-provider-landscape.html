@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 27: The Model Provider Landscape</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 27</span>
+  <span class="tag green">Roadmap · Model Providers</span>
+  <span class="tag orange">Landscape</span>
+  <span class="tag yellow">~12 min</span>
+</div>
+
+<h1>The Model Provider Landscape</h1>
+<p class="subtitle">Beyond OpenAI: Anthropic, Google, and the open-weight players. Plus the abstraction layer that lets you switch between them.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">Why this is a short lesson</div>
+  You learned the OpenAI API shape in Lesson 18 precisely so this lesson can be short: every provider below is a variation on the same theme — messages in, completion out, tool calling, streaming. You're learning <em>differences</em>, not new fundamentals.
+</div>
+
+<!-- ── PROVIDERS ───────────────────────────────────────────── -->
+<h2>The major closed providers</h2>
+<table>
+  <tr><th>Provider</th><th>Flagship</th><th>Distinctive strengths</th></tr>
+  <tr><td><strong>OpenAI</strong></td><td>GPT-5, o-series</td><td>The reference API; strong tooling, ecosystem, Responses/Agents SDK</td></tr>
+  <tr><td><strong>Anthropic</strong></td><td>Claude (Opus/Sonnet)</td><td>Long-context reliability, agentic coding, Claude Code &amp; Agent SDK</td></tr>
+  <tr><td><strong>Google</strong></td><td>Gemini</td><td>Huge context windows, native multimodal, ADK / Vertex AI</td></tr>
+  <tr><td><strong>Cohere</strong></td><td>Command, Embed, Rerank</td><td>Enterprise RAG — strong embeddings and rerankers</td></tr>
+</table>
+
+<h2>The open-weight players</h2>
+<table>
+  <tr><th>Model family</th><th>From</th><th>Note</th></tr>
+  <tr><td><strong>Llama</strong></td><td>Meta</td><td>The open-weight default; huge ecosystem</td></tr>
+  <tr><td><strong>Mistral</strong></td><td>Mistral AI</td><td>Efficient, strong for size; European</td></tr>
+  <tr><td><strong>Qwen</strong></td><td>Alibaba</td><td>Very strong multilingual &amp; coding; many sizes</td></tr>
+  <tr><td><strong>DeepSeek</strong></td><td>DeepSeek</td><td>Frontier-level reasoning (R1) at low cost; open weights</td></tr>
+  <tr><td><strong>Gemma</strong></td><td>Google</td><td>Lightweight open models, good on-device</td></tr>
+</table>
+
+<!-- ── COMPATIBILITY ───────────────────────────────────────── -->
+<h2>OpenAI-compatible APIs &amp; OpenRouter</h2>
+<p>Two facts make multi-provider life easy:</p>
+<ul>
+  <li><strong>"OpenAI-compatible" endpoints</strong> — most providers (and local runtimes like Ollama) expose an endpoint that accepts the OpenAI request format. Change <code>base_url</code> + key + model name; keep your code.</li>
+  <li><strong><a href="https://openrouter.ai">OpenRouter</a></strong> — a single API in front of <em>hundreds</em> of models across all providers. One key, one format, switch models with a string. Ideal for the tiered routing from Lesson 16 and for comparison shopping.</li>
+</ul>
+
+<pre><span class="pre-label">python — same code, three providers</span><span class="comment"># OpenAI</span>
+OpenAI(base_url=<span class="string">"https://api.openai.com/v1"</span>)
+<span class="comment"># Local Llama via Ollama</span>
+OpenAI(base_url=<span class="string">"http://localhost:11434/v1"</span>, api_key=<span class="string">"ollama"</span>)
+<span class="comment"># Anything, via OpenRouter</span>
+OpenAI(base_url=<span class="string">"https://openrouter.ai/api/v1"</span>, api_key=OR_KEY)
+<span class="comment"># ...then the SAME .chat.completions.create(model="...") call</span></pre>
+
+<div class="callout warning">
+  <div class="callout-label">Where compatibility breaks down</div>
+  Provider-specific features — Anthropic's extended thinking, Gemini's enormous context, OpenAI's Responses API tools — aren't in the shared OpenAI shape. For those you use the native SDK. Compatibility covers the common 80%; the differentiated 20% needs the real SDK.
+</div>
+
+<div class="callout insight">
+  <div class="callout-label">The strategic takeaway</div>
+  Treat models as <em>swappable</em> behind an interface. Don't hard-code one provider's quirks throughout your app — wrap model calls in a thin adapter so you can re-route by cost, capability, or outage. This is plain software engineering applied to a volatile, fast-moving market.
+</div>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">You want to A/B test Claude, GPT-5, and a Llama model on one task with minimal code changes. What's the most efficient approach?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Write three separate codebases, one per provider's native SDK, and run each</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Use OpenRouter (or compatible endpoints) and swap the model string in one place</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Fine-tune one model to imitate the other two so you only need a single API</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>You can't compare across providers; pick one upfront and never switch</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. OpenRouter (or OpenAI-compatible endpoints) put all three behind one API and request format, so an A/B test becomes "change the model string." Three native codebases is wasted effort for a comparison, fine-tuning to imitate is nonsensical here, and cross-provider comparison is exactly what these abstraction layers enable.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">OpenRouter or compatible endpoints (option B) let you swap the model string in one place — perfect for A/B testing. Three native codebases is unnecessary, imitation fine-tuning makes no sense, and cross-provider comparison is very much possible via these layers.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">Your app relies on Anthropic's extended-thinking feature. A teammate says "just route it through OpenRouter's OpenAI-compatible format like everything else." What's the catch?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>No catch — the compatible format exposes every provider-specific feature identically</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Differentiated features often aren't in the shared shape; you may need the native SDK</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Extended thinking only works on local models, never through any hosted API</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>The compatible format is slower, so all advanced features are automatically disabled</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. The OpenAI-compatible shape covers the common ~80% (messages, tools, streaming) but provider-specific capabilities like Anthropic's extended thinking, Gemini's giant context, or OpenAI's Responses tools may not be exposed through it — for those you use the native SDK. Compatibility is a convenience for the shared core, not a universal translator.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">The catch is that differentiated, provider-specific features often aren't in the shared compatible shape, so you may need the native SDK (option B). The compatible format doesn't expose everything, extended thinking isn't local-only, and it doesn't silently disable features for being slow.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want help designing a swappable model adapter for an app? Ask: "sketch a thin provider-adapter interface in Node so I can switch between Claude and a local model." That one abstraction pays off every time the market shifts.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://openrouter.ai/docs">OpenRouter Docs</a> for the unified API, plus each provider's own quickstart (<a href="https://docs.anthropic.com/">Anthropic</a>, <a href="https://ai.google.dev/">Google AI</a>). Compare current capabilities on <a href="https://artificialanalysis.ai/">Artificial Analysis</a> (Lesson 16).</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — model providers (Gemini, Cohere, Mistral, DeepSeek, Llama, Qwen, OpenRouter, OpenAI-compatible APIs)</a></li>
+  <li><a href="https://openrouter.ai/docs">OpenRouter — Documentation</a></li>
+  <li><a href="https://docs.anthropic.com/en/api/getting-started">Anthropic API</a> · <a href="https://ai.google.dev/gemini-api/docs">Gemini API</a> · <a href="https://docs.cohere.com/">Cohere</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 27 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

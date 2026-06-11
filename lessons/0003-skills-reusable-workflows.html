@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 3: Skills — Reusable, Triggerable Workflows</title>
+<style>
+  :root {
+    --bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;
+    --accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;
+    --red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;
+    --mono:'JetBrains Mono','Fira Code','Courier New',monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:780px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .prop{color:#a5b4fc}.string{color:#86efac}.comment{color:#4b5563}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.87rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  td:first-child{font-family:var(--mono);font-size:.8rem;color:#a5b4fc}
+  tr:nth-child(even) td{background:#13151f}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+  .file-tree{font-family:var(--mono);font-size:.83rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;line-height:1.9;color:#c4cad8;margin:1rem 0 1.5rem}
+  .file-tree .dir{color:var(--accent)}.file-tree .file{color:#86efac}.file-tree .note{color:#4b5563}
+</style>
+</head>
+<body>
+<div class="lesson-meta">
+  <span class="tag">Lesson 3</span>
+  <span class="tag green">Harness Layer 4</span>
+  <span class="tag yellow">~20 min</span>
+</div>
+<h1>Skills</h1>
+<p class="subtitle">Write a triggerable workflow once. Invoke it in any session, forever.</p>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<h2>What a Skill Is</h2>
+<p>A <strong>skill</strong> is a Markdown file that Claude reads and executes when you invoke it. You type <code>/skill-name</code> and Claude loads the skill's instructions and runs the workflow described there.</p>
+<p>Skills are layer 4 of the harness — they sit above hooks (layer 5) and below the tool surface (layer 2). They're the <strong>reusable workflow</strong> layer. Anything you find yourself explaining to Claude repeatedly is a skill candidate.</p>
+
+<div class="callout key">
+  <div class="callout-label">Why Skills Beat Prompts</div>
+  A prompt lives in your head or clipboard. A skill lives in the harness. It's consistent across sessions, gets refined over time, and works the same whether you trigger it or Claude does. Skills are the Write strategy applied to procedures, not just data.
+</div>
+
+<h2>Anatomy of a Skill File</h2>
+<p>Skills are stored in <code>~/.claude/skills/</code> (global) or <code>.claude/skills/</code> (project). The file format is Markdown with YAML frontmatter:</p>
+
+<pre>
+<span class="pre-label">~/.claude/skills/my-skill.md</span>---
+<span class="prop">name</span>: <span class="string">my-skill</span>
+<span class="prop">description</span>: <span class="string">One-line description — used to decide when to suggest this skill</span>
+<span class="prop">argument-hint</span>: <span class="string">Optional hint shown in the /skill autocomplete UI</span>
+---
+
+<span class="comment"># The body is plain Markdown instructions.</span>
+<span class="comment"># Claude reads this and follows the instructions when the skill is invoked.</span>
+<span class="comment"># Write it like a clear procedure, not a prompt.</span>
+
+The user has invoked this skill. Follow these steps:
+
+1. Do X
+2. Then do Y
+3. Output the result as Z
+</pre>
+
+<p>Key frontmatter fields:</p>
+<table>
+  <tr><th>Field</th><th>Purpose</th><th>Required</th></tr>
+  <tr><td>name</td><td>The trigger slug — what you type after <code>/</code></td><td>Yes</td></tr>
+  <tr><td>description</td><td>One-line summary used by Claude to decide when to auto-suggest the skill</td><td>Yes</td></tr>
+  <tr><td>argument-hint</td><td>Shown in autocomplete UI when the user starts typing <code>/skill-name</code></td><td>No</td></tr>
+  <tr><td>disable-model-invocation</td><td>Set <code>true</code> to prevent the skill from being auto-suggested by Claude</td><td>No</td></tr>
+</table>
+
+<h2>Where Skills Live</h2>
+<div class="file-tree">
+~/.claude/skills/              <span class="note"># global — available in all projects</span>
+  └── my-global-skill.md
+
+/your-project/.claude/skills/ <span class="note"># project — only available here</span>
+  └── project-specific.md
+</div>
+
+<p>Global skills are always available. Project skills are only loaded when Claude Code is running inside that project directory. You already have skills at <code>~/.claude/skills/teach/</code> — the <code>/teach</code> skill you triggered to start this lesson.</p>
+
+<h2>A Real Skill for Your Project</h2>
+<p>Here's a generic skill that runs a structured code review whenever you invoke <code>/code-review</code>. Adapt the criteria to your language or framework:</p>
+
+<pre>
+<span class="pre-label">.claude/skills/code-review.md</span>---
+<span class="prop">name</span>: <span class="string">code-review</span>
+<span class="prop">description</span>: <span class="string">Review a source file for correctness, performance, and project conventions</span>
+<span class="prop">argument-hint</span>: <span class="string">Which file should I review? (leave blank to use the most recently edited)</span>
+---
+
+The user wants a code review. Follow this procedure:
+
+<span class="comment">## Step 1: Identify the target</span>
+If the user specified a file, read it. Otherwise, identify the most recently
+edited source file in the project src/ directory.
+
+<span class="comment">## Step 2: Review against these criteria</span>
+Check each of the following and note any issues:
+- Naming conventions: match the project's documented style (check CLAUDE.md)
+- No unused imports, dead code, or debug statements
+- Error handling: all async calls have try/catch or equivalent
+- Security: no secrets, no SQL string interpolation, no eval()
+- Performance: flag O(n²) loops where a map/set lookup would suffice
+- Test coverage: flag any exported function with no corresponding test
+
+<span class="comment">## Step 3: Output format</span>
+Produce a structured review with:
+- **Summary**: 1-2 sentences on overall quality
+- **Issues**: bulleted list, severity tagged [HIGH/MED/LOW]
+- **Suggestions**: specific improvements with example code
+</pre>
+
+<div class="callout insight">
+  <div class="callout-label">What Makes a Good Skill Body</div>
+  The best skill bodies are <strong>procedures</strong>, not prompts. They describe exact steps, output formats, and decision rules. Claude follows them literally — so be specific. Vague instructions in skills produce vague output, just like vague prompts do.
+</div>
+
+<h2>Skills vs. Hooks vs. CLAUDE.md</h2>
+<table>
+  <tr><th>Layer</th><th>When it runs</th><th>You control it by</th></tr>
+  <tr><td>CLAUDE.md</td><td>Every session, always loaded</td><td>Writing project rules (layer 1)</td></tr>
+  <tr><td>Skills</td><td>On demand — when invoked with <code>/skill-name</code></td><td>Writing a skill file (layer 4)</td></tr>
+  <tr><td>Hooks</td><td>Automatically at lifecycle events</td><td>Configuring settings.json (layer 5)</td></tr>
+</table>
+<p>The rule of thumb: if it should run <em>every time</em>, put it in CLAUDE.md. If it should run <em>when triggered</em>, make it a skill. If it should run <em>automatically on an event</em>, make it a hook.</p>
+
+<h2>Hands-On: Write Your First Skill</h2>
+<p>Create the <code>code-review</code> skill in your project:</p>
+<ol>
+  <li>Create <code>.claude/skills/</code> directory: <code>mkdir -p /path/to/your-project/.claude/skills</code></li>
+  <li>Create the file at <code>.claude/skills/code-review.md</code> with the content above</li>
+  <li>Adjust the Step 2 criteria to match your project's language and conventions</li>
+  <li>In a new Claude Code session in this project, type <code>/code-review</code></li>
+</ol>
+
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">You want Claude to automatically remind you to check open GitHub issues before starting any coding task. Should this be a skill or a hook?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Skill — you'll invoke <code>/check-issues</code> when you remember to</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Hook on <code>SessionStart</code> — fires automatically when each session opens</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>CLAUDE.md — add a note telling Claude to check issues</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Memory file — write the reminder once so Claude recalls it</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">A SessionStart hook fires automatically every time a session opens. That's automatic, not on-demand. A skill would work but requires you to remember to type /check-issues — defeating "automatic." CLAUDE.md would tell Claude to check issues, but it won't reliably trigger action unless a hook enforces it.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">The key word is "automatically." Automatic = hook. On-demand = skill. Always-loaded context = CLAUDE.md. A SessionStart hook fires every time you open Claude Code — no manual invocation needed.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">What's the single most important thing the <code>description</code> field in a skill's frontmatter does?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Provides documentation for humans reading the skill file</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Tells Claude when to auto-suggest the skill — it's read by the agent, not just humans</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Sets the title shown in the <code>/</code> autocomplete menu</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Nothing — it's optional metadata</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. The description is read by Claude to decide whether to proactively suggest the skill. A poor description means Claude may never surface the skill at the right moment. Think of it as a semantic trigger: "if the user's task matches this description, suggest this skill."</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">The description is used by Claude (not just humans) to decide when to auto-suggest the skill. It's a semantic signal — Claude matches the user's task against skill descriptions and surfaces relevant ones. Write it as a clear statement of when this skill applies.</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">You have a skill at <code>~/.claude/skills/deploy.md</code> and another at <code>.claude/skills/deploy.md</code> inside your current project. What happens when you type <code>/deploy</code> inside that project?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">A</div><div>Error — duplicate skill name is not allowed</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">B</div><div>The project-local skill wins — it takes precedence over the global one</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">C</div><div>The global skill wins — global always takes precedence</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">D</div><div>Both run — skills stack when names collide</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">Project-local skills override global ones of the same name. This lets you have a generic global skill and a project-specific override — the same pattern as project settings.json overriding global settings.json. Use this to customize global workflow skeletons for specific projects.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">Project-local skills take precedence. This mirrors the settings.json precedence: project overrides global. It lets you maintain a global skill skeleton and override it per-project without touching the global version.</div>
+</div>
+
+<h2>What to Hold Onto</h2>
+<ol style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem">
+  <li><strong>Skills = reusable procedures in Markdown.</strong> Write them like step-by-step instructions, not prompts. Specificity is what makes them work reliably.</li>
+  <li><strong>Trigger: <code>/skill-name</code>. Location: <code>~/.claude/skills/</code> (global) or <code>.claude/skills/</code> (project).</strong></li>
+  <li><strong>The description field is read by Claude, not just humans.</strong> It's the signal Claude uses to auto-suggest the skill. Make it semantic and precise.</li>
+  <li><strong>Skills vs. Hooks vs. CLAUDE.md:</strong> on-demand → skill, automatic → hook, always-loaded context → CLAUDE.md.</li>
+</ol>
+
+<div class="callout" style="margin-top:2.5rem">
+  <div class="callout-label">Next Lesson</div>
+  <strong>Lesson 4: CLAUDE.md — The Project Knowledge Layer</strong><br>
+  <span style="color:var(--muted);font-size:.9rem">What goes in CLAUDE.md, what doesn't, and how to write one that genuinely improves Claude's output on your project.</span>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Ask Claude Code anything about skills — how to structure the body, how to pass arguments, how skills relate to the skills you already have in <code>~/.claude/skills/</code>.</p>
+</div>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://harness-engineering.fr/en/">Harness Engineering — Skills, Hooks, MCP, Subagents reference</a></li>
+  <li><a href="https://www.paradime.io/guides/claude-code-skills-plugins-rules-guide">Paradime — Complete Guide to Claude Code Skills &amp; MCP</a></li>
+  <li><a href="https://addyosmani.com/blog/agent-harness-engineering/">Addy Osmani — Agent Harness Engineering</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 3 of 10 · Context &amp; Harness Engineering</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/3*100)+'%';
+}
+</script>
+</body>
+</html>

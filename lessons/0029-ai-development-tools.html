@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 29: AI-Assisted Development Tools</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+  .capstone{background:linear-gradient(135deg,var(--accent-dim),var(--purple-dim));border:1px solid var(--accent);border-radius:10px;padding:1.5rem;margin:2rem 0}
+  .capstone h3{color:var(--accent);margin-top:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 29</span>
+  <span class="tag green">Roadmap · Dev Tools</span>
+  <span class="tag orange">Capstone</span>
+  <span class="tag yellow">~12 min</span>
+</div>
+
+<h1>AI-Assisted Development Tools</h1>
+<p class="subtitle">The tools you build with — and the home turf where this whole journey started. The roadmap's last node, and your full-circle moment.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">Full circle</div>
+  Phase 1 made you an expert <em>operator</em> of one of these tools (Claude Code). Now you can see the whole category — and, crucially, you understand <em>how they work inside</em>: they're agents (Lesson 25) with harnesses (Lesson 1) over provider APIs (Lesson 18), connected to tools via MCP (Lesson 6).
+</div>
+
+<!-- ── LANDSCAPE ───────────────────────────────────────────── -->
+<h2>The tool landscape</h2>
+<table>
+  <tr><th>Tool</th><th>Form</th><th>Niche</th></tr>
+  <tr><td><strong>Claude Code</strong></td><td>Terminal / IDE agent</td><td>Agentic, multi-file, harness-rich (hooks, skills, MCP, subagents) — your home base</td></tr>
+  <tr><td><strong>Cursor</strong></td><td>AI-native IDE (VS Code fork)</td><td>Tight in-editor flow, Tab completion, Composer, .cursor/rules</td></tr>
+  <tr><td><strong>Codex</strong></td><td>OpenAI's coding agent (CLI/cloud)</td><td>Autonomous tasks, cloud sandboxes</td></tr>
+  <tr><td><strong>Windsurf</strong></td><td>AI-native IDE</td><td>Cascade agent flow, automatic memories</td></tr>
+  <tr><td><strong>GitHub Copilot</strong></td><td>IDE extension</td><td>Ubiquitous inline completion + chat/agent mode</td></tr>
+  <tr><td><strong>Replit Agent</strong></td><td>Cloud IDE</td><td>Zero-setup, build-and-deploy in the browser</td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-label">You already know how to evaluate these</div>
+  Lesson 12 (tool-agnostic harness engineering) taught you that <code>CLAUDE.md</code>, <code>.cursor/rules</code>, Copilot custom instructions, Windsurf memories, and <code>AGENTS.md</code> are <em>the same idea</em> in different syntax. Switching tools is a config-translation problem, not a relearning problem. That's a Phase 1 superpower applied to this whole table.
+</div>
+
+<!-- ── WHAT MAKES A GOOD ONE ───────────────────────────────── -->
+<h2>What separates them (the axes that matter)</h2>
+<ul>
+  <li><strong>Autonomy</strong> — inline completion (Copilot) → chat → agent that edits many files and runs commands (Claude Code, Codex). More autonomy = more leverage and more need for the gating you learned in Lesson 13.</li>
+  <li><strong>Harness depth</strong> — hooks, skills, custom tools, memory, subagents. This is where Claude Code is deep and where your Phase 1 skills directly pay off.</li>
+  <li><strong>Context handling</strong> — how the tool selects, compresses, and isolates context (Lessons 7–9) determines reliability on big codebases.</li>
+  <li><strong>Model flexibility</strong> — can you bring your own model / route providers (Lesson 27)?</li>
+</ul>
+
+<!-- ── CAPSTONE ────────────────────────────────────────────── -->
+<div class="capstone">
+  <h3>🎓 You've completed the roadmap</h3>
+  <p style="margin-bottom:.75rem">Twenty-nine lessons. You moved from <strong>operating</strong> an AI harness to <strong>engineering AI applications</strong> end to end:</p>
+  <ul style="margin-bottom:.75rem">
+    <li><strong>Foundations</strong> (14–17): what an AI engineer is, how LLMs work, choosing models, inference params</li>
+    <li><strong>APIs &amp; prompting</strong> (18–19): the OpenAI platform, prompt-engineering techniques</li>
+    <li><strong>Safety</strong> (20): shipping AI features that don't get exploited</li>
+    <li><strong>The RAG stack</strong> (21–24): open models, embeddings, vector DBs, retrieval-augmented generation</li>
+    <li><strong>Agents &amp; beyond</strong> (25–29): function-calling agents, multimodal, the provider landscape, fine-tuning, dev tools</li>
+    <li><strong>Plus Phase 1</strong> (1–13): the deepest harness/context-engineering specialization most engineers never get</li>
+  </ul>
+  <p style="margin:0"><strong>Wisdom comes next.</strong> The remaining gap between you and mastery is real-world reps — build, ship, and get feedback from a community.</p>
+</div>
+
+<h2>Where to go for wisdom (community)</h2>
+<ul>
+  <li><a href="https://www.reddit.com/r/LocalLLaMA/">r/LocalLLaMA</a> — the best practitioner community for open models, RAG, fine-tuning, and self-hosting.</li>
+  <li><a href="https://www.reddit.com/r/ClaudeAI/">r/ClaudeAI</a> &amp; the <a href="https://discord.gg/anthropic">Anthropic Discord</a> — harness, agents, Claude Code (your existing home).</li>
+  <li><a href="https://roadmap.sh/ai-engineer/projects">roadmap.sh AI Engineer Projects</a> — build-along projects to turn these lessons into a portfolio.</li>
+</ul>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">A colleague using Cursor asks how to give it persistent project rules like your <code>CLAUDE.md</code>. Drawing on Lesson 12, what's the accurate answer?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Cursor has no equivalent; persistent rules are unique to Claude Code's design</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Cursor uses .cursor/rules files — same concept, different syntax; translate the rules over</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>They must fine-tune a model on the rules since editors can't hold persistent instructions</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Persistent rules only work if both people use the exact same AI coding tool</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. Persistent project instructions are a cross-tool concept: <code>CLAUDE.md</code>, <code>.cursor/rules</code>, Copilot custom instructions, Windsurf memories, and <code>AGENTS.md</code> are the same idea in different syntax (Lesson 12). The task is translating the rules into Cursor's format — not relearning, and certainly not fine-tuning.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Cursor uses <code>.cursor/rules</code> — the same persistent-instructions concept in different syntax (option B). It's a translation task, not a missing feature, and it has nothing to do with fine-tuning or requiring identical tools.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">Why is "an AI coding tool" not a black box to you anymore, after this curriculum?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Because all of them are now open-source, so you can read every line of their code</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>It's an agent (loop + tools) with a harness over a provider API, connected via MCP — all things you learned</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Because you fine-tuned the underlying model yourself in an earlier lesson</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Because these tools don't actually use LLMs; they use hardcoded rules</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct — and a fitting place to end. Every tool in the table is an LLM agent: a reason-act-observe loop (Lesson 25) with a harness of hooks/skills/memory (Lessons 1–13), calling a provider API (Lesson 18), reaching external tools through MCP (Lesson 6). You now understand the machine you've been operating from the inside out.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">They're not black boxes because you understand their architecture: an agent loop + harness over a provider API, with MCP for tools (option B). It's not about open-source access, your own fine-tuning, or the false claim that they avoid LLMs.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">This isn't the end — keep asking.</div>
+  <p>You've finished the roadmap, but I'm still your teacher. Ask me to: build any project from these lessons end-to-end, go deeper on any topic, design a learning path for a specialization (RAG, agents, multimodal), or quiz you across all 29 lessons to find weak spots. What do you want to build first?</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://roadmap.sh/ai-engineer/projects">roadmap.sh — AI Engineer Projects</a>. The single best next step: pick a project and build it. Reading is fluency; building is storage strength.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — development tools cluster (Cursor, Claude Code, Codex, Windsurf, Replit)</a></li>
+  <li><a href="https://roadmap.sh/ai-engineer/projects">roadmap.sh — AI Engineer Projects</a></li>
+  <li>Cross-reference: <a href="0012-tool-agnostic-harness.html">Lesson 12 — Tool-Agnostic Harness Engineering</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 29 of 29 · Roadmap complete 🎓</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

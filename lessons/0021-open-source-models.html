@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 21: Open-Source & Self-Hosted Models</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 21</span>
+  <span class="tag green">Roadmap · Open-Source Models</span>
+  <span class="tag orange">Hands-on</span>
+  <span class="tag yellow">~14 min</span>
+</div>
+
+<h1>Open-Source &amp; Self-Hosted Models</h1>
+<p class="subtitle">Running models you control — on your laptop or your own servers. The privacy axis from Lesson 16, made real.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">When you reach for this</div>
+  Data can't leave your machine · you want zero per-token cost at scale · you need to fine-tune or modify the model · you want to work offline. If none of those apply, a hosted API (Lesson 18) is usually less work.
+</div>
+
+<!-- ── HUGGING FACE ────────────────────────────────────────── -->
+<h2>Hugging Face — the GitHub of models</h2>
+
+<p><a href="https://huggingface.co">Hugging Face</a> is where open models, datasets, and demos live. The pieces you'll touch:</p>
+<table>
+  <tr><th>Thing</th><th>What it is</th></tr>
+  <tr><td><strong>The Hub</strong></td><td>Hosting for model weights, datasets, and Spaces (demos). Search, filter, download.</td></tr>
+  <tr><td><strong>Models</strong></td><td>Llama, Mistral, Qwen, Gemma, DeepSeek, embedding models, and 100k+ others — each with a model card.</td></tr>
+  <tr><td><strong>Tasks</strong></td><td>The Hub organizes models by task: text-generation, embeddings, ASR, image-classification, etc.</td></tr>
+  <tr><td><strong>Inference SDK</strong></td><td>The <code>transformers</code> library + Inference API/Endpoints to run models locally or hosted.</td></tr>
+  <tr><td><strong>Transformers.js</strong></td><td>Run small models <em>in the browser</em> via WebGPU — no server at all.</td></tr>
+</table>
+
+<!-- ── OLLAMA ──────────────────────────────────────────────── -->
+<h2>Ollama — local models, one command</h2>
+<p>The fastest way to run an open model on your own machine. It handles download, quantization, and serving with an OpenAI-compatible API.</p>
+<pre><span class="pre-label">bash + python</span><span class="comment"># pull and run a model locally</span>
+ollama pull llama3.2
+ollama run llama3.2 <span class="string">"Summarize theta decay in one line"</span>
+
+<span class="comment"># it exposes an OpenAI-compatible endpoint on :11434</span>
+<span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+client = OpenAI(base_url=<span class="string">"http://localhost:11434/v1"</span>, api_key=<span class="string">"ollama"</span>)
+<span class="comment"># ...same .chat.completions.create() call as Lesson 18</span></pre>
+
+<div class="callout insight">
+  <div class="callout-label">The payoff of Lesson 18</div>
+  Because Ollama (and LM Studio, and many others) speak the OpenAI API shape, the code you learned in Lesson 18 runs against a local model by changing only <code>base_url</code>. This is why "learn the OpenAI shape once" pays off — it's the universal adapter.
+</div>
+
+<!-- ── LM STUDIO + SELF HOST ───────────────────────────────── -->
+<h2>LM Studio &amp; self-hosting at scale</h2>
+<ul>
+  <li><strong>LM Studio</strong> — a desktop GUI for discovering, downloading, and chatting with local models; also serves an OpenAI-compatible endpoint. Great for non-terminal exploration.</li>
+  <li><strong>Production self-hosting</strong> — for real throughput you use a serving engine like <strong>vLLM</strong> or <strong>TGI</strong> on a GPU box, which batch requests efficiently. This is where "free weights" meets "you pay for GPUs + ops" from Lesson 16.</li>
+  <li><strong>Quantization</strong> — shrinking model weights (e.g. to 4-bit) so they fit on consumer hardware, trading a little quality for big memory/speed savings. It's why a 7B–8B model runs on a laptop at all.</li>
+</ul>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">You've written code against the OpenAI API. You now want to test the same logic against a local Llama model via Ollama. How much of your code must change?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Rewrite it entirely — local models use a completely different request format</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Almost none — point base_url at the local endpoint; Ollama is OpenAI-compatible</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>You must switch from the SDK to raw socket calls because there's no HTTP server</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>You must retrain the local model on your prompts before it will accept requests</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. Ollama exposes an OpenAI-compatible endpoint, so you change <code>base_url</code> (and the model name) and the same SDK call works. This API-shape compatibility is the practical reason the OpenAI format is worth learning first — it's the lingua franca that even local runtimes adopt.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">Ollama is OpenAI-compatible, so you just repoint <code>base_url</code> at <code>localhost:11434/v1</code> and keep the same SDK call (option B). No rewrite, no raw sockets, no retraining — that compatibility is the whole point.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">A 70B-parameter model won't fit in your laptop's memory at full precision. What technique most directly lets you run a smaller-footprint version locally, and what's the trade-off?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Streaming — it sends the model in chunks so it never needs full memory at once</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Quantization — store weights at lower precision; trade a little quality for memory/speed</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Few-shot prompting — adding examples reduces the model's memory requirements</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Raising temperature — a hotter model compresses its own weights automatically</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. Quantization reduces the numeric precision of the weights (e.g. 16-bit → 4-bit), shrinking the memory footprint enough to fit on consumer hardware, at the cost of a small quality drop. Streaming is about output delivery, and prompting/temperature don't change a model's size.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Quantization (option B) lowers weight precision to shrink the footprint, trading a bit of quality for fitting in memory. Streaming concerns output, not model size; few-shot and temperature don't reduce memory at all.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want to run a model locally right now? Ask: "walk me through installing Ollama and running a model that fits my laptop," or "which open model is best for keeping my options data private?" I'll match the recommendation to your hardware and use case.</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://huggingface.co/learn">Hugging Face — Learn / NLP Course</a> for the ecosystem, and <a href="https://github.com/ollama/ollama">Ollama's README</a> for the fastest local start. Both are hands-on and free.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — open-source models cluster (Hugging Face, Ollama, LM Studio, self-hosted)</a></li>
+  <li><a href="https://huggingface.co/docs">Hugging Face — Documentation</a></li>
+  <li><a href="https://ollama.com">Ollama</a> · <a href="https://lmstudio.ai">LM Studio</a> · <a href="https://docs.vllm.ai">vLLM</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 21 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

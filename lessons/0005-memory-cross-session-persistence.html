@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 5: Memory — Cross-Session Persistence</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:780px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}.tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .prop{color:#a5b4fc}.string{color:#86efac}.comment{color:#4b5563}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.87rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  td:first-child{font-family:var(--mono);font-size:.8rem;color:#a5b4fc}
+  tr:nth-child(even) td{background:#13151f}
+  .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0 1.5rem}
+  .type-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1rem 1.25rem}
+  .type-card-name{font-family:var(--mono);font-size:.82rem;color:#a5b4fc;font-weight:600;margin-bottom:.35rem}
+  .type-card-desc{font-size:.84rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+<div class="lesson-meta">
+  <span class="tag">Lesson 5</span>
+  <span class="tag green">Harness Layer 6</span>
+  <span class="tag yellow">~15 min</span>
+</div>
+<h1>Memory</h1>
+<p class="subtitle">What Claude knows across sessions — and how you control it.</p>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<h2>The Problem Memory Solves</h2>
+<p>Claude's context window is a session artifact. When you close a session, everything in it disappears. If you had to re-explain your preferences, your project state, and your constraints at the start of every session, the agent would be useless for sustained work.</p>
+<p>Memory files solve this. They're plain Markdown files written to disk — a durable Write operation — that Claude reads and injects into future sessions via the <strong>Select</strong> strategy: only the relevant files are loaded, not all of them at once.</p>
+
+<div class="callout key">
+  <div class="callout-label">Memory vs. CLAUDE.md</div>
+  <strong>CLAUDE.md</strong>: always loaded, stable rules, low-frequency change.<br>
+  <strong>Memory files</strong>: selectively loaded, current state, can be updated or deleted. Use memory for anything that changes — project state, your preferences, recent decisions.
+</div>
+
+<h2>Where Memory Lives</h2>
+<p>For this project, memory files are at:</p>
+<pre>
+<span class="pre-label">path</span>~/.claude/projects/-path-to-your-project/memory/
+  ├── MEMORY.md          <span class="comment"># index — one line per memory file</span>
+  ├── user_role.md
+  ├── feedback_testing.md
+  └── project_migration.md
+</pre>
+<p>The <code>MEMORY.md</code> index is always loaded. The individual files are loaded on demand — Claude reads the index to find relevant files, then reads those files when they're relevant to the current task.</p>
+
+<h2>Four Memory Types</h2>
+<div class="type-grid">
+  <div class="type-card">
+    <div class="type-card-name">user</div>
+    <div class="type-card-desc">Who you are: role, expertise level, preferences. Helps Claude tailor explanations and recommendations to you specifically.</div>
+  </div>
+  <div class="type-card">
+    <div class="type-card-name">feedback</div>
+    <div class="type-card-desc">How you want to collaborate: corrections ("don't mock the DB"), confirmations ("yes, one bundled PR"). The most impactful type — prevents repeating the same mistakes.</div>
+  </div>
+  <div class="type-card">
+    <div class="type-card-name">project</div>
+    <div class="type-card-desc">Current project state: ongoing migrations, decisions made, deadlines. Decays fast — always include a Why and a date so future sessions can tell if it's still relevant.</div>
+  </div>
+  <div class="type-card">
+    <div class="type-card-name">reference</div>
+    <div class="type-card-desc">Pointers to external resources: Linear project names, Grafana dashboards, Slack channels. Where to look, not what's there.</div>
+  </div>
+</div>
+
+<h2>Memory File Format</h2>
+<pre>
+<span class="pre-label">memory/feedback_no_trailing_summaries.md</span>---
+<span class="prop">name</span>: <span class="string">no-trailing-summaries</span>
+<span class="prop">description</span>: <span class="string">User wants terse responses — no summary paragraph at the end of every reply</span>
+<span class="prop">metadata</span>:
+  <span class="prop">type</span>: <span class="string">feedback</span>
+---
+
+Don't summarize what you just did at the end of responses.
+
+<span class="comment">**Why:** The user said "I can read the diff" — they find trailing summaries
+redundant and mildly irritating.
+
+**How to apply:** End responses with the last piece of relevant content.
+No "In summary..." or "To recap..." closings.</span>
+</pre>
+
+<p>The <strong>Why</strong> and <strong>How to apply</strong> lines are critical for feedback and project memories. They let Claude judge edge cases rather than following the rule blindly.</p>
+
+<h2>What NOT to Save</h2>
+<p>Memory is expensive (loaded into context) and becomes stale. Don't save:</p>
+<ul>
+  <li>Code patterns or architecture — derivable from reading the files</li>
+  <li>Git history or who changed what — <code>git log</code> is authoritative</li>
+  <li>Debugging solutions — the fix is in the code; the commit message has the context</li>
+  <li>Anything already in CLAUDE.md</li>
+  <li>Ephemeral task state (use the conversation context instead)</li>
+</ul>
+
+<div class="callout warning">
+  <div class="callout-label">Stale Memory is Actively Harmful</div>
+  A memory that says "migration is in progress" six months after it completed will mislead Claude. Treat memory as a living system: update or delete files when state changes. A good memory has a date and a Why — so future Claude can judge relevance.
+</div>
+
+<h2>The MEMORY.md Index</h2>
+<p>Claude always loads <code>MEMORY.md</code> first. It's a table of contents — one line per memory, under 150 characters each:</p>
+<pre>
+<span class="pre-label">MEMORY.md</span><span class="comment"># Memory Index
+
+- [No trailing summaries](feedback_no_trailing_summaries.md) — user finds summary paragraphs redundant
+- [User background](user_background.md) — intermediate prompter, new to harness engineering, current project domain
+- [ESM migration](project_esm_migration.md) — migrating src/ from CommonJS to ESM, started 2026-06-08</span>
+</pre>
+<p>Keep the index under 200 lines — anything after that gets truncated when loaded into context.</p>
+
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">You tell Claude: "Always use <code>async/await</code> instead of <code>.then()</code> chains in this project." Where should this be saved?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>A <code>feedback</code> memory file — it's a preference about how to work</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>CLAUDE.md — it's a stable, always-applicable code convention for this project</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>A <code>project</code> memory file — it's project-specific state</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Both CLAUDE.md and a memory file — duplicate for safety</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">CLAUDE.md is correct. This is a stable code convention — it won't change, it applies to all work in this project, and it should be loaded every session. Memory files are for state that changes and needs to be selected vs. always loaded. Duplicating wastes tokens.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">A stable, always-applicable code convention belongs in CLAUDE.md. Memory files are for things that change: current project state, recent decisions, evolving preferences. A rule about async/await is permanent — it should be in the always-loaded layer.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">Which memory type is the most impactful for improving Claude's behavior session-over-session, and why?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div><code>user</code> — knowing who you are changes every response</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div><code>feedback</code> — it captures both corrections and confirmations, preventing repeat mistakes and preserving what works</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div><code>project</code> — current state is most relevant to immediate tasks</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div><code>reference</code> — knowing where to look is foundational</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Feedback memories are the ratchet in practice. They capture both corrections (what to stop) and confirmations (what worked and should continue). Without feedback memory, Claude makes the same mistakes indefinitely. With it, every session starts slightly smarter than the last. User memories help, but they change less frequently.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Feedback memories implement the ratchet principle — each session leaves the harness slightly tighter. They capture corrections AND confirmations, preventing regression. User memories matter but change rarely. Project memories decay fast. Feedback is the type that compounds most reliably over time.</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">Your MEMORY.md has 250 lines. What's the consequence, and what's the fix?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">A</div><div>No consequence — MEMORY.md length doesn't matter</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">B</div><div>Slower responses — more content to process</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">C</div><div>Lines after 200 get truncated — some memory entries become invisible to Claude. Fix: prune stale entries.</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">D</div><div>Claude will ask you to clean it up automatically</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">The MEMORY.md index is truncated at 200 lines when loaded into context. Entries beyond line 200 are invisible — Claude doesn't know those memory files exist. The fix is to prune stale entries (old project state, resolved issues) and consolidate similar memories. Treat MEMORY.md as a bounded resource.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">MEMORY.md is truncated at 200 lines when loaded. Everything after line 200 is invisible to Claude. The fix: prune stale project memories (resolved migrations, closed issues) and consolidate similar feedback entries. The index is a bounded resource — treat it that way.</div>
+</div>
+
+<h2>What to Hold Onto</h2>
+<ol style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem">
+  <li><strong>Memory = Write + Select.</strong> Files are written to disk. MEMORY.md index tells Claude they exist. Individual files are loaded when relevant.</li>
+  <li><strong>Four types: user, feedback, project, reference.</strong> Feedback is the highest-leverage — it's the ratchet.</li>
+  <li><strong>Always include Why and How to apply in feedback/project memories.</strong> Without why, Claude can't judge edge cases.</li>
+  <li><strong>Memory decays. Prune it.</strong> Stale memories are actively harmful — they mislead. Delete or update when state changes.</li>
+</ol>
+
+<div class="callout" style="margin-top:2.5rem">
+  <div class="callout-label">Next Lesson</div>
+  <strong>Lesson 6: MCP Servers — Extending the Tool Surface</strong><br>
+  <span style="color:var(--muted);font-size:.9rem">Wire external systems (GitHub, APIs, databases) into Claude's tool surface. What MCP is, how to configure it, and when it's worth the overhead.</span>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want to see the memory files Claude is currently using for this project? Ask: "show me what's in the memory directory for this project." Or ask how to write a specific memory file.</p>
+</div>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://addyosmani.com/blog/agent-harness-engineering/">Addy Osmani — Agent Harness Engineering</a></li>
+  <li><a href="https://blog.logrocket.com/llm-context-problem-strategies-2026/">LogRocket — LLM context strategies: memory, relevance, scale</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 5 of 10 · Context &amp; Harness Engineering</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+<script>
+const answered={};
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/3*100)+'%';
+}
+</script>
+</body>
+</html>

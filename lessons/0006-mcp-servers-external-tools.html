@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 6: MCP Servers — Extending the Tool Surface</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:780px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}.tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .prop{color:#a5b4fc}.string{color:#86efac}.comment{color:#4b5563}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.87rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  td:first-child{font-family:var(--mono);font-size:.8rem;color:#a5b4fc}
+  tr:nth-child(even) td{background:#13151f}
+  .arch-diagram{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;flex-wrap:wrap}
+  .arch-box{padding:.6rem 1.1rem;border-radius:6px;border:1px solid;font-family:var(--mono);font-size:.8rem;font-weight:600;text-align:center}
+  .arch-box.claude{background:var(--accent-dim);border-color:var(--accent);color:#a5b4fc}
+  .arch-box.mcp{background:var(--green-dim);border-color:var(--green);color:#86efac}
+  .arch-box.ext{background:var(--surface);border-color:var(--border);color:var(--muted);font-size:.75rem}
+  .arch-arrow{color:var(--muted);font-size:1.2rem}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+</style>
+</head>
+<body>
+<div class="lesson-meta">
+  <span class="tag">Lesson 6</span>
+  <span class="tag green">Harness Layer 3</span>
+  <span class="tag yellow">~15 min</span>
+</div>
+<h1>MCP Servers</h1>
+<p class="subtitle">Wire external systems into Claude's tool surface. GitHub, APIs, databases — all reachable without leaving the agent loop.</p>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<h2>What MCP Is</h2>
+<p><strong>Model Context Protocol (MCP)</strong> is an open standard that lets external systems expose themselves as tools Claude can call. Instead of Claude writing a curl command to hit your API, an MCP server wraps that API and presents it as a first-class tool — with proper typing, authentication, and error handling.</p>
+
+<div class="arch-diagram">
+  <div class="arch-box claude">Claude Code</div>
+  <div class="arch-arrow">⟷</div>
+  <div class="arch-box mcp">MCP Server</div>
+  <div class="arch-arrow">⟷</div>
+  <div class="arch-box ext">GitHub / Jira / DB / API</div>
+</div>
+
+<p>From Claude's perspective, MCP tools look exactly like built-in tools (Bash, Read, Edit). Claude just calls them. The MCP server handles authentication, rate limiting, and translating Claude's intent into API calls.</p>
+
+<div class="callout key">
+  <div class="callout-label">Key Distinction from Bash</div>
+  You <em>could</em> use Bash to call any API. The difference: MCP gives Claude <strong>structured tool descriptions</strong> with typed parameters and clear error messages — so Claude uses them correctly without guesswork. Bash is general-purpose; MCP is purpose-built.
+</div>
+
+<h2>MCP vs. Built-in Tools</h2>
+<table>
+  <tr><th>Built-in tools</th><th>MCP tools</th></tr>
+  <tr><td>Bash, Read, Edit, Write, Agent, WebFetch…</td><td>GitHub PR create, Jira issue update, DB query, Slack message…</td></tr>
+  <tr><td>Always available</td><td>Available when the MCP server is configured and running</td></tr>
+  <tr><td>General-purpose</td><td>Domain-specific with typed schemas</td></tr>
+  <tr><td>Configured by Anthropic</td><td>Configured by you in settings.json</td></tr>
+</table>
+
+<h2>Configuring an MCP Server</h2>
+<p>MCP servers are configured in <code>settings.json</code> under the <code>mcpServers</code> key. Two transport types:</p>
+
+<pre>
+<span class="pre-label">~/.claude/settings.json</span>{
+  <span class="prop">"mcpServers"</span>: {
+
+    <span class="comment">// stdio — most common. Spawns a local process.</span>
+    <span class="string">"github"</span>: {
+      <span class="prop">"type"</span>: <span class="string">"stdio"</span>,
+      <span class="prop">"command"</span>: <span class="string">"npx"</span>,
+      <span class="prop">"args"</span>: [<span class="string">"-y"</span>, <span class="string">"@modelcontextprotocol/server-github"</span>],
+      <span class="prop">"env"</span>: { <span class="prop">"GITHUB_TOKEN"</span>: <span class="string">"${GITHUB_TOKEN}"</span> }
+    },
+
+    <span class="comment">// sse — connects to a running HTTP server</span>
+    <span class="string">"my-api"</span>: {
+      <span class="prop">"type"</span>: <span class="string">"sse"</span>,
+      <span class="prop">"url"</span>: <span class="string">"http://localhost:3001/mcp"</span>
+    }
+  }
+}
+</pre>
+
+<p>Once configured, Claude can call tools from that server as if they were built-in. No special syntax — just tool calls.</p>
+
+<h2>MCP Servers Useful for Your Project</h2>
+<table>
+  <tr><th>Server</th><th>What it enables</th><th>Install</th></tr>
+  <tr><td>github</td><td>Create PRs, read issues, list branches, get file contents from any repo</td><td><code>@modelcontextprotocol/server-github</code></td></tr>
+  <tr><td>filesystem</td><td>Read/write files with path restrictions — safer than raw Bash</td><td><code>@modelcontextprotocol/server-filesystem</code></td></tr>
+  <tr><td>fetch</td><td>Fetch URLs with proper HTML parsing — better than WebFetch for scraping</td><td><code>@modelcontextprotocol/server-fetch</code></td></tr>
+  <tr><td>sqlite / postgres</td><td>Query a database directly — useful for options data analysis</td><td><code>@modelcontextprotocol/server-sqlite</code></td></tr>
+</table>
+
+<div class="callout insight">
+  <div class="callout-label">Applied to a Real Project</div>
+  A GitHub MCP server would let Claude create PRs automatically — no copy-pasting. A filesystem MCP with path restrictions to <code>output/</code> would let Claude write results without needing broad Bash access. MCP is how you give Claude capability with guardrails.
+</div>
+
+<h2>When MCP Is Worth the Overhead</h2>
+<p>MCP servers add setup cost (configuration, authentication, running a process). Worth it when:</p>
+<ul>
+  <li>You need the same external action repeatedly in agent workflows</li>
+  <li>The external system has auth complexity you don't want Claude solving with Bash</li>
+  <li>You want structured tool schemas so Claude uses the API correctly</li>
+  <li>You're building a multi-agent workflow where subagents need external access</li>
+</ul>
+<p>Not worth it when you just need to run a one-off shell command — use Bash.</p>
+
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 3</div>
+  <div class="quiz-q">Claude needs to create a GitHub PR every time it finishes implementing a feature. Which approach is better — a Bash <code>gh pr create</code> call or an MCP GitHub server?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Bash — simpler, no setup required, <code>gh</code> CLI handles auth</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>MCP GitHub server — structured schema means Claude will form PR requests correctly; reusable in subagents without re-solving auth</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Neither — PR creation should be a manual human step</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Bash for simple PRs, MCP for complex PRs</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">MCP is the right call for repeated, structured actions in agent workflows. The structured schema prevents Claude from getting PR parameters wrong. Auth is handled once in the MCP config, not re-solved each time. And MCP tools are callable by subagents — Bash gh commands require the CLI to be available in each subagent's environment.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">For repeated actions in agent workflows, MCP beats Bash. The structured schema prevents parameter errors. Auth is solved once. And subagents can call MCP tools cleanly. Bash works fine for one-off PR creation, but in a workflow that runs repeatedly, MCP gives you reliability and reusability.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 3</div>
+  <div class="quiz-q">You configure a GitHub MCP server but Claude still uses Bash <code>curl</code> to call the GitHub API. What's most likely wrong?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>MCP servers don't work with GitHub — use Bash instead</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Claude doesn't know the MCP server is available — the server isn't starting or CLAUDE.md doesn't mention it</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>The MCP server needs to be restarted after every session</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Claude prefers Bash for all GitHub operations</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Two common causes: (1) the MCP server process failed to start — check the server logs, (2) Claude doesn't know to prefer the MCP tool over Bash — add a note in CLAUDE.md like "use the github MCP tool for all GitHub operations, not curl or gh CLI." Claude won't automatically prefer MCP tools without guidance.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Most likely the MCP server isn't starting (check logs) or Claude doesn't know to prefer it. Add to CLAUDE.md: "use the github MCP tool for GitHub operations." Claude needs explicit guidance to prefer a new tool over familiar patterns like Bash.</div>
+</div>
+
+<div class="quiz" id="q3">
+  <div class="quiz-title">Quiz · Question 3 of 3</div>
+  <div class="quiz-q">Which layer of the harness does MCP extend?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">A</div><div>Layer 1 — System prompt / CLAUDE.md</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">B</div><div>Layer 5 — Hooks</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">C</div><div>Layer 2 — Tool surface (what actions Claude can take)</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">D</div><div>Layer 6 — Memory</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q3-correct">MCP extends the tool surface — layer 2. Built-in tools like Bash, Read, Edit, Write are also layer 2. MCP simply adds more tools to that surface: GitHub, Jira, databases, APIs. From Claude's perspective, MCP tools are indistinguishable from built-in tools once they're configured.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">MCP is layer 2 — the tool surface. It extends what actions Claude can take, adding structured external system tools alongside the built-ins (Bash, Read, Edit, Write). The harness layers are: CLAUDE.md (1), tool surface (2), MCP (3, extending 2), skills (4), hooks (5), memory (6).</div>
+</div>
+
+<h2>What to Hold Onto</h2>
+<ol style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem">
+  <li><strong>MCP = structured external tools.</strong> Anything you can call via an API, you can expose as an MCP tool. Claude calls it like any built-in tool.</li>
+  <li><strong>Configure in settings.json under <code>mcpServers</code>.</strong> stdio for local processes, sse for HTTP servers.</li>
+  <li><strong>Claude won't automatically prefer MCP tools.</strong> Tell it to in CLAUDE.md: "use the X MCP tool for Y operations."</li>
+  <li><strong>Worth it for repeated, structured, auth-heavy external actions.</strong> Not worth it for one-off shell commands.</li>
+</ol>
+
+<div class="callout" style="margin-top:2.5rem">
+  <div class="callout-label">Next Lesson</div>
+  <strong>Lesson 7: Context Window Anatomy</strong><br>
+  <span style="color:var(--muted);font-size:.9rem">What's actually inside the context window — and how that shapes every engineering decision you've made in lessons 1–6.</span>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want to configure a specific MCP server for this project? Ask: "help me set up the GitHub MCP server" and Claude will walk you through it step by step.</p>
+</div>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://okhlopkov.com/claude-code-setup-mcp-hooks-skills-2026/">okhlopkov — Claude Code Setup: MCP, Hooks, Skills (2026)</a></li>
+  <li><a href="https://www.paradime.io/guides/claude-code-skills-plugins-rules-guide">Paradime — Complete Guide to Claude Code Skills &amp; MCP</a></li>
+  <li><a href="https://mer.vin/2026/05/claude-code-architecture-explained-six-harness-layers-beyond-the-llm/">Mervin Praison — Six Harness Layers Beyond the LLM</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 6 of 10 · Context &amp; Harness Engineering</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+<script>
+const answered={};
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/3*100)+'%';
+}
+</script>
+</body>
+</html>
