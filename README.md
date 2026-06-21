@@ -44,13 +44,11 @@ jump between lessons.
 
 ## Deploying as a static site
 
-The whole workspace is plain HTML/CSS with no build step, so it deploys as-is to any
-static host. For [Cloudflare Pages](https://pages.cloudflare.com/):
-
-- **Dashboard / GitHub integration**: connect this repo, leave the build command empty,
-  and set the build output directory to `/` (repo root).
-- **Wrangler CLI**: a [`wrangler.toml`](wrangler.toml) is included, so `npx wrangler pages
-  deploy .` works directly from the repo root.
+The whole workspace is plain HTML/CSS with no build step, so it deploys as-is to
+Cloudflare. The included [`wrangler.toml`](wrangler.toml) configures it as a Worker
+serving static assets from the repo root — the deploy command is `npx wrangler deploy`
+(not `wrangler pages deploy`). This works both from the Cloudflare dashboard's Git
+integration (deploy command auto-detected as `npx wrangler deploy`) and from the CLI.
 
 `index.html` at the repo root is the entry point and links out to the curriculum,
 glossary, and docs.
