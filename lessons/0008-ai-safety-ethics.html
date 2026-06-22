@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 20: AI Safety & Ethics</title>
+<title>Lesson 8: AI Safety & Ethics</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,16 +65,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0019-prompt-engineering-techniques.html">&larr; 19. Prompt Engineering Techniques</a>
+  <a class="nav-prev" href="0007-prompt-engineering-techniques.html">&larr; 7. Prompt Engineering Techniques</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0021-open-source-models.html">21. Open-Source &amp; Self-Hosted Models &rarr;</a>
+  <a class="nav-next" href="0009-model-vs-harness.html">9. Model vs Harness &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 20</span>
+  <span class="tag">Lesson 8</span>
   <span class="tag red">Roadmap · Safety &amp; Ethics</span>
   <span class="tag orange">Production</span>
   <span class="tag yellow">~15 min</span>
@@ -104,10 +104,10 @@
 <div class="callout key">
   <div class="callout-label">Defenses (layered — no single fix)</div>
   <ul style="margin-bottom:0">
-    <li><strong>Separate instructions from data</strong> with delimiters (Lesson 19) — wrap untrusted content in tags.</li>
+    <li><strong>Separate instructions from data</strong> with delimiters (Lesson 7) — wrap untrusted content in tags.</li>
     <li><strong>Constrain inputs and outputs</strong> — validate against schemas; allowlist what tools the model may call.</li>
     <li><strong>Least privilege</strong> — the agent's tools should only do what's necessary; an agent that can't send email can't be tricked into sending email.</li>
-    <li><strong>Human-in-the-loop</strong> for high-impact actions (echoes the L1/L2 gating from Lesson 13).</li>
+    <li><strong>Human-in-the-loop</strong> for high-impact actions (echoes the L1/L2 gating from Lesson 21).</li>
   </ul>
 </div>
 
@@ -124,13 +124,13 @@
 <ul>
   <li><strong>Data classification</strong> — know what you're sending. Don't pipe secrets, PII, or regulated data to a third-party API without checking terms and redacting.</li>
   <li><strong>PII handling</strong> — redact or tokenize before the prompt; log carefully (prompts often end up in logs).</li>
-  <li><strong>End-user IDs</strong> — pass a per-user identifier to the provider (Lesson 18) for abuse detection and traceability.</li>
-  <li><strong>Self-hosting</strong> — when data truly can't leave, use open-weight models locally (Lesson 21). This is the privacy axis from Lesson 16 in action.</li>
+  <li><strong>End-user IDs</strong> — pass a per-user identifier to the provider (Lesson 6) for abuse detection and traceability.</li>
+  <li><strong>Self-hosting</strong> — when data truly can't leave, use open-weight models locally (Lesson 22). This is the privacy axis from Lesson 3 in action.</li>
 </ul>
 
 <!-- ── ADVERSARIAL TESTING ─────────────────────────────────── -->
 <h2>Adversarial testing (red-teaming)</h2>
-<p>Before shipping, <em>attack your own system</em>: try to jailbreak it, inject instructions, extract the system prompt, and elicit harmful output. Build these probes into a regression test so a future prompt change can't silently reopen a hole. This is the safety equivalent of the maker/checker split from Lesson 13.</p>
+<p>Before shipping, <em>attack your own system</em>: try to jailbreak it, inject instructions, extract the system prompt, and elicit harmful output. Build these probes into a regression test so a future prompt change can't silently reopen a hole. This is the safety equivalent of the maker/checker split from Lesson 21.</p>
 
 <!-- ── QUIZ ────────────────────────────────────────────────── -->
 <h2>Check Your Understanding</h2>
@@ -177,7 +177,7 @@
 </ul>
 
 <div class="footer">
-  <span>Lesson 20 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 8 of 30 &middot; AI Engineer Roadmap (APIs & Prompting)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

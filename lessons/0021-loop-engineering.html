@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 13: Loop Engineering</title>
+<title>Lesson 21: Loop Engineering</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -90,16 +90,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0012-tool-agnostic-harness.html">&larr; 12. Tool-Agnostic Harness</a>
+  <a class="nav-prev" href="0020-tool-agnostic-harness.html">&larr; 20. Tool-Agnostic Harness</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0014-what-is-an-ai-engineer.html">14. What Is an AI Engineer &rarr;</a>
+  <a class="nav-next" href="0022-open-source-models.html">22. Open-Source & Self-Hosted Models &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 13</span>
+  <span class="tag">Lesson 21</span>
   <span class="tag green">Loop Engineering</span>
   <span class="tag orange">Automation</span>
   <span class="tag yellow">~30 min</span>
@@ -132,7 +132,7 @@
 <!-- ── RALPH LOOP ORIGIN ───────────────────────────────────── -->
 <h2>Where It Started: The Ralph Loop</h2>
 
-<p>You met "Ralph Loops" briefly in Lesson 9 as a multi-session continuation pattern. The full story: in July 2025, engineer Geoffrey Huntley documented what he called the "Ralph Wiggum loop" — named after the <em>Simpsons</em> character known for confidently wrong answers.</p>
+<p>You met "Ralph Loops" briefly in Lesson 17 as a multi-session continuation pattern. The full story: in July 2025, engineer Geoffrey Huntley documented what he called the "Ralph Wiggum loop" — named after the <em>Simpsons</em> character known for confidently wrong answers.</p>
 
 <p>The pattern is deceptively simple: <code>while true; do claude -p "your prompt"; done</code> — a bash loop that keeps invoking an agent against the same goal, with state persisted to disk between iterations (since each invocation gets a fresh context).</p>
 
@@ -144,7 +144,7 @@
 <!-- ── SIX COMPONENTS ──────────────────────────────────────── -->
 <h2>The Six Components of a Loop</h2>
 
-<p>Osmani breaks a production loop into six parts. If this list feels familiar, it should — <strong>every component maps directly onto a harness layer or strategy you already know</strong>. Loop engineering doesn't introduce new primitives; it arranges the ones from Lessons 1–12 into a system that runs without you.</p>
+<p>Osmani breaks a production loop into six parts. If this list feels familiar, it should — <strong>every component maps directly onto a harness layer or strategy you already know</strong>. Loop engineering doesn't introduce new primitives; it arranges the ones from Lessons 9–20 into a system that runs without you.</p>
 
 <div class="component-grid">
   <div class="component-card">
@@ -158,42 +158,42 @@
     <div class="component-header"><div class="component-num">2</div><div class="component-name">Worktrees</div></div>
     <div class="component-body">
       Isolated working directories so parallel agents don't overwrite each other's changes. Solves "two agents writing the same file."
-      <div class="component-maps">↳ Maps to: Isolate strategy (Lesson 8/9)</div>
+      <div class="component-maps">↳ Maps to: Isolate strategy (Lesson 16/17)</div>
     </div>
   </div>
   <div class="component-card">
     <div class="component-header"><div class="component-num">3</div><div class="component-name">Skills</div></div>
     <div class="component-body">
       Reusable instruction sets (<code>SKILL.md</code>) encoding project knowledge, so the loop doesn't "re-derive your whole project from zero every cycle."
-      <div class="component-maps">↳ Maps to: Layer 4 — Skills (Lesson 3)</div>
+      <div class="component-maps">↳ Maps to: Layer 4 — Skills (Lesson 11)</div>
     </div>
   </div>
   <div class="component-card">
     <div class="component-header"><div class="component-num">4</div><div class="component-name">Connectors</div></div>
     <div class="component-body">
       MCP-based integrations to issue trackers, databases, Slack, CI — letting loops "act inside your actual environment," not just read/write local files.
-      <div class="component-maps">↳ Maps to: Layer 3 — MCP servers (Lesson 6)</div>
+      <div class="component-maps">↳ Maps to: Layer 3 — MCP servers (Lesson 14)</div>
     </div>
   </div>
   <div class="component-card">
     <div class="component-header"><div class="component-num">5</div><div class="component-name">Sub-agents</div></div>
     <div class="component-body">
       Separate agents with different instructions, splitting drafting from verification. Prevents "the model that wrote the code" from grading its own work — the direct fix for the Ralph Wiggum failure mode.
-      <div class="component-maps">↳ Maps to: Subagents / EPCR pattern (Lesson 9)</div>
+      <div class="component-maps">↳ Maps to: Subagents / EPCR pattern (Lesson 17)</div>
     </div>
   </div>
   <div class="component-card">
     <div class="component-header"><div class="component-num">6</div><div class="component-name">State / Memory</div></div>
     <div class="component-body">
       Persistent markdown files (<code>STATE.md</code>) or external boards tracking progress across runs. "The model forgets, the repo doesn't."
-      <div class="component-maps">↳ Maps to: Layer 6 — Memory + Write strategy (Lesson 5)</div>
+      <div class="component-maps">↳ Maps to: Layer 6 — Memory + Write strategy (Lesson 13)</div>
     </div>
   </div>
 </div>
 
 <div class="callout insight">
   <div class="callout-label">Insight</div>
-  This is why Lessons 1–12 weren't wasted effort even if you never run an unattended loop. A loop is just these six harness components wired together with a scheduler. If any one of them is weak — vague skills, no isolation, no separate verifier — the loop inherits that weakness and runs it on autopilot, at scale, while you're not watching.
+  This is why Lessons 9–20 weren't wasted effort even if you never run an unattended loop. A loop is just these six harness components wired together with a scheduler. If any one of them is weak — vague skills, no isolation, no separate verifier — the loop inherits that weakness and runs it on autopilot, at scale, while you're not watching.
 </div>
 
 <!-- ── LOOP ANATOMY ────────────────────────────────────────── -->
@@ -347,7 +347,7 @@
   </tr>
   <tr>
     <td>State / memory</td>
-    <td>A <code>STATE.md</code> in the project, or the memory system from Lesson 5</td>
+    <td>A <code>STATE.md</code> in the project, or the memory system from Lesson 13</td>
     <td>Write progress + open questions at the end of every iteration</td>
   </tr>
 </table>
@@ -359,7 +359,7 @@ summary to STATE.md, do NOT fix anything yet.
 
 <span class="comment"># Inside the loop, the agent should:</span>
 <span class="comment"># 1. Read STATE.md for what was true last run</span>
-<span class="comment"># 2. Run the test suite (compressed via RTK — Lesson 11)</span>
+<span class="comment"># 2. Run the test suite (compressed via RTK — Lesson 19)</span>
 <span class="comment"># 3. Diff against last run's failures</span>
 <span class="comment"># 4. Append findings to STATE.md</span>
 <span class="comment"># 5. ScheduleWakeup for the next check (1200-1800s for idle ticks)</span></pre>
@@ -403,12 +403,12 @@ summary to STATE.md, do NOT fix anything yet.
   <div class="quiz-q">Which of the six loop components did you NOT need to learn about in this lesson, because it was already fully covered by an earlier lesson's harness layer?</div>
   <div class="quiz-options">
     <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">A</div><div>Automations — this is new, covered by /loop and ScheduleWakeup</div></div>
-    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">B</div><div>Skills, Connectors, Sub-agents, Worktrees, and State/Memory — these are Layer 4, Layer 3, Lesson 9's subagents, the Isolate strategy, and Layer 6/Write strategy respectively</div></div>
+    <div class="quiz-option" onclick="answer(this,'q3',true)"><div class="quiz-option-letter">B</div><div>Skills, Connectors, Sub-agents, Worktrees, and State/Memory — these are Layer 4, Layer 3, Lesson 17's subagents, the Isolate strategy, and Layer 6/Write strategy respectively</div></div>
     <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">C</div><div>None — all six components are entirely new concepts specific to loop engineering</div></div>
     <div class="quiz-option" onclick="answer(this,'q3',false)"><div class="quiz-option-letter">D</div><div>Sub-agents only — the others are loop-specific infrastructure</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q3-correct">Correct — five of the six components are direct applications of concepts from Lessons 1–12: Skills (Layer 4), Connectors (Layer 3 / MCP), Sub-agents (Lesson 9's maker/checker pattern), Worktrees (the Isolate strategy), and State/Memory (Layer 6 + Write strategy). The only genuinely new piece is Automations — the scheduling layer that turns a one-shot harness into a recurring one. Loop engineering's contribution isn't new primitives; it's the realization that a well-built harness, given a heartbeat, becomes a system that runs without you.</div>
-  <div class="quiz-feedback wrong" id="q3-wrong">Five of the six components — Skills, Connectors, Sub-agents, Worktrees, State/Memory — map directly onto harness layers and strategies from Lessons 1–12. Only Automations (the scheduling/heartbeat layer) is new. This is the core insight of the lesson: loop engineering doesn't require new primitives, just a scheduler wrapped around a harness you already know how to build.</div>
+  <div class="quiz-feedback correct" id="q3-correct">Correct — five of the six components are direct applications of concepts from Lessons 9–20: Skills (Layer 4), Connectors (Layer 3 / MCP), Sub-agents (Lesson 17's maker/checker pattern), Worktrees (the Isolate strategy), and State/Memory (Layer 6 + Write strategy). The only genuinely new piece is Automations — the scheduling layer that turns a one-shot harness into a recurring one. Loop engineering's contribution isn't new primitives; it's the realization that a well-built harness, given a heartbeat, becomes a system that runs without you.</div>
+  <div class="quiz-feedback wrong" id="q3-wrong">Five of the six components — Skills, Connectors, Sub-agents, Worktrees, State/Memory — map directly onto harness layers and strategies from Lessons 9–20. Only Automations (the scheduling/heartbeat layer) is new. This is the core insight of the lesson: loop engineering doesn't require new primitives, just a scheduler wrapped around a harness you already know how to build.</div>
 </div>
 
 <div class="ask-teacher">
@@ -427,7 +427,7 @@ summary to STATE.md, do NOT fix anything yet.
 </ul>
 
 <div class="footer">
-  <span>Lesson 13 of 13 · Context &amp; Harness Engineering</span>
+  <span>Lesson 21 of 30 &middot; Context & Harness Engineering</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

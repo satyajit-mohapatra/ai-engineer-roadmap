@@ -12,19 +12,26 @@ path, built and taught interactively with Claude Code's `/teach` skill.
 | [`NOTES.md`](NOTES.md) | Living notes: user profile, preferences, curriculum status, session log. |
 | [`reference/curriculum.html`](reference/curriculum.html) | Index of all lessons, grouped by phase. Open this to navigate. |
 | [`reference/glossary.html`](reference/glossary.html) | Glossary of terms used across lessons. |
-| [`lessons/`](lessons/) | Self-contained HTML lessons (0001–0029), each with a quiz and source links. |
+| [`lessons/`](lessons/) | Self-contained HTML lessons (0001–0030), each with a quiz and source links. |
 | `learning-records/` | Personal session reflections — git-ignored, kept local only. |
 
 ## Curriculum
 
-29 lessons in two phases:
+30 lessons, ordered basic to advanced:
 
-- **Phase 1 (1–13)** — Context & harness engineering for Claude Code: hooks, skills,
-  CLAUDE.md, memory, MCP, context window management, subagents, loop engineering.
-- **Phase 2 (14–29)** — The rest of the AI Engineer roadmap: how LLMs work, choosing
-  models, inference parameters, provider APIs, prompt engineering, AI safety,
-  open-source models, embeddings, vector databases, RAG, agents & function calling,
-  multimodal AI, the model provider landscape, fine-tuning, and AI dev tools.
+- **Foundations (1–5)** — what an AI engineer is, how LLMs work, choosing models,
+  inference parameters, token economics & efficient prompting.
+- **APIs & Prompting (6–8)** — provider APIs, prompt engineering techniques, AI safety.
+- **Applied Track · Context & Harness Engineering (9–21)** — the Claude Code harness
+  specialization, recast as an advanced applied track: hooks, skills, CLAUDE.md,
+  memory, MCP, context window management, subagents, loop engineering.
+- **The RAG Stack (22–25)** — open-source models, embeddings, vector databases, RAG.
+- **Agents & Beyond (26–30)** — agents & function calling, multimodal AI, the model
+  provider landscape, fine-tuning, and AI dev tools (capstone).
+
+Reordered 2026-06-19 from the original write-order (harness specialization first,
+fundamentals tacked on after) into a genuine basic→advanced sequence. See
+[`learning-records/0004-curriculum-reordered-basic-to-advanced.md`](learning-records/0004-curriculum-reordered-basic-to-advanced.md).
 
 Open [`reference/curriculum.html`](reference/curriculum.html) in a browser to browse and
 jump between lessons.

@@ -3,8 +3,14 @@
 > **Scope changed 2026-06-10.** Originally this mission was narrow — *Context & Harness
 > Engineering for Claude Code* (see learning record 0003). The user chose to broaden it to
 > the full [AI Engineer roadmap](https://roadmap.sh/ai-engineer): "cover all aspects from
-> this page." The harness/context-engineering work (Lessons 1–13) is now **Phase 1** of a
-> larger curriculum, not the whole thing.
+> this page." The harness/context-engineering work is now an **applied/advanced track**
+> within a larger curriculum, not the whole thing.
+>
+> **Reordered 2026-06-19.** The curriculum originally ran in write-order (harness track
+> first, general fundamentals tacked on after), which read as random rather than basic→
+> advanced. Renumbered into Foundations → APIs & Prompting → Applied Track (Context &
+> Harness Engineering, lessons 9–21) → RAG Stack → Agents & Beyond. Added a new lesson on
+> token economics & efficient prompting. See learning record 0004.
 
 ## Why
 You work with Claude Code daily on a technical analysis codebase (Pine Script, Node.js,
@@ -24,7 +30,7 @@ models, and know when to fine-tune. The roadmap.sh/ai-engineer path is the targe
 - You can use multimodal models (vision, image gen, speech) in an application
 - You can judge RAG vs fine-tuning vs context engineering for a given problem
 - You ship AI features safely (prompt injection, moderation, privacy)
-- **(Phase 1, done)** You can diagnose why an agent fails and fix it at the right harness layer
+- **(Applied Track, done)** You can diagnose why an agent fails and fix it at the right harness layer
 
 ## Constraints
 - Already intermediate on prompting and Claude Code internals — don't re-teach Phase 1 basics

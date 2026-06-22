@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 16: Choosing the Right Model</title>
+<title>Lesson 3: Choosing the Right Model</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,16 +65,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0015-how-llms-work.html">&larr; 15. How LLMs Work</a>
+  <a class="nav-prev" href="0002-how-llms-work.html">&larr; 2. How LLMs Work</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0017-inference-parameters.html">17. Inference Parameters &rarr;</a>
+  <a class="nav-next" href="0004-inference-parameters.html">4. Inference Parameters &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 16</span>
+  <span class="tag">Lesson 3</span>
   <span class="tag green">Roadmap · Pre-trained Models</span>
   <span class="tag orange">Decision-making</span>
   <span class="tag yellow">~14 min</span>
@@ -98,7 +98,7 @@
 <table>
   <tr><th>Benefit</th><th>Matching limitation</th></tr>
   <tr><td>Broad knowledge out of the box</td><td>Frozen at a cutoff date — no current events</td></tr>
-  <tr><td>No training cost or data needed</td><td>Knows nothing private/proprietary to you (→ RAG, Lesson 24)</td></tr>
+  <tr><td>No training cost or data needed</td><td>Knows nothing private/proprietary to you (→ RAG, Lesson 25)</td></tr>
   <tr><td>Strong general reasoning</td><td>Hallucinates confidently outside what it knows</td></tr>
   <tr><td>One model, many tasks</td><td>Generic — may underperform a specialist on a narrow task</td></tr>
 </table>
@@ -118,14 +118,14 @@
 
 <div class="callout insight">
   <div class="callout-label">For your trading work specifically</div>
-  If options/positions data is sensitive, an open-weight model running locally (via Ollama — Lesson 21) keeps it on your machine. If you just need the best reasoning on public market concepts, a closed frontier model via API is simpler and stronger. The privacy axis often decides this before capability does.
+  If options/positions data is sensitive, an open-weight model running locally (via Ollama — Lesson 22) keeps it on your machine. If you just need the best reasoning on public market concepts, a closed frontier model via API is simpler and stronger. The privacy axis often decides this before capability does.
 </div>
 
 <!-- ── DECISION FRAMEWORK ──────────────────────────────────── -->
 <h2>A four-axis decision framework</h2>
 
 <ol>
-  <li><strong>Capability</strong> — Does it pass <em>your</em> eval on <em>your</em> task? (Public benchmarks ≠ your use case. Build a tiny eval set — Lesson 19/20 touch on this.)</li>
+  <li><strong>Capability</strong> — Does it pass <em>your</em> eval on <em>your</em> task? (Public benchmarks ≠ your use case. Build a tiny eval set — Lesson 7/8 touch on this.)</li>
   <li><strong>Cost</strong> — Price per million input/output tokens × your volume. A 10× cheaper model that's "good enough" often wins at scale.</li>
   <li><strong>Latency</strong> — Smaller/distilled models respond faster. Interactive UX vs batch jobs have different tolerances.</li>
   <li><strong>Control</strong> — Privacy, data residency, ability to self-host or fine-tune.</li>
@@ -133,7 +133,7 @@
 
 <div class="callout key">
   <div class="callout-label">The practitioner's move: tiered routing</div>
-  Don't pick one model for everything. Route: a small/cheap model for easy/high-volume calls (classification, extraction), a frontier model for hard reasoning. <a href="https://openrouter.ai">OpenRouter</a> (Lesson 27) lets you switch providers behind one API to do exactly this.
+  Don't pick one model for everything. Route: a small/cheap model for easy/high-volume calls (classification, extraction), a frontier model for hard reasoning. <a href="https://openrouter.ai">OpenRouter</a> (Lesson 28) lets you switch providers behind one API to do exactly this.
 </div>
 
 <h2>Reasoning vs standard models</h2>
@@ -184,7 +184,7 @@
 </ul>
 
 <div class="footer">
-  <span>Lesson 16 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 3 of 30 &middot; AI Engineer Roadmap (Foundations)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 29: AI-Assisted Development Tools</title>
+<title>Lesson 30: AI-Assisted Development Tools</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -67,7 +67,7 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0028-fine-tuning.html">&larr; 28. Fine-Tuning</a>
+  <a class="nav-prev" href="0029-fine-tuning.html">&larr; 29. Fine-Tuning</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
@@ -76,7 +76,7 @@
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 29</span>
+  <span class="tag">Lesson 30</span>
   <span class="tag green">Roadmap · Dev Tools</span>
   <span class="tag orange">Capstone</span>
   <span class="tag yellow">~12 min</span>
@@ -89,7 +89,7 @@
 
 <div class="callout key">
   <div class="callout-label">Full circle</div>
-  Phase 1 made you an expert <em>operator</em> of one of these tools (Claude Code). Now you can see the whole category — and, crucially, you understand <em>how they work inside</em>: they're agents (Lesson 25) with harnesses (Lesson 1) over provider APIs (Lesson 18), connected to tools via MCP (Lesson 6).
+  Phase 1 made you an expert <em>operator</em> of one of these tools (Claude Code). Now you can see the whole category — and, crucially, you understand <em>how they work inside</em>: they're agents (Lesson 26) with harnesses (Lesson 9) over provider APIs (Lesson 6), connected to tools via MCP (Lesson 14).
 </div>
 
 <!-- ── LANDSCAPE ───────────────────────────────────────────── -->
@@ -106,16 +106,16 @@
 
 <div class="callout insight">
   <div class="callout-label">You already know how to evaluate these</div>
-  Lesson 12 (tool-agnostic harness engineering) taught you that <code>CLAUDE.md</code>, <code>.cursor/rules</code>, Copilot custom instructions, Windsurf memories, and <code>AGENTS.md</code> are <em>the same idea</em> in different syntax. Switching tools is a config-translation problem, not a relearning problem. That's a Phase 1 superpower applied to this whole table.
+  Lesson 20 (tool-agnostic harness engineering) taught you that <code>CLAUDE.md</code>, <code>.cursor/rules</code>, Copilot custom instructions, Windsurf memories, and <code>AGENTS.md</code> are <em>the same idea</em> in different syntax. Switching tools is a config-translation problem, not a relearning problem. That's a Phase 1 superpower applied to this whole table.
 </div>
 
 <!-- ── WHAT MAKES A GOOD ONE ───────────────────────────────── -->
 <h2>What separates them (the axes that matter)</h2>
 <ul>
-  <li><strong>Autonomy</strong> — inline completion (Copilot) → chat → agent that edits many files and runs commands (Claude Code, Codex). More autonomy = more leverage and more need for the gating you learned in Lesson 13.</li>
+  <li><strong>Autonomy</strong> — inline completion (Copilot) → chat → agent that edits many files and runs commands (Claude Code, Codex). More autonomy = more leverage and more need for the gating you learned in Lesson 21.</li>
   <li><strong>Harness depth</strong> — hooks, skills, custom tools, memory, subagents. This is where Claude Code is deep and where your Phase 1 skills directly pay off.</li>
-  <li><strong>Context handling</strong> — how the tool selects, compresses, and isolates context (Lessons 7–9) determines reliability on big codebases.</li>
-  <li><strong>Model flexibility</strong> — can you bring your own model / route providers (Lesson 27)?</li>
+  <li><strong>Context handling</strong> — how the tool selects, compresses, and isolates context (Lessons 15–17) determines reliability on big codebases.</li>
+  <li><strong>Model flexibility</strong> — can you bring your own model / route providers (Lesson 28)?</li>
 </ul>
 
 <!-- ── CAPSTONE ────────────────────────────────────────────── -->
@@ -145,14 +145,14 @@
 
 <div class="quiz" id="q1">
   <div class="quiz-title">Quiz · Question 1 of 2</div>
-  <div class="quiz-q">A colleague using Cursor asks how to give it persistent project rules like your <code>CLAUDE.md</code>. Drawing on Lesson 12, what's the accurate answer?</div>
+  <div class="quiz-q">A colleague using Cursor asks how to give it persistent project rules like your <code>CLAUDE.md</code>. Drawing on Lesson 20, what's the accurate answer?</div>
   <div class="quiz-options">
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Cursor has no equivalent; persistent rules are unique to Claude Code's design</div></div>
     <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Cursor uses .cursor/rules files — same concept, different syntax; translate the rules over</div></div>
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>They must fine-tune a model on the rules since editors can't hold persistent instructions</div></div>
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Persistent rules only work if both people use the exact same AI coding tool</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q1-correct">Correct. Persistent project instructions are a cross-tool concept: <code>CLAUDE.md</code>, <code>.cursor/rules</code>, Copilot custom instructions, Windsurf memories, and <code>AGENTS.md</code> are the same idea in different syntax (Lesson 12). The task is translating the rules into Cursor's format — not relearning, and certainly not fine-tuning.</div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. Persistent project instructions are a cross-tool concept: <code>CLAUDE.md</code>, <code>.cursor/rules</code>, Copilot custom instructions, Windsurf memories, and <code>AGENTS.md</code> are the same idea in different syntax (Lesson 20). The task is translating the rules into Cursor's format — not relearning, and certainly not fine-tuning.</div>
   <div class="quiz-feedback wrong" id="q1-wrong">Cursor uses <code>.cursor/rules</code> — the same persistent-instructions concept in different syntax (option B). It's a translation task, not a missing feature, and it has nothing to do with fine-tuning or requiring identical tools.</div>
 </div>
 
@@ -165,7 +165,7 @@
     <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Because you fine-tuned the underlying model yourself in an earlier lesson</div></div>
     <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Because these tools don't actually use LLMs; they use hardcoded rules</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q2-correct">Correct — and a fitting place to end. Every tool in the table is an LLM agent: a reason-act-observe loop (Lesson 25) with a harness of hooks/skills/memory (Lessons 1–13), calling a provider API (Lesson 18), reaching external tools through MCP (Lesson 6). You now understand the machine you've been operating from the inside out.</div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct — and a fitting place to end. Every tool in the table is an LLM agent: a reason-act-observe loop (Lesson 26) with a harness of hooks/skills/memory (Lessons 9–21), calling a provider API (Lesson 6), reaching external tools through MCP (Lesson 14). You now understand the machine you've been operating from the inside out.</div>
   <div class="quiz-feedback wrong" id="q2-wrong">They're not black boxes because you understand their architecture: an agent loop + harness over a provider API, with MCP for tools (option B). It's not about open-source access, your own fine-tuning, or the false claim that they avoid LLMs.</div>
 </div>
 
@@ -181,11 +181,11 @@
 <ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
   <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh — development tools cluster (Cursor, Claude Code, Codex, Windsurf, Replit)</a></li>
   <li><a href="https://roadmap.sh/ai-engineer/projects">roadmap.sh — AI Engineer Projects</a></li>
-  <li>Cross-reference: <a href="0012-tool-agnostic-harness.html">Lesson 12 — Tool-Agnostic Harness Engineering</a></li>
+  <li>Cross-reference: <a href="0020-tool-agnostic-harness.html">Lesson 20 — Tool-Agnostic Harness Engineering</a></li>
 </ul>
 
 <div class="footer">
-  <span>Lesson 29 of 29 · Roadmap complete 🎓</span>
+  <span>Lesson 30 of 30 &middot; AI Engineer Roadmap (Agents & Beyond)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 28: Fine-Tuning</title>
+<title>Lesson 29: Fine-Tuning</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,16 +65,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0027-model-provider-landscape.html">&larr; 27. Model Provider Landscape</a>
+  <a class="nav-prev" href="0028-model-provider-landscape.html">&larr; 28. Model Provider Landscape</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0029-ai-development-tools.html">29. AI-Assisted Development Tools &rarr;</a>
+  <a class="nav-next" href="0030-ai-development-tools.html">30. AI-Assisted Development Tools &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 28</span>
+  <span class="tag">Lesson 29</span>
   <span class="tag green">Roadmap · Fine-Tuning</span>
   <span class="tag orange">Advanced</span>
   <span class="tag yellow">~13 min</span>
@@ -95,7 +95,7 @@
 <p>You take a pre-trained model and continue training it on <em>your</em> examples (input→output pairs), nudging the weights so it adopts a behavior. Unlike RAG (which adds <em>knowledge</em> at query time), fine-tuning changes the model's <strong>default behavior</strong> — its style, format, tone, or skill at a narrow task.</p>
 
 <div class="callout key">
-  <div class="callout-label">The mantra (from Lesson 24)</div>
+  <div class="callout-label">The mantra (from Lesson 25)</div>
   <strong>RAG adds knowledge. Fine-tuning adds behavior.</strong> If you can phrase the need as "it should <em>know</em> X," reach for RAG. If it's "it should always <em>respond like</em> Y," consider fine-tuning.
 </div>
 
@@ -147,7 +147,7 @@
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Fine-tune once on all historical pricing so the model can interpolate future prices</div></div>
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Raise the model's temperature so it adapts to new pricing automatically</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q1-correct">Correct. This is a <em>knowledge</em> need with frequently-changing facts — the textbook RAG case (Lesson 24). Fine-tuning bakes facts into weights that go stale immediately, and re-tuning weekly is slow, costly, and fragile. Put the pricing in a retrievable store and let the model fetch the current value at query time.</div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. This is a <em>knowledge</em> need with frequently-changing facts — the textbook RAG case (Lesson 25). Fine-tuning bakes facts into weights that go stale immediately, and re-tuning weekly is slow, costly, and fragile. Put the pricing in a retrievable store and let the model fetch the current value at query time.</div>
   <div class="quiz-feedback wrong" id="q1-wrong">Frequently-changing facts = RAG (option B), not fine-tuning. Weights go stale the moment pricing changes; re-tuning weekly is wasteful; models can't "interpolate" future prices; and temperature has nothing to do with knowledge freshness.</div>
 </div>
 
@@ -180,7 +180,7 @@
 </ul>
 
 <div class="footer">
-  <span>Lesson 28 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 29 of 30 &middot; AI Engineer Roadmap (Agents & Beyond)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

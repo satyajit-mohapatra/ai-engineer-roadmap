@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 11: Token Compression Tools</title>
+<title>Lesson 19: Token Compression Tools</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -103,16 +103,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0010-end-to-end-harness-design.html">&larr; 10. End-to-End Harness Design</a>
+  <a class="nav-prev" href="0018-end-to-end-harness-design.html">&larr; 18. End-to-End Harness Design</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0012-tool-agnostic-harness.html">12. Tool-Agnostic Harness &rarr;</a>
+  <a class="nav-next" href="0020-tool-agnostic-harness.html">20. Tool-Agnostic Harness &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 11</span>
+  <span class="tag">Lesson 19</span>
   <span class="tag green">Context Engineering</span>
   <span class="tag orange">Token Compression</span>
   <span class="tag yellow">~25 min</span>
@@ -125,8 +125,12 @@
 
 <!-- ── WHY ─────────────────────────────────────────────────── -->
 <h2>The Problem</h2>
-<p>In Lesson 7 you learned that tool results are the biggest context consumer in most sessions. A <code>git status</code> that returns 200 lines dumps 1,500+ tokens into the window. A test run with 80 failures returns 10,000 tokens of stack traces. A recursive directory listing: 3,000 tokens of paths most of which are irrelevant.</p>
-<p>The Compress strategy from Lesson 8 says: <em>reduce token count without losing meaning, before information lands in the window</em>. These six tools operationalize that strategy — each attacking a different source of token bloat.</p>
+<div class="callout" style="margin-bottom:1.5rem">
+  <div class="callout-label">Not the same problem as Lesson 5</div>
+  <a href="0005-token-economics-efficient-prompting.html">Lesson 5</a> covered deliberate input/output discipline you control by hand — caching, excerpting, bounding output. This lesson is about <em>automatic</em> compression of tool output you can't easily hand-edit (test runs, git status, codebase reads). Use both: Lesson 5's habits for what you write, these tools for what your shell and editor hand back to you.
+</div>
+<p>In Lesson 15 you learned that tool results are the biggest context consumer in most sessions. A <code>git status</code> that returns 200 lines dumps 1,500+ tokens into the window. A test run with 80 failures returns 10,000 tokens of stack traces. A recursive directory listing: 3,000 tokens of paths most of which are irrelevant.</p>
+<p>The Compress strategy from Lesson 16 says: <em>reduce token count without losing meaning, before information lands in the window</em>. These six tools operationalize that strategy — each attacking a different source of token bloat.</p>
 
 <div class="callout key">
   <div class="callout-label">Key Framing</div>
@@ -587,7 +591,7 @@ lsp references validateSession
 </ul>
 
 <div class="footer">
-  <span>Lesson 11 of 12 · Context &amp; Harness Engineering</span>
+  <span>Lesson 19 of 30 &middot; Context & Harness Engineering</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

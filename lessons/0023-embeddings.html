@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 22: Embeddings</title>
+<title>Lesson 23: Embeddings</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -66,16 +66,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0021-open-source-models.html">&larr; 21. Open-Source &amp; Self-Hosted Models</a>
+  <a class="nav-prev" href="0022-open-source-models.html">&larr; 22. Open-Source & Self-Hosted Models</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0023-vector-databases.html">23. Vector Databases &rarr;</a>
+  <a class="nav-next" href="0024-vector-databases.html">24. Vector Databases &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 22</span>
+  <span class="tag">Lesson 23</span>
   <span class="tag green">Roadmap · Embeddings</span>
   <span class="tag orange">RAG Stack 1/3</span>
   <span class="tag yellow">~15 min</span>
@@ -128,7 +128,7 @@ def cosine(a, b):
   <div class="callout-label">Two rules that bite beginners</div>
   <ol style="margin-bottom:0">
     <li><strong>Embed queries and documents with the <em>same</em> model.</strong> Vectors from different models live in different spaces and aren't comparable.</li>
-    <li><strong>Dimension count is fixed per model.</strong> Your vector DB (Lesson 23) must be configured for that exact dimension. Switching models = re-embedding everything.</li>
+    <li><strong>Dimension count is fixed per model.</strong> Your vector DB (Lesson 24) must be configured for that exact dimension. Switching models = re-embedding everything.</li>
   </ol>
 </div>
 
@@ -136,7 +136,7 @@ def cosine(a, b):
 <h2>What embeddings power</h2>
 <ul>
   <li><strong>Semantic search</strong> — find documents by meaning, not exact words ("downside protection" matches "hedging strategy").</li>
-  <li><strong>RAG retrieval</strong> — fetch the most relevant chunks to ground an answer (Lesson 24).</li>
+  <li><strong>RAG retrieval</strong> — fetch the most relevant chunks to ground an answer (Lesson 25).</li>
   <li><strong>Recommendation / clustering</strong> — group or suggest similar items.</li>
   <li><strong>Classification / dedup / anomaly detection</strong> — distance in embedding space = a feature.</li>
 </ul>
@@ -186,7 +186,7 @@ def cosine(a, b):
 </ul>
 
 <div class="footer">
-  <span>Lesson 22 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 23 of 30 &middot; AI Engineer Roadmap (RAG Stack)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

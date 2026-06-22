@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 18: The OpenAI Platform</title>
+<title>Lesson 6: The OpenAI Platform</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,16 +65,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0017-inference-parameters.html">&larr; 17. Inference Parameters</a>
+  <a class="nav-prev" href="0005-token-economics-efficient-prompting.html">&larr; 5. Token Economics & Efficient Prompting</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0019-prompt-engineering-techniques.html">19. Prompt Engineering Techniques &rarr;</a>
+  <a class="nav-next" href="0007-prompt-engineering-techniques.html">7. Prompt Engineering Techniques &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 18</span>
+  <span class="tag">Lesson 6</span>
   <span class="tag green">Roadmap · OpenAI Platform</span>
   <span class="tag orange">Hands-on</span>
   <span class="tag yellow">~16 min</span>
@@ -113,7 +113,7 @@ print(resp.choices[0].message.content)</pre>
 
 <div class="callout insight">
   <div class="callout-label">The three roles, mapped to what you know</div>
-  <code>system</code> = the persistent instructions (your CLAUDE.md / system prompt from Lesson 4). <code>user</code> = the request. <code>assistant</code> = the model's turns, including prior ones you replay to give it conversation history (since it has no memory — Lesson 15).
+  <code>system</code> = the persistent instructions (your CLAUDE.md / system prompt from Lesson 12). <code>user</code> = the request. <code>assistant</code> = the model's turns, including prior ones you replay to give it conversation history (since it has no memory — Lesson 2).
 </div>
 
 <!-- ── STREAMING ───────────────────────────────────────────── -->
@@ -140,15 +140,15 @@ trade = resp.choices[0].message.parsed  <span class="comment"># a typed Trade ob
 
 <div class="callout key">
   <div class="callout-label">This is the single biggest reliability upgrade</div>
-  Structured output turns "LLM in a pipeline" from flaky to dependable. Combine it with temperature 0 (Lesson 17) for extraction tasks and you get near-deterministic, schema-valid data every call.
+  Structured output turns "LLM in a pipeline" from flaky to dependable. Combine it with temperature 0 (Lesson 4) for extraction tasks and you get near-deterministic, schema-valid data every call.
 </div>
 
 <!-- ── TOOL CALLING + CACHING ──────────────────────────────── -->
 <h2>Function calling &amp; prompt caching (preview)</h2>
 <ul>
-  <li><strong>Function / tool calling</strong> — you describe functions (name, params as JSON Schema); the model returns a structured request to call one. This is the foundation of agents — full treatment in <a href="0025-agents-function-calling.html">Lesson 25</a>.</li>
-  <li><strong>Prompt caching</strong> — repeated prefixes (a big system prompt, a long document) get cached server-side, cutting cost and latency on follow-up calls. You met the idea in Lesson 11; every major provider now offers it.</li>
-  <li><strong>Vision &amp; images</strong> — the same API accepts image inputs (vision) and there are image-generation endpoints (DALL·E) — covered in <a href="0026-multimodal-ai.html">Lesson 26</a>.</li>
+  <li><strong>Function / tool calling</strong> — you describe functions (name, params as JSON Schema); the model returns a structured request to call one. This is the foundation of agents — full treatment in <a href="0026-agents-function-calling.html">Lesson 26</a>.</li>
+  <li><strong>Prompt caching</strong> — repeated prefixes (a big system prompt, a long document) get cached server-side, cutting cost and latency on follow-up calls. You met the idea in Lesson 19; every major provider now offers it.</li>
+  <li><strong>Vision &amp; images</strong> — the same API accepts image inputs (vision) and there are image-generation endpoints (DALL·E) — covered in <a href="0027-multimodal-ai.html">Lesson 27</a>.</li>
 </ul>
 
 <!-- ── COST ────────────────────────────────────────────────── -->
@@ -180,7 +180,7 @@ trade = resp.choices[0].message.parsed  <span class="comment"># a typed Trade ob
     <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>In the model's first assistant-role message, as a self-introduction</div></div>
     <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>It can't be set via the API; you must fine-tune a model with that persona</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q2-correct">Correct. Persistent instructions go in the <code>system</code>-role message — the API's equivalent of the system prompt / CLAUDE.md you know from Lesson 4. Stuffing it into every user message wastes tokens and muddies the request; assistant messages are the model's turns; and no fine-tuning is needed for a persona.</div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. Persistent instructions go in the <code>system</code>-role message — the API's equivalent of the system prompt / CLAUDE.md you know from Lesson 12. Stuffing it into every user message wastes tokens and muddies the request; assistant messages are the model's turns; and no fine-tuning is needed for a persona.</div>
   <div class="quiz-feedback wrong" id="q2-wrong">Persistent behavior belongs in the <code>system</code>-role message (option B) — the API analog of a system prompt. Repeating it in user messages is wasteful, assistant messages are for the model's replies, and fine-tuning is overkill for a simple persona.</div>
 </div>
 
@@ -200,7 +200,7 @@ trade = resp.choices[0].message.parsed  <span class="comment"># a typed Trade ob
 </ul>
 
 <div class="footer">
-  <span>Lesson 18 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 6 of 30 &middot; AI Engineer Roadmap (APIs & Prompting)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

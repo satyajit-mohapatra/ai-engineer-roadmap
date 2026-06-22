@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 26: Multimodal AI</title>
+<title>Lesson 27: Multimodal AI</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,16 +65,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0025-agents-function-calling.html">&larr; 25. AI Agents &amp; Function Calling</a>
+  <a class="nav-prev" href="0026-agents-function-calling.html">&larr; 26. AI Agents & Function Calling</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0027-model-provider-landscape.html">27. Model Provider Landscape &rarr;</a>
+  <a class="nav-next" href="0028-model-provider-landscape.html">28. Model Provider Landscape &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 26</span>
+  <span class="tag">Lesson 27</span>
   <span class="tag green">Roadmap · Multimodal AI</span>
   <span class="tag orange">Capabilities</span>
   <span class="tag yellow">~14 min</span>
@@ -87,7 +87,7 @@
 
 <div class="callout key">
   <div class="callout-label">The mental shift</div>
-  "Multimodal" = a model that handles more than text — images, audio, sometimes video — as <em>input</em>, <em>output</em>, or both. Under the hood, other modalities get converted into tokens the same transformer processes (Lesson 15). For you, the API is mostly unchanged: you just attach an image or audio file.
+  "Multimodal" = a model that handles more than text — images, audio, sometimes video — as <em>input</em>, <em>output</em>, or both. Under the hood, other modalities get converted into tokens the same transformer processes (Lesson 2). For you, the API is mostly unchanged: you just attach an image or audio file.
 </div>
 
 <!-- ── MAP ─────────────────────────────────────────────────── -->
@@ -112,7 +112,7 @@
 
 <div class="callout insight">
   <div class="callout-label">A real tie to your work</div>
-  Vision is genuinely useful in trading workflows: feed a chart screenshot and ask the model to describe the setup, extract numbers from a broker statement (OCR), or read a table from a PDF report into structured data (combine with Structured Outputs, Lesson 18). It's not a trading oracle — but it's a strong "read this image into text/JSON" tool.
+  Vision is genuinely useful in trading workflows: feed a chart screenshot and ask the model to describe the setup, extract numbers from a broker statement (OCR), or read a table from a PDF report into structured data (combine with Structured Outputs, Lesson 6). It's not a trading oracle — but it's a strong "read this image into text/JSON" tool.
 </div>
 
 <!-- ── AUDIO / GEN ─────────────────────────────────────────── -->
@@ -139,7 +139,7 @@
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Speech-to-text plus a reranker, since PDFs are processed as audio streams</div></div>
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Video understanding, because a multi-page PDF counts as a sequence of frames</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q1-correct">Correct. A scanned PDF is an image, so you need image understanding / OCR to read the values, then Structured Outputs (Lesson 18) to force them into a strict JSON schema. This image→text→structured combination is one of the most practical multimodal patterns. The other options mix in unrelated modalities (audio, video, generation).</div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. A scanned PDF is an image, so you need image understanding / OCR to read the values, then Structured Outputs (Lesson 6) to force them into a strict JSON schema. This image→text→structured combination is one of the most practical multimodal patterns. The other options mix in unrelated modalities (audio, video, generation).</div>
   <div class="quiz-feedback wrong" id="q1-wrong">A scanned PDF is an <em>image</em>: use vision/OCR to read it, then Structured Outputs to enforce JSON (option B). TTS, STT, video, and image generation don't apply to reading values out of a scanned document.</div>
 </div>
 
@@ -152,7 +152,7 @@
     <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>You must first convert the image to text yourself before the model can read it</div></div>
     <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Images can only be sent to fine-tuned models, never to standard hosted ones</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q2-correct">Correct. It's the same Chat Completions / messages shape you learned in Lesson 18 — you just include an image content part alongside the text. The model handles converting the image into tokens internally. That continuity is why mastering the base API pays off across every modality.</div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. It's the same Chat Completions / messages shape you learned in Lesson 6 — you just include an image content part alongside the text. The model handles converting the image into tokens internally. That continuity is why mastering the base API pays off across every modality.</div>
   <div class="quiz-feedback wrong" id="q2-wrong">It's the same messages format with an added image part (option B) — no separate protocol, no manual image-to-text step, and no fine-tuning requirement. The model tokenizes the image internally.</div>
 </div>
 
@@ -171,7 +171,7 @@
 </ul>
 
 <div class="footer">
-  <span>Lesson 26 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 27 of 30 &middot; AI Engineer Roadmap (Agents & Beyond)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

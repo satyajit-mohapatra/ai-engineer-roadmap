@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 24: Retrieval-Augmented Generation</title>
+<title>Lesson 25: Retrieval-Augmented Generation</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -70,16 +70,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0023-vector-databases.html">&larr; 23. Vector Databases</a>
+  <a class="nav-prev" href="0024-vector-databases.html">&larr; 24. Vector Databases</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0025-agents-function-calling.html">25. AI Agents &amp; Function Calling &rarr;</a>
+  <a class="nav-next" href="0026-agents-function-calling.html">26. AI Agents & Function Calling &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 24</span>
+  <span class="tag">Lesson 25</span>
   <span class="tag green">Roadmap · RAG</span>
   <span class="tag orange">RAG Stack 3/3 · Keystone</span>
   <span class="tag yellow">~18 min</span>
@@ -97,7 +97,7 @@
 
 <!-- ── WHY ─────────────────────────────────────────────────── -->
 <h2>Why RAG exists</h2>
-<p>Recall from Lesson 15: the model's weights are frozen and it knows nothing private or post-cutoff. RAG is the standard fix. It directly attacks the two biggest LLM failure modes:</p>
+<p>Recall from Lesson 2: the model's weights are frozen and it knows nothing private or post-cutoff. RAG is the standard fix. It directly attacks the two biggest LLM failure modes:</p>
 <ul>
   <li><strong>Hallucination</strong> — grounding the answer in retrieved text gives the model facts to cite instead of inventing.</li>
   <li><strong>Knowledge gaps</strong> — your internal docs, current data, and proprietary knowledge become answerable without retraining.</li>
@@ -110,9 +110,9 @@
 <div class="pipe">
   <div class="pipe-row"><div class="pipe-icon" style="background:rgba(99,102,241,.15);color:var(--accent)">1</div><div><strong>Chunk</strong></div><div class="pipe-desc">Split documents into passages (~200–800 tokens) that each carry one coherent idea</div></div>
   <div class="pipe-arrow">↓</div>
-  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(34,197,94,.15);color:var(--green)">2</div><div><strong>Embed</strong></div><div class="pipe-desc">Turn each chunk into a vector (Lesson 22)</div></div>
+  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(34,197,94,.15);color:var(--green)">2</div><div><strong>Embed</strong></div><div class="pipe-desc">Turn each chunk into a vector (Lesson 23)</div></div>
   <div class="pipe-arrow">↓</div>
-  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(251,146,60,.15);color:var(--orange)">3</div><div><strong>Store / Index</strong></div><div class="pipe-desc">Put vectors + text + metadata into a vector DB (Lesson 23)</div></div>
+  <div class="pipe-row"><div class="pipe-icon" style="background:rgba(251,146,60,.15);color:var(--orange)">3</div><div><strong>Store / Index</strong></div><div class="pipe-desc">Put vectors + text + metadata into a vector DB (Lesson 24)</div></div>
 </div>
 
 <h3>Retrieval + generation — every query</h3>
@@ -137,7 +137,7 @@ answer = llm(prompt, temperature=0.2)                  <span class="comment"># g
 
 <div class="callout insight">
   <div class="callout-label">RAG is context engineering with a search step</div>
-  Look at step 6: it's just assembling a good context window (your Phase 1 skill) where the relevant material is <em>selected</em> automatically by similarity. RAG is the "select" strategy from <a href="0008-four-strategies-deep-dive.html">Lesson 8</a> applied to an external corpus. You already know the destination — RAG is the on-ramp.
+  Look at step 6: it's just assembling a good context window (your Phase 1 skill) where the relevant material is <em>selected</em> automatically by similarity. RAG is the "select" strategy from <a href="0016-four-strategies-deep-dive.html">Lesson 16</a> applied to an external corpus. You already know the destination — RAG is the on-ramp.
 </div>
 
 <!-- ── PITFALLS ────────────────────────────────────────────── -->
@@ -159,7 +159,7 @@ answer = llm(prompt, temperature=0.2)                  <span class="comment"># g
   <tr><td>Data changes often (just re-index)</td><td>Behavior is stable and well-defined</td></tr>
   <tr><td>You need citations / traceability</td><td>You want shorter prompts at inference</td></tr>
 </table>
-<p>They're complementary, not rivals — and for most teams, <strong>start with RAG</strong> (and good prompting). Full fine-tuning treatment in <a href="0028-fine-tuning.html">Lesson 28</a>.</p>
+<p>They're complementary, not rivals — and for most teams, <strong>start with RAG</strong> (and good prompting). Full fine-tuning treatment in <a href="0029-fine-tuning.html">Lesson 29</a>.</p>
 
 <h2>Frameworks</h2>
 <p>You can build RAG by hand (recommended once, to understand it). In production, frameworks remove boilerplate: <strong>LangChain</strong> and <strong>LlamaIndex</strong> are the big two; <strong>Haystack</strong> and <strong>RAGFlow</strong> are strong alternatives. They give you loaders, chunkers, retrievers, and rerankers as composable pieces.</p>
@@ -209,7 +209,7 @@ answer = llm(prompt, temperature=0.2)                  <span class="comment"># g
 </ul>
 
 <div class="footer">
-  <span>Lesson 24 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 25 of 30 &middot; AI Engineer Roadmap (RAG Stack)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

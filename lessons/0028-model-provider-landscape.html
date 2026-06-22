@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 27: The Model Provider Landscape</title>
+<title>Lesson 28: Model Provider Landscape</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,16 +65,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0026-multimodal-ai.html">&larr; 26. Multimodal AI</a>
+  <a class="nav-prev" href="0027-multimodal-ai.html">&larr; 27. Multimodal AI</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0028-fine-tuning.html">28. Fine-Tuning &rarr;</a>
+  <a class="nav-next" href="0029-fine-tuning.html">29. Fine-Tuning &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 27</span>
+  <span class="tag">Lesson 28</span>
   <span class="tag green">Roadmap · Model Providers</span>
   <span class="tag orange">Landscape</span>
   <span class="tag yellow">~12 min</span>
@@ -87,7 +87,7 @@
 
 <div class="callout key">
   <div class="callout-label">Why this is a short lesson</div>
-  You learned the OpenAI API shape in Lesson 18 precisely so this lesson can be short: every provider below is a variation on the same theme — messages in, completion out, tool calling, streaming. You're learning <em>differences</em>, not new fundamentals.
+  You learned the OpenAI API shape in Lesson 6 precisely so this lesson can be short: every provider below is a variation on the same theme — messages in, completion out, tool calling, streaming. You're learning <em>differences</em>, not new fundamentals.
 </div>
 
 <!-- ── PROVIDERS ───────────────────────────────────────────── -->
@@ -115,7 +115,7 @@
 <p>Two facts make multi-provider life easy:</p>
 <ul>
   <li><strong>"OpenAI-compatible" endpoints</strong> — most providers (and local runtimes like Ollama) expose an endpoint that accepts the OpenAI request format. Change <code>base_url</code> + key + model name; keep your code.</li>
-  <li><strong><a href="https://openrouter.ai">OpenRouter</a></strong> — a single API in front of <em>hundreds</em> of models across all providers. One key, one format, switch models with a string. Ideal for the tiered routing from Lesson 16 and for comparison shopping.</li>
+  <li><strong><a href="https://openrouter.ai">OpenRouter</a></strong> — a single API in front of <em>hundreds</em> of models across all providers. One key, one format, switch models with a string. Ideal for the tiered routing from Lesson 3 and for comparison shopping.</li>
 </ul>
 
 <pre><span class="pre-label">python — same code, three providers</span><span class="comment"># OpenAI</span>
@@ -171,7 +171,7 @@ OpenAI(base_url=<span class="string">"https://openrouter.ai/api/v1"</span>, api_
 </div>
 
 <h2>Primary Source</h2>
-<p>📖 <a href="https://openrouter.ai/docs">OpenRouter Docs</a> for the unified API, plus each provider's own quickstart (<a href="https://docs.anthropic.com/">Anthropic</a>, <a href="https://ai.google.dev/">Google AI</a>). Compare current capabilities on <a href="https://artificialanalysis.ai/">Artificial Analysis</a> (Lesson 16).</p>
+<p>📖 <a href="https://openrouter.ai/docs">OpenRouter Docs</a> for the unified API, plus each provider's own quickstart (<a href="https://docs.anthropic.com/">Anthropic</a>, <a href="https://ai.google.dev/">Google AI</a>). Compare current capabilities on <a href="https://artificialanalysis.ai/">Artificial Analysis</a> (Lesson 3).</p>
 
 <h2>Sources</h2>
 <ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
@@ -181,7 +181,7 @@ OpenAI(base_url=<span class="string">"https://openrouter.ai/api/v1"</span>, api_
 </ul>
 
 <div class="footer">
-  <span>Lesson 27 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 28 of 30 &middot; AI Engineer Roadmap (Agents & Beyond)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

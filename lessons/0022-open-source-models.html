@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 21: Open-Source & Self-Hosted Models</title>
+<title>Lesson 22: Open-Source & Self-Hosted Models</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,29 +65,29 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0020-ai-safety-ethics.html">&larr; 20. AI Safety &amp; Ethics</a>
+  <a class="nav-prev" href="0021-loop-engineering.html">&larr; 21. Loop Engineering</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0022-embeddings.html">22. Embeddings &rarr;</a>
+  <a class="nav-next" href="0023-embeddings.html">23. Embeddings &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 21</span>
+  <span class="tag">Lesson 22</span>
   <span class="tag green">Roadmap · Open-Source Models</span>
   <span class="tag orange">Hands-on</span>
   <span class="tag yellow">~14 min</span>
 </div>
 
 <h1>Open-Source &amp; Self-Hosted Models</h1>
-<p class="subtitle">Running models you control — on your laptop or your own servers. The privacy axis from Lesson 16, made real.</p>
+<p class="subtitle">Running models you control — on your laptop or your own servers. The privacy axis from Lesson 3, made real.</p>
 
 <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
 
 <div class="callout key">
   <div class="callout-label">When you reach for this</div>
-  Data can't leave your machine · you want zero per-token cost at scale · you need to fine-tune or modify the model · you want to work offline. If none of those apply, a hosted API (Lesson 18) is usually less work.
+  Data can't leave your machine · you want zero per-token cost at scale · you need to fine-tune or modify the model · you want to work offline. If none of those apply, a hosted API (Lesson 6) is usually less work.
 </div>
 
 <!-- ── HUGGING FACE ────────────────────────────────────────── -->
@@ -113,18 +113,18 @@ ollama run llama3.2 <span class="string">"Summarize theta decay in one line"</sp
 <span class="comment"># it exposes an OpenAI-compatible endpoint on :11434</span>
 <span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
 client = OpenAI(base_url=<span class="string">"http://localhost:11434/v1"</span>, api_key=<span class="string">"ollama"</span>)
-<span class="comment"># ...same .chat.completions.create() call as Lesson 18</span></pre>
+<span class="comment"># ...same .chat.completions.create() call as Lesson 6</span></pre>
 
 <div class="callout insight">
-  <div class="callout-label">The payoff of Lesson 18</div>
-  Because Ollama (and LM Studio, and many others) speak the OpenAI API shape, the code you learned in Lesson 18 runs against a local model by changing only <code>base_url</code>. This is why "learn the OpenAI shape once" pays off — it's the universal adapter.
+  <div class="callout-label">The payoff of Lesson 6</div>
+  Because Ollama (and LM Studio, and many others) speak the OpenAI API shape, the code you learned in Lesson 6 runs against a local model by changing only <code>base_url</code>. This is why "learn the OpenAI shape once" pays off — it's the universal adapter.
 </div>
 
 <!-- ── LM STUDIO + SELF HOST ───────────────────────────────── -->
 <h2>LM Studio &amp; self-hosting at scale</h2>
 <ul>
   <li><strong>LM Studio</strong> — a desktop GUI for discovering, downloading, and chatting with local models; also serves an OpenAI-compatible endpoint. Great for non-terminal exploration.</li>
-  <li><strong>Production self-hosting</strong> — for real throughput you use a serving engine like <strong>vLLM</strong> or <strong>TGI</strong> on a GPU box, which batch requests efficiently. This is where "free weights" meets "you pay for GPUs + ops" from Lesson 16.</li>
+  <li><strong>Production self-hosting</strong> — for real throughput you use a serving engine like <strong>vLLM</strong> or <strong>TGI</strong> on a GPU box, which batch requests efficiently. This is where "free weights" meets "you pay for GPUs + ops" from Lesson 3.</li>
   <li><strong>Quantization</strong> — shrinking model weights (e.g. to 4-bit) so they fit on consumer hardware, trading a little quality for big memory/speed savings. It's why a 7B–8B model runs on a laptop at all.</li>
 </ul>
 
@@ -173,7 +173,7 @@ client = OpenAI(base_url=<span class="string">"http://localhost:11434/v1"</span>
 </ul>
 
 <div class="footer">
-  <span>Lesson 21 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 22 of 30 &middot; AI Engineer Roadmap (RAG Stack)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

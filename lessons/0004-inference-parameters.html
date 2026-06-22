@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 17: Inference Parameters</title>
+<title>Lesson 4: Inference Parameters</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,16 +65,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0016-choosing-models.html">&larr; 16. Choosing the Right Model</a>
+  <a class="nav-prev" href="0003-choosing-models.html">&larr; 3. Choosing the Right Model</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0018-openai-platform.html">18. The OpenAI Platform &rarr;</a>
+  <a class="nav-next" href="0005-token-economics-efficient-prompting.html">5. Token Economics & Efficient Prompting &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 17</span>
+  <span class="tag">Lesson 4</span>
   <span class="tag green">Roadmap · LLM Fundamentals</span>
   <span class="tag orange">Hands-on</span>
   <span class="tag yellow">~14 min</span>
@@ -86,7 +86,7 @@
 <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
 
 <div class="callout key">
-  <div class="callout-label">Recall from Lesson 15</div>
+  <div class="callout-label">Recall from Lesson 2</div>
   Generation = repeatedly sampling the next token from a probability distribution. These parameters control <em>how</em> that sample is drawn. They change nothing about the model's knowledge — only its willingness to take the less-likely path.
 </div>
 
@@ -195,7 +195,7 @@ resp = client.chat.completions.create(
 </ul>
 
 <div class="footer">
-  <span>Lesson 17 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 4 of 30 &middot; AI Engineer Roadmap (Foundations)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

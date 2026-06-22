@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 19: Prompt Engineering Techniques</title>
+<title>Lesson 7: Prompt Engineering Techniques</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,16 +65,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0018-openai-platform.html">&larr; 18. The OpenAI Platform</a>
+  <a class="nav-prev" href="0006-openai-platform.html">&larr; 6. The OpenAI Platform</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0020-ai-safety-ethics.html">20. AI Safety &amp; Ethics &rarr;</a>
+  <a class="nav-next" href="0008-ai-safety-ethics.html">8. AI Safety & Ethics &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 19</span>
+  <span class="tag">Lesson 7</span>
   <span class="tag green">Roadmap · Prompt Engineering</span>
   <span class="tag orange">Technique</span>
   <span class="tag yellow">~15 min</span>
@@ -107,7 +107,7 @@ Text: "MACD cross up, reclaiming VWAP"      -> Signal:</pre>
 
 <div class="callout insight">
   <div class="callout-label">Why few-shot works</div>
-  The examples occupy the context window and self-attention (Lesson 15) lets the model pattern-match the new input against them. You're not training the model — you're <em>demonstrating</em> the task in-context. 2–5 well-chosen, diverse examples usually beat 20 redundant ones.
+  The examples occupy the context window and self-attention (Lesson 2) lets the model pattern-match the new input against them. You're not training the model — you're <em>demonstrating</em> the task in-context. 2–5 well-chosen, diverse examples usually beat 20 redundant ones.
 </div>
 
 <!-- ── COT ─────────────────────────────────────────────────── -->
@@ -124,14 +124,14 @@ Text: "MACD cross up, reclaiming VWAP"      -> Signal:</pre>
 
 <!-- ── REACT ───────────────────────────────────────────────── -->
 <h2>ReAct — Reason + Act</h2>
-<p><strong>ReAct</strong> (Yao et al., 2022) interleaves reasoning steps with <em>actions</em> (tool calls) and <em>observations</em> (tool results): <code>Thought → Action → Observation → Thought → …</code>. It's the prompting pattern underneath most agents — the model reasons about what to do, calls a tool, reads the result, and reasons again. You'll build on this directly in <a href="0025-agents-function-calling.html">Lesson 25</a>.</p>
+<p><strong>ReAct</strong> (Yao et al., 2022) interleaves reasoning steps with <em>actions</em> (tool calls) and <em>observations</em> (tool results): <code>Thought → Action → Observation → Thought → …</code>. It's the prompting pattern underneath most agents — the model reasons about what to do, calls a tool, reads the result, and reasons again. You'll build on this directly in <a href="0026-agents-function-calling.html">Lesson 26</a>.</p>
 
 <!-- ── STRUCTURE ───────────────────────────────────────────── -->
 <h2>Structuring the prompt itself</h2>
 <table>
   <tr><th>Lever</th><th>Effect</th></tr>
   <tr><td><strong>Role</strong> ("You are a risk-averse options analyst")</td><td>Sets tone, vocabulary, and priorities</td></tr>
-  <tr><td><strong>System prompting</strong></td><td>Persistent rules that outrank the user turn (Lesson 4 / 18)</td></tr>
+  <tr><td><strong>System prompting</strong></td><td>Persistent rules that outrank the user turn (Lesson 12 / 6)</td></tr>
   <tr><td><strong>Delimiters</strong> (XML tags, <code>###</code>, triple quotes)</td><td>Cleanly separate instructions from data — reduces injection &amp; confusion</td></tr>
   <tr><td><strong>Output constraints</strong> ("Respond in ≤3 bullets, no preamble")</td><td>Controls shape and length</td></tr>
   <tr><td><strong>Positive instructions</strong> ("Do X") over negative ("Don't do Y")</td><td>Models follow "do" more reliably than "don't"</td></tr>
@@ -154,7 +154,7 @@ Text: "MACD cross up, reclaiming VWAP"      -> Signal:</pre>
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Raise the temperature so the model varies until it lands on the right format</div></div>
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Fine-tune the model on the format before using it for anything else</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q1-correct">Correct. Few-shot examples are the highest-leverage, lowest-effort way to lock a format — the model pattern-matches the demonstrated shape. Repetition is weaker, higher temperature makes format <em>less</em> stable, and fine-tuning is heavy machinery for what 3 examples solve. (For machine-readable formats, also consider Structured Outputs from Lesson 18.)</div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. Few-shot examples are the highest-leverage, lowest-effort way to lock a format — the model pattern-matches the demonstrated shape. Repetition is weaker, higher temperature makes format <em>less</em> stable, and fine-tuning is heavy machinery for what 3 examples solve. (For machine-readable formats, also consider Structured Outputs from Lesson 6.)</div>
   <div class="quiz-feedback wrong" id="q1-wrong">Few-shot examples (option B) are the reliable, low-code fix — demonstrate the exact format 3 times and the model matches it. Repetition is weak, higher temperature destabilizes format, and fine-tuning is overkill here.</div>
 </div>
 
@@ -188,7 +188,7 @@ Text: "MACD cross up, reclaiming VWAP"      -> Signal:</pre>
 </ul>
 
 <div class="footer">
-  <span>Lesson 19 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 7 of 30 &middot; AI Engineer Roadmap (APIs & Prompting)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 25: AI Agents & Function Calling</title>
+<title>Lesson 26: AI Agents & Function Calling</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -70,16 +70,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0024-rag.html">&larr; 24. Retrieval-Augmented Generation</a>
+  <a class="nav-prev" href="0025-rag.html">&larr; 25. Retrieval-Augmented Generation</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0026-multimodal-ai.html">26. Multimodal AI &rarr;</a>
+  <a class="nav-next" href="0027-multimodal-ai.html">27. Multimodal AI &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 25</span>
+  <span class="tag">Lesson 26</span>
   <span class="tag green">Roadmap · AI Agents</span>
   <span class="tag orange">Build</span>
   <span class="tag yellow">~17 min</span>
@@ -92,7 +92,7 @@
 
 <div class="callout key">
   <div class="callout-label">Agent, defined</div>
-  An <strong>agent</strong> is an LLM in a loop with access to <strong>tools</strong>, working toward a goal: it reasons, decides which tool to call, reads the result, and repeats until done. That loop is the ReAct pattern from Lesson 19 — Claude Code is one industrial-strength instance of it.
+  An <strong>agent</strong> is an LLM in a loop with access to <strong>tools</strong>, working toward a goal: it reasons, decides which tool to call, reads the result, and repeats until done. That loop is the ReAct pattern from Lesson 7 — Claude Code is one industrial-strength instance of it.
 </div>
 
 <!-- ── FUNCTION CALLING ────────────────────────────────────── -->
@@ -131,14 +131,14 @@ final = client.chat.completions.create(model=<span class="string">"gpt-5"</span>
 
 <div class="callout insight">
   <div class="callout-label">You already know the hard parts</div>
-  Every reliability concern here — tool surface design, context bloat from tool results, isolation of sub-tasks, knowing when to stop — is what Phase 1 was about. An agent <em>is</em> a harness (Lesson 1). Function calling is just the API-level primitive underneath the harness you've been engineering all along.
+  Every reliability concern here — tool surface design, context bloat from tool results, isolation of sub-tasks, knowing when to stop — is what Phase 1 was about. An agent <em>is</em> a harness (Lesson 9). Function calling is just the API-level primitive underneath the harness you've been engineering all along.
 </div>
 
 <!-- ── MEMORY + MULTI-AGENT ────────────────────────────────── -->
 <h2>Memory &amp; multi-agent systems</h2>
 <ul>
-  <li><strong>External memory</strong> — agents need state across steps and sessions: scratchpad files, a vector DB of past interactions (RAG over memory), or a structured store. This is the Write/Select strategies (Lesson 5/8) at the agent level.</li>
-  <li><strong>Multi-agent</strong> — split a hard job across specialized agents (planner, researcher, coder, critic) that pass messages. Powerful, but adds coordination cost and failure modes — same maker/checker logic as <a href="0013-loop-engineering.html">Lesson 13</a>. Start single-agent; reach for multi only when one agent's context can't hold the job.</li>
+  <li><strong>External memory</strong> — agents need state across steps and sessions: scratchpad files, a vector DB of past interactions (RAG over memory), or a structured store. This is the Write/Select strategies (Lesson 13/16) at the agent level.</li>
+  <li><strong>Multi-agent</strong> — split a hard job across specialized agents (planner, researcher, coder, critic) that pass messages. Powerful, but adds coordination cost and failure modes — same maker/checker logic as <a href="0021-loop-engineering.html">Lesson 21</a>. Start single-agent; reach for multi only when one agent's context can't hold the job.</li>
 </ul>
 
 <h2>Agent SDKs &amp; frameworks</h2>
@@ -149,7 +149,7 @@ final = client.chat.completions.create(model=<span class="string">"gpt-5"</span>
   <tr><td><strong>Google ADK / Vertex Agent Builder</strong></td><td>Google</td></tr>
   <tr><td><strong>LangGraph, CrewAI, AutoGen</strong></td><td>Open-source orchestration for multi-step / multi-agent</td></tr>
 </table>
-<p>Tools are increasingly standardized via <strong>MCP</strong> (Model Context Protocol) — the tool-connection layer you learned in <a href="0006-mcp-servers-external-tools.html">Lesson 6</a>. MCP is how an agent discovers and calls tools that live outside its own codebase.</p>
+<p>Tools are increasingly standardized via <strong>MCP</strong> (Model Context Protocol) — the tool-connection layer you learned in <a href="0014-mcp-servers-external-tools.html">Lesson 14</a>. MCP is how an agent discovers and calls tools that live outside its own codebase.</p>
 
 <!-- ── QUIZ ────────────────────────────────────────────────── -->
 <h2>Check Your Understanding</h2>
@@ -163,13 +163,13 @@ final = client.chat.completions.create(model=<span class="string">"gpt-5"</span>
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>The model rewrites your function's source code and ships an optimized version back</div></div>
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>The function is embedded into the model's weights so future calls are instant</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q1-correct">Correct. The model never executes anything — it emits a structured tool call (function name + JSON arguments). <em>Your</em> code runs the function and appends the result to the conversation, then the model continues. This client-side execution is what makes function calling safe and flexible: you control exactly what the tools can do (least privilege, Lesson 20).</div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. The model never executes anything — it emits a structured tool call (function name + JSON arguments). <em>Your</em> code runs the function and appends the result to the conversation, then the model continues. This client-side execution is what makes function calling safe and flexible: you control exactly what the tools can do (least privilege, Lesson 8).</div>
   <div class="quiz-feedback wrong" id="q1-wrong">The model only <em>requests</em> a call — it returns a structured name + arguments, and your code executes the function and feeds back the result (option B). The provider doesn't run your code, rewrite it, or bake it into weights.</div>
 </div>
 
 <div class="quiz" id="q2">
   <div class="quiz-title">Quiz · Question 2 of 2</div>
-  <div class="quiz-q">A teammate proposes a 6-agent system (planner, 3 researchers, coder, critic) for a task one capable agent could handle. What's the right instinct, per this lesson and Lesson 13?</div>
+  <div class="quiz-q">A teammate proposes a 6-agent system (planner, 3 researchers, coder, critic) for a task one capable agent could handle. What's the right instinct, per this lesson and Lesson 21?</div>
   <div class="quiz-options">
     <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Always prefer more agents — parallelism strictly improves quality and speed</div></div>
     <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Start single-agent; add agents only when one agent's context can't hold the job</div></div>
@@ -196,7 +196,7 @@ final = client.chat.completions.create(model=<span class="string">"gpt-5"</span>
 </ul>
 
 <div class="footer">
-  <span>Lesson 25 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 26 of 30 &middot; AI Engineer Roadmap (Agents & Beyond)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

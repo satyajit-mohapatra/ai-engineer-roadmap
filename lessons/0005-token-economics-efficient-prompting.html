@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 5: Token Economics & Efficient Prompting</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:800px;margin:0 auto;padding:2rem 1.5rem 6rem;line-height:1.7}
+  .lesson-meta{display:flex;gap:.75rem;align-items:center;margin-bottom:2.5rem;flex-wrap:wrap}
+  .tag{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:4px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .tag.green{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+  .tag.yellow{background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)}
+  .tag.orange{background:var(--orange-dim);color:var(--orange);border-color:var(--orange)}
+  .tag.red{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+  .subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:3rem}
+  h2{font-size:1.2rem;font-weight:600;letter-spacing:-.01em;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+  h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.5rem 0 .5rem}
+  p{margin-bottom:1rem}
+  ul,ol{padding-left:1.5rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.35rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0}
+  .callout.key{border-left-color:var(--yellow)}.callout.insight{border-left-color:var(--green)}.callout.warning{border-left-color:var(--red)}
+  .callout-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+  .callout.key .callout-label{color:var(--yellow)}.callout.insight .callout-label{color:var(--green)}.callout.warning .callout-label{color:var(--red)}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  pre{font-family:var(--mono);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;overflow-x:auto;margin:1rem 0 1.5rem;line-height:1.65;color:#c4cad8;position:relative}
+  .pre-label{position:absolute;top:.6rem;right:.75rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .comment{color:#4b5563}.string{color:#86efac}.keyword{color:#c084fc}
+  .progress-bar{background:var(--border);height:3px;border-radius:2px;margin-bottom:2.5rem}
+  .progress-fill{background:var(--accent);height:100%;border-radius:2px;width:0%;transition:width .4s ease}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.85rem}
+  th{text-align:left;padding:.5rem .9rem;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  td{padding:.65rem .9rem;border:1px solid var(--border);vertical-align:top}
+  tr:nth-child(even) td{background:#13151f}
+  td code{font-size:.8em}
+  .quote{border-left:3px solid var(--purple);background:var(--purple-dim);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-style:italic;color:#e9d5ff;font-size:.95rem}
+  .quote-attr{display:block;margin-top:.5rem;font-style:normal;font-size:.78rem;color:var(--muted)}
+  .quiz{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0}
+  .quiz-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .quiz-q{font-weight:600;margin-bottom:1rem;font-size:.95rem}
+  .quiz-options{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+  .quiz-option{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:var(--bg)}
+  .quiz-option:hover{border-color:var(--accent)}.quiz-option.correct{background:var(--green-dim);border-color:var(--green)}.quiz-option.wrong{background:var(--red-dim);border-color:var(--red)}.quiz-option.revealed{opacity:.45;cursor:default}
+  .quiz-option-letter{min-width:1.5rem;height:1.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono);flex-shrink:0}
+  .quiz-feedback{display:none;padding:.75rem 1rem;border-radius:6px;font-size:.9rem;margin-top:.5rem}
+  .quiz-feedback.correct{display:block;background:var(--green-dim);color:var(--green)}.quiz-feedback.wrong{display:block;background:var(--red-dim);color:var(--red)}
+  .footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--muted)}
+  .ask-teacher{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;padding:1.25rem 1.5rem;margin:3rem 0 1rem}
+  .ask-teacher-title{font-weight:600;color:var(--accent);margin-bottom:.4rem;font-size:.9rem}
+  .ask-teacher p{color:var(--muted);font-size:.88rem;margin:0}
+
+  .lesson-nav{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);font-size:.85rem}
+  .lesson-nav a{color:var(--muted);display:flex;align-items:center;gap:.35rem;transition:color .15s ease}
+  .lesson-nav a:hover{color:var(--accent);text-decoration:none}
+  .lesson-nav .nav-center a{color:var(--accent)}
+  .lesson-nav .nav-spacer{flex:1}
+  .lesson-nav .nav-prev,.lesson-nav .nav-next{max-width:38%}
+  .lesson-nav .nav-next{justify-content:flex-end;text-align:right}
+  .lesson-nav .nav-disabled{color:var(--border);cursor:default}
+  @media (max-width:600px){.lesson-nav{font-size:.78rem}.lesson-nav .nav-prev,.lesson-nav .nav-next{max-width:32%}}
+</style>
+</head>
+<body>
+<nav class="lesson-nav">
+  <a class="nav-prev" href="0004-inference-parameters.html">&larr; 4. Inference Parameters</a>
+  <span class="nav-spacer"></span>
+  <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
+  <span class="nav-spacer"></span>
+  <a class="nav-next" href="0006-openai-platform.html">6. The OpenAI Platform &rarr;</a>
+</nav>
+
+
+<div class="lesson-meta">
+  <span class="tag">Lesson 5</span>
+  <span class="tag green">Roadmap · LLM Fundamentals</span>
+  <span class="tag orange">Hands-on</span>
+  <span class="tag yellow">~12 min</span>
+</div>
+
+<h1>Token Economics & Efficient Prompting</h1>
+<p class="subtitle">Tokens are the unit you're billed in and the unit that determines latency. Before you reach for compression tools, these are the cheap, deliberate habits that keep the bill — and the wait — small.</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="callout key">
+  <div class="callout-label">Recall from Lesson 2</div>
+  Generation is sequential: the model emits one token, feeds it back in, emits the next. That's why <strong>output tokens cost more and take longer than input tokens</strong> — input is processed in parallel in a single forward pass; output can't be. Every lever below follows from that one fact.
+</div>
+
+<!-- ── WHY ─────────────────────────────────────────────────── -->
+<h2>The two budgets: cost and latency</h2>
+<p>Every API call has two token counts that matter separately:</p>
+<ul>
+  <li><strong>Input tokens</strong> — everything you send: system prompt, conversation history, retrieved documents, tool results. Priced lower per-token, processed in parallel, so it mostly affects <em>cost</em>, not speed.</li>
+  <li><strong>Output tokens</strong> — everything the model generates. Priced higher per-token (often 3–5×), and generated one at a time, so it drives <em>both</em> cost and the time you wait.</li>
+</ul>
+<p>This means the highest-leverage move is usually shrinking <em>output</em>, not input — a lesson most people learn backwards.</p>
+
+<!-- ── CACHING ─────────────────────────────────────────────── -->
+<h2>Prompt caching — pay once, reuse many times</h2>
+<p>If the same large block of text (a system prompt, a style guide, a set of docs) appears at the <strong>start</strong> of every call in a session, both Anthropic and OpenAI let you cache it. A cache hit reprocesses none of that text — you pay a small fraction of the input price and the response starts faster.</p>
+
+<div class="callout insight">
+  <div class="callout-label">The one rule that makes caching work</div>
+  Put everything <strong>static</strong> first (system prompt, reference docs, tool definitions) and everything <strong>variable</strong> (the user's actual question) last. If a single token changes upstream of the cached block, the whole block misses. Stable ordering is the entire trick.
+</div>
+
+<pre><span class="pre-label">Anthropic — explicit cache breakpoint</span>{
+  <span class="string">"system"</span>: [
+    {<span class="string">"type"</span>: <span class="string">"text"</span>, <span class="string">"text"</span>: long_static_docs,
+     <span class="string">"cache_control"</span>: {<span class="string">"type"</span>: <span class="string">"ephemeral"</span>}}
+  ],
+  <span class="string">"messages"</span>: [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: question}]
+}
+<span class="comment">// First call: pays full price, writes the cache.
+// Calls within the TTL window: ~90% cheaper on the cached portion.</span></pre>
+
+<p>The cache has a short TTL (minutes, not hours) — it rewards tight loops of related calls, not occasional ones. If your calls are spaced far apart, caching won't help; restructure for batching instead (below).</p>
+
+<!-- ── INPUT DISCIPLINE ────────────────────────────────────── -->
+<h2>Send less input on purpose</h2>
+<p>This is different from <a href="0019-token-compression-tools.html">Lesson 19's compression tools</a>, which automatically shrink <em>tool output</em> after the fact. This is about not generating the bloat in the first place:</p>
+<ul>
+  <li><strong>Excerpt, don't paste</strong> — if you need lines 40–60 of a file, send those lines with a line-number anchor, not the whole file.</li>
+  <li><strong>Summarize old turns</strong> — in a long conversation, the first ten exchanges are rarely load-bearing for the eleventh. Periodically replace history with a short recap.</li>
+  <li><strong>Don't echo what the model just wrote</strong> — if Claude just produced a 500-line file, you don't need to paste it back to ask a follow-up question about it; it's already in context.</li>
+  <li><strong>Reference, don't re-send, static material</strong> — if a doc is already cached or already in context, point at it ("the schema above") instead of repeating it.</li>
+</ul>
+
+<!-- ── OUTPUT BOUNDING ─────────────────────────────────────── -->
+<h2>Bound the output deliberately</h2>
+<p>Recall <a href="0004-inference-parameters.html">Lesson 4</a>'s <code>max_tokens</code> and <code>stop</code> sequences — they're cost controls as much as formatting controls, since output is the expensive half of every call.</p>
+<ul>
+  <li>Ask explicitly for the shape you want: "answer in 3 bullet points," "return only the JSON, no explanation." Verbosity is a default, not a requirement.</li>
+  <li>Set <code>max_tokens</code> tight for short, structured answers; generous only when you actually expect a long answer.</li>
+  <li>Use a <code>stop</code> sequence to cut off generation right after the structured part ends, before the model adds an unrequested summary.</li>
+</ul>
+
+<!-- ── MODEL SELECTION ─────────────────────────────────────── -->
+<h2>Match the model to the task</h2>
+<p>Not every step in a pipeline needs your most expensive model. A classification, extraction, or routing step that a small/cheap model handles at 95% accuracy doesn't need a frontier model — save that budget for the one step that actually requires deep reasoning. <a href="0003-choosing-models.html">Lesson 3</a> covers the decision framework; the token-economics version of it is simply: <strong>the model is also a cost lever, not just a quality lever</strong>.</p>
+
+<table>
+  <tr><th>Lever</th><th>Reach for it when</th></tr>
+  <tr><td>Prompt caching</td><td>Same large static block, repeated calls, tight time window</td></tr>
+  <tr><td>Excerpting / summarizing input</td><td>Long files or long conversation history padding every call</td></tr>
+  <tr><td><code>max_tokens</code> / <code>stop</code></td><td>Output runs longer than you need, every single time</td></tr>
+  <tr><td>Explicit format request</td><td>The model defaults to prose when you wanted bullets/JSON</td></tr>
+  <tr><td>Cheaper model for sub-tasks</td><td>Pipeline has an easy step (classify, extract) feeding a hard step</td></tr>
+</table>
+
+<!-- ── QUIZ ────────────────────────────────────────────────── -->
+<h2>Check Your Understanding</h2>
+
+<div class="quiz" id="q1">
+  <div class="quiz-title">Quiz · Question 1 of 2</div>
+  <div class="quiz-q">A request and its response both run about 500 tokens, but the response consistently takes longer to generate and costs more per token. Why, fundamentally?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">A</div><div>Output tokens are larger in byte size than input tokens</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',true)"><div class="quiz-option-letter">B</div><div>Input is processed in parallel in one pass; output is generated one token at a time, feeding back in</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>Output always passes through a slower, separate model</div></div>
+    <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>Pricing is arbitrary and unrelated to compute cost</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. Input tokens are processed together in a single forward pass — that's parallelizable and cheap. Output tokens are generated sequentially: each one requires its own forward pass before the next can start. That sequential dependency is why output is both slower and priced higher per token — it's a direct compute cost, not an arbitrary pricing choice.</div>
+  <div class="quiz-feedback wrong" id="q1-wrong">It comes down to how generation works (option B): input is processed in parallel in one pass, but output tokens are produced one at a time, each depending on the last. That sequential step is real extra compute per token — which is exactly why output is priced higher and takes longer, not because of token size or a separate model.</div>
+</div>
+
+<div class="quiz" id="q2">
+  <div class="quiz-title">Quiz · Question 2 of 2</div>
+  <div class="quiz-q">You're sending the same 4,000-token style guide as part of the system prompt on every call in a rapid back-and-forth session. What's the most direct fix, and what's the one rule that makes it work?</div>
+  <div class="quiz-options">
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">A</div><div>Switch to a cheaper model; the style guide cost is unavoidable otherwise</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',true)"><div class="quiz-option-letter">B</div><div>Prompt caching; the static block must come first and stay byte-identical across calls</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">C</div><div>Lower max_tokens on the response so there's room left for the style guide</div></div>
+    <div class="quiz-option" onclick="answer(this,'q2',false)"><div class="quiz-option-letter">D</div><div>Run LLMLingua on the style guide before every call</div></div>
+  </div>
+  <div class="quiz-feedback correct" id="q2-correct">Correct. This is exactly what prompt caching is for: a large, unchanging block sent repeatedly in a tight loop. Put it first in the prompt, keep it byte-identical call to call, and cache hits cost a fraction of the full input price. The rule that makes it work is ordering — static content first, variable content (the actual question) last, since any change upstream of the cached block invalidates the cache.</div>
+  <div class="quiz-feedback wrong" id="q2-wrong">Prompt caching (option B) is the direct fix — a large static block repeated across a tight sequence of calls is the textbook case. The rule: static content first, unchanged byte-for-byte, variable content after it. Changing the model doesn't address the redundant resend; max_tokens only bounds output, not the cached input; LLMLingua is for compressing retrieved/variable text, not for avoiding redundant resends of a fixed block.</div>
+</div>
+
+<div class="ask-teacher">
+  <div class="ask-teacher-title">Questions? Ask your teacher.</div>
+  <p>Want a concrete before/after for a session you're running? Ask: "estimate the token cost of my last few turns and tell me which lever would help most," or "show me how to restructure this prompt so the static part is cacheable."</p>
+</div>
+
+<h2>Primary Source</h2>
+<p>📖 <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching">Anthropic — Prompt Caching</a>. The authoritative explanation of cache breakpoints, TTL, and pricing. OpenAI's <a href="https://platform.openai.com/docs/guides/prompt-caching">Prompt Caching guide</a> covers the equivalent automatic caching on their platform.</p>
+
+<h2>Sources</h2>
+<ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.4rem;font-size:.88rem;color:var(--muted)">
+  <li><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching">Anthropic — Prompt Caching documentation</a></li>
+  <li><a href="https://platform.openai.com/docs/guides/prompt-caching">OpenAI — Prompt Caching guide</a></li>
+  <li><a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI — Chat Completions API reference (max_tokens, stop)</a></li>
+  <li><a href="https://roadmap.sh/ai-engineer">roadmap.sh/ai-engineer — inference & cost-optimization nodes</a></li>
+</ul>
+
+<div class="footer">
+  <span>Lesson 5 of 30 &middot; AI Engineer Roadmap (Foundations)</span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
+</div>
+
+<script>
+const answered={};const TOTAL=2;
+function answer(el,qid,isCorrect){
+  if(answered[qid])return;answered[qid]=true;
+  document.getElementById(qid).querySelectorAll('.quiz-option').forEach(o=>o.classList.add('revealed'));
+  el.classList.remove('revealed');el.classList.add(isCorrect?'correct':'wrong');
+  document.getElementById(qid+(isCorrect?'-correct':'-wrong')).classList.add(isCorrect?'correct':'wrong');
+  document.getElementById('progress').style.width=(Object.keys(answered).length/TOTAL*100)+'%';
+}
+</script>
+</body>
+</html>

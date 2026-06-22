@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 15: How LLMs Work</title>
+<title>Lesson 2: How LLMs Work</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -67,16 +67,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0014-what-is-an-ai-engineer.html">&larr; 14. What Is an AI Engineer</a>
+  <a class="nav-prev" href="0001-what-is-an-ai-engineer.html">&larr; 1. What Is an AI Engineer</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0016-choosing-models.html">16. Choosing the Right Model &rarr;</a>
+  <a class="nav-next" href="0003-choosing-models.html">3. Choosing the Right Model &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 15</span>
+  <span class="tag">Lesson 2</span>
   <span class="tag green">Roadmap · LLM Fundamentals</span>
   <span class="tag orange">Mental Model</span>
   <span class="tag yellow">~15 min</span>
@@ -101,7 +101,7 @@
   <span class="tok">Token</span><span class="tok">ization</span><span class="tok"> splits</span><span class="tok"> text</span><span class="tok"> into</span><span class="tok"> chunks</span><span class="tok">.</span>
 </div>
 
-<p>Tokens are the currency of LLMs. You're billed per token, the context window is measured in tokens, and latency scales with tokens. You already met this in <a href="0007-context-window-anatomy.html">Lesson 7</a> — here's the link to <em>why</em>: tokens are literally the model's input and output alphabet.</p>
+<p>Tokens are the currency of LLMs. You're billed per token, the context window is measured in tokens, and latency scales with tokens. You already met this in <a href="0015-context-window-anatomy.html">Lesson 15</a> — here's the link to <em>why</em>: tokens are literally the model's input and output alphabet.</p>
 
 <!-- ── TRANSFORMER ─────────────────────────────────────────── -->
 <h2>2. The Transformer &amp; attention</h2>
@@ -110,8 +110,8 @@
 
 <p>Two consequences you'll use constantly:</p>
 <ul>
-  <li><strong>Attention is the reason context matters.</strong> The model literally weighs everything in the window against everything else. Junk in the context dilutes attention — the empirical basis for the whole context-engineering discipline (Lessons 7–8).</li>
-  <li><strong>Attention cost grows ~quadratically with context length.</strong> Doubling the prompt more than doubles the compute. This is why long contexts are slow and why compression (Lesson 11) pays off.</li>
+  <li><strong>Attention is the reason context matters.</strong> The model literally weighs everything in the window against everything else. Junk in the context dilutes attention — the empirical basis for the whole context-engineering discipline (Lessons 15–16).</li>
+  <li><strong>Attention cost grows ~quadratically with context length.</strong> Doubling the prompt more than doubles the compute. This is why long contexts are slow and why compression (Lesson 19) pays off.</li>
 </ul>
 
 <!-- ── TRAINING vs INFERENCE ───────────────────────────────── -->
@@ -122,7 +122,7 @@
   <tr><td>When</td><td>Once, before release (months, huge GPU clusters)</td><td>Every time you call the API</td></tr>
   <tr><td>What happens</td><td>Weights are adjusted to predict next tokens well across trillions of tokens</td><td>Weights are frozen; model just runs forward to predict next token</td></tr>
   <tr><td>Stages</td><td>Pre-training → fine-tuning → RLHF/alignment</td><td>Prefill (read prompt) → decode (emit tokens one by one)</td></tr>
-  <tr><td>You control</td><td>Nothing (unless you fine-tune — Lesson 28)</td><td>The prompt, the sampling parameters (Lesson 17)</td></tr>
+  <tr><td>You control</td><td>Nothing (unless you fine-tune — Lesson 29)</td><td>The prompt, the sampling parameters (Lesson 4)</td></tr>
 </table>
 
 <div class="callout insight">
@@ -136,13 +136,13 @@
 <pre><span class="pre-label">how a response is produced</span>context = [your prompt tokens]
 <span class="keyword">while</span> not done:
     probs = model(context)        <span class="comment"># distribution over next token</span>
-    next  = sample(probs, temp)   <span class="comment"># pick one (Lesson 17)</span>
+    next  = sample(probs, temp)   <span class="comment"># pick one (Lesson 4)</span>
     context.append(next)          <span class="comment"># feed it back in</span>
     <span class="keyword">if</span> next == STOP: done = True</pre>
 
 <p>This is <strong>autoregressive</strong> generation: each new token is conditioned on everything before it, including tokens the model just produced. Two implications:</p>
 <ul>
-  <li><strong>Hallucination is structural.</strong> The model optimizes for <em>plausible next token</em>, not <em>true</em>. A confident, well-formed falsehood is exactly what the objective rewards if it's statistically likely. Grounding (RAG, Lesson 24) is the fix.</li>
+  <li><strong>Hallucination is structural.</strong> The model optimizes for <em>plausible next token</em>, not <em>true</em>. A confident, well-formed falsehood is exactly what the objective rewards if it's statistically likely. Grounding (RAG, Lesson 25) is the fix.</li>
   <li><strong>Output is sequential, so latency scales with output length.</strong> Streaming exists because the first token can be shown before the last is computed.</li>
 </ul>
 
@@ -158,7 +158,7 @@
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">C</div><div>The temperature was too high; lower it so the model retains facts between sessions</div></div>
     <div class="quiz-option" onclick="answer(this,'q1',false)"><div class="quiz-option-letter">D</div><div>The tokenizer dropped the name; switch to a tokenizer that preserves proper nouns</div></div>
   </div>
-  <div class="quiz-feedback correct" id="q1-correct">Correct. At inference the weights are frozen, so nothing from one call carries to the next. "Memory" is an engineering construct: you persist the fact (a file, a DB, the memory system from Lesson 5) and re-inject it into the context window on the next call. Temperature and tokenizers are unrelated to cross-session recall.</div>
+  <div class="quiz-feedback correct" id="q1-correct">Correct. At inference the weights are frozen, so nothing from one call carries to the next. "Memory" is an engineering construct: you persist the fact (a file, a DB, the memory system from Lesson 13) and re-inject it into the context window on the next call. Temperature and tokenizers are unrelated to cross-session recall.</div>
   <div class="quiz-feedback wrong" id="q1-wrong">The model isn't "forgetting" — at inference, weights are frozen and there is no state between calls. The fix is at the engineering layer: persist the fact and re-inject it into the next call's context (option B). Retraining, temperature, and tokenizers don't create cross-session memory.</div>
 </div>
 
@@ -191,7 +191,7 @@
 </ul>
 
 <div class="footer">
-  <span>Lesson 15 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 2 of 30 &middot; AI Engineer Roadmap (Foundations)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 

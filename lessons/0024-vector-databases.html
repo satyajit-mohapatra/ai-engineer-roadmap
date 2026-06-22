@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 23: Vector Databases</title>
+<title>Lesson 24: Vector Databases</title>
 <style>
   :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--accent-dim:#1e1f3a;--green:#22c55e;--green-dim:#0d2b1a;--red:#ef4444;--red-dim:#2b0d0d;--yellow:#f59e0b;--yellow-dim:#2b1d0d;--orange:#fb923c;--orange-dim:#2b1200;--purple:#c084fc;--purple-dim:#1e0d2b;--mono:'JetBrains Mono','Fira Code','Courier New',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -65,16 +65,16 @@
 </head>
 <body>
 <nav class="lesson-nav">
-  <a class="nav-prev" href="0022-embeddings.html">&larr; 22. Embeddings</a>
+  <a class="nav-prev" href="0023-embeddings.html">&larr; 23. Embeddings</a>
   <span class="nav-spacer"></span>
   <span class="nav-center"><a href="../reference/curriculum.html">Curriculum</a></span>
   <span class="nav-spacer"></span>
-  <a class="nav-next" href="0024-rag.html">24. Retrieval-Augmented Generation &rarr;</a>
+  <a class="nav-next" href="0025-rag.html">25. Retrieval-Augmented Generation &rarr;</a>
 </nav>
 
 
 <div class="lesson-meta">
-  <span class="tag">Lesson 23</span>
+  <span class="tag">Lesson 24</span>
   <span class="tag green">Roadmap · Vector Databases</span>
   <span class="tag orange">RAG Stack 2/3</span>
   <span class="tag yellow">~14 min</span>
@@ -87,7 +87,7 @@
 
 <div class="callout key">
   <div class="callout-label">The problem they solve</div>
-  You have a million document embeddings (Lesson 22). A query comes in. Comparing it to all million with cosine similarity is too slow. A <strong>vector database</strong> indexes the vectors so it can find the nearest neighbors in milliseconds — approximately, but fast.
+  You have a million document embeddings (Lesson 23). A query comes in. Comparing it to all million with cosine similarity is too slow. A <strong>vector database</strong> indexes the vectors so it can find the nearest neighbors in milliseconds — approximately, but fast.
 </div>
 
 <!-- ── ANN ─────────────────────────────────────────────────── -->
@@ -131,7 +131,7 @@ hits = col.query(query_embeddings=[embed(question)],
                  n_results=4,
                  where={<span class="string">"year"</span>: 2026})   <span class="comment"># metadata filter</span></pre>
 
-<p>Note the same three concepts in every vector DB: <strong>add</strong> (index), <strong>query</strong> (k-NN search), and <strong>metadata filtering</strong>. Learn them once here; Lesson 24 wires this into a full RAG pipeline.</p>
+<p>Note the same three concepts in every vector DB: <strong>add</strong> (index), <strong>query</strong> (k-NN search), and <strong>metadata filtering</strong>. Learn them once here; Lesson 25 wires this into a full RAG pipeline.</p>
 
 <!-- ── QUIZ ────────────────────────────────────────────────── -->
 <h2>Check Your Understanding</h2>
@@ -178,7 +178,7 @@ hits = col.query(query_embeddings=[embed(question)],
 </ul>
 
 <div class="footer">
-  <span>Lesson 23 of 29 · AI Engineer Roadmap (Phase 2)</span>
+  <span>Lesson 24 of 30 &middot; AI Engineer Roadmap (RAG Stack)</span>
   <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/curriculum.html">Curriculum</a> · <a href="../MISSION.md">Mission</a></span>
 </div>
 
