@@ -7,6 +7,7 @@ path, built and taught interactively with Claude Code's `/teach` skill.
 
 | Path | What it is |
 |---|---|
+| [`index.html`](index.html) | Landing page — links to the curriculum, glossary, and key docs. |
 | [`MISSION.md`](MISSION.md) | The learning goal, success criteria, and scope/constraints. Read this first. |
 | [`RESOURCES.md`](RESOURCES.md) | Reference material and links used across lessons. |
 | [`NOTES.md`](NOTES.md) | Living notes: user profile, preferences, curriculum status, session log. |
@@ -47,6 +48,17 @@ jump between lessons.
    off, generates new lessons, and updates the curriculum index as you progress.
 4. **Track progress**: `NOTES.md` records curriculum status and session history so a
    new session can resume seamlessly.
+
+## Deploying as a static site
+
+The whole workspace is plain HTML/CSS with no build step, so it deploys as-is to
+Cloudflare. The included [`wrangler.toml`](wrangler.toml) configures it as a Worker
+serving static assets from the repo root — the deploy command is `npx wrangler deploy`
+(not `wrangler pages deploy`). This works both from the Cloudflare dashboard's Git
+integration (deploy command auto-detected as `npx wrangler deploy`) and from the CLI.
+
+`index.html` at the repo root is the entry point and links out to the curriculum,
+glossary, and docs.
 
 ## Notes
 
