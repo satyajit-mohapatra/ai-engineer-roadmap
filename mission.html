@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission — AI Engineer Roadmap</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--green:#22c55e;--yellow:#f59e0b;--mono:'JetBrains Mono','Fira Code',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:760px;margin:0 auto;padding:2.5rem 1.5rem 6rem;line-height:1.7}
+  .back{display:inline-block;font-size:.85rem;color:var(--muted);margin-bottom:1.5rem}
+  .back:hover{color:var(--accent)}
+  h1{font-size:2rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:1.5rem}
+  h2{font-size:1.15rem;font-weight:600;margin:2.25rem 0 .85rem;padding-bottom:.45rem;border-bottom:1px solid var(--border)}
+  p{margin-bottom:1rem}
+  ul{padding-left:1.4rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:.4rem}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.85em;background:var(--surface);border:1px solid var(--border);padding:.1em .4em;border-radius:3px;color:#a5b4fc}
+  strong{color:var(--text)}
+  blockquote{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--yellow);border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;font-size:.9rem;color:var(--muted)}
+  blockquote p:last-child{margin-bottom:0}
+  blockquote strong{color:var(--yellow)}
+  .footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.82rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">&larr; Back to index</a>
+
+<h1>Mission: Become a Complete AI Engineer</h1>
+
+<blockquote>
+  <p><strong>Scope changed 2026-06-10.</strong> Originally this mission was narrow — <em>Context &amp; Harness Engineering for Claude Code</em> (see learning record 0003). The user chose to broaden it to the full <a href="https://roadmap.sh/ai-engineer">AI Engineer roadmap</a>: "cover all aspects from this page." The harness/context-engineering work is now an <strong>applied/advanced track</strong> within a larger curriculum, not the whole thing.</p>
+  <p><strong>Reordered 2026-06-19.</strong> The curriculum originally ran in write-order (harness track first, general fundamentals tacked on after), which read as random rather than basic&rarr;advanced. Renumbered into Foundations &rarr; APIs &amp; Prompting &rarr; Applied Track (Context &amp; Harness Engineering, lessons 9–21) &rarr; RAG Stack &rarr; Agents &amp; Beyond. Added a new lesson on token economics &amp; efficient prompting. See learning record 0004.</p>
+</blockquote>
+
+<h2>Why</h2>
+<p>You work with Claude Code daily on a technical analysis codebase (Pine Script, Node.js, options data). You've already gone deep on <em>using</em> and <em>engineering</em> an AI harness. Now you want the full AI Engineer skill set — the ability to <strong>build AI-powered applications</strong> end to end: pick and call models from any provider, do prompt engineering, build RAG pipelines over your own data, stand up vector search, build agents that use tools, work with multimodal models, and know when to fine-tune. The <a href="https://roadmap.sh/ai-engineer">roadmap.sh/ai-engineer</a> path is the target.</p>
+
+<h2>Success looks like</h2>
+<ul>
+  <li>You can pick the right model for a task across providers (OpenAI, Anthropic, Google, open-source) and call its API directly</li>
+  <li>You can tune inference (temperature, top-p, tokens) deliberately, not by superstition</li>
+  <li>You can build a RAG pipeline: chunk &rarr; embed &rarr; store in a vector DB &rarr; retrieve &rarr; generate</li>
+  <li>You can build an agent that uses tools / function calling, and reason about multi-agent setups</li>
+  <li>You can work with embeddings and run semantic search over your own data</li>
+  <li>You can use multimodal models (vision, image gen, speech) in an application</li>
+  <li>You can judge RAG vs fine-tuning vs context engineering for a given problem</li>
+  <li>You ship AI features safely (prompt injection, moderation, privacy)</li>
+  <li><strong>(Applied Track, done)</strong> You can diagnose why an agent fails and fix it at the right harness layer</li>
+</ul>
+
+<h2>Constraints</h2>
+<ul>
+  <li>Already intermediate on prompting and Claude Code internals — don't re-teach Phase 1 basics</li>
+  <li>Primary practical context: Claude Code + the TradingView/options repo (use it for examples where a realistic tie exists, but standalone subject coverage is the priority)</li>
+  <li>Wants both knowledge AND hands-on skills — not just theory</li>
+  <li>Hands-on examples may use Python or Node.js (the repo is Node-based)</li>
+</ul>
+
+<h2>Out of scope</h2>
+<ul>
+  <li>Deep ML theory / training models from scratch (this is an <em>applied</em> AI engineering path)</li>
+  <li>Math-heavy derivations of transformers (conceptual understanding is enough)</li>
+</ul>
+
+<h2>Roadmap coverage map</h2>
+<p>See <a href="reference/curriculum.html">the curriculum</a> for the full roadmap &rarr; lesson map.</p>
+
+<div class="footer">
+  <a href="index.html">&larr; Back to index</a> · <a href="resources.html">Resources</a> · <a href="reference/curriculum.html">Curriculum</a> · <a href="https://roadmap.sh/ai-engineer">roadmap.sh/ai-engineer</a>
+</div>
+
+</body>
+</html>

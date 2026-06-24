@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resources — AI Engineer Roadmap</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6366f1;--green:#22c55e;--yellow:#f59e0b;--mono:'JetBrains Mono','Fira Code',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 6rem;line-height:1.6}
+  .back{display:inline-block;font-size:.85rem;color:var(--muted);margin-bottom:1.5rem}
+  .back:hover{color:var(--accent)}
+  h1{font-size:2rem;font-weight:700;letter-spacing:-.03em;margin-bottom:.4rem}
+  .subtitle{color:var(--muted);font-size:1rem;margin-bottom:2.25rem}
+  h2{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:2.5rem 0 .85rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;padding:.4rem .75rem;border-bottom:1px solid var(--border)}
+  td{padding:.6rem .75rem;border-bottom:1px solid var(--border);vertical-align:top}
+  td.title{font-weight:600;width:38%}
+  td.notes{color:var(--muted);font-size:.85rem}
+  tr:hover td{background:var(--surface)}
+  .footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.82rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">&larr; Back to index</a>
+
+<h1>Resources</h1>
+<p class="subtitle">Reference material and links used across lessons.</p>
+
+<h2>Context Engineering</h2>
+<table>
+  <thead><tr><th>Title</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="title"><a href="https://www.deepset.ai/blog/context-engineering-the-next-frontier-beyond-prompt-engineering">Context Engineering: The Next Frontier</a></td><td class="notes">Strong conceptual overview. write/select/compress/isolate framework.</td></tr>
+    <tr><td class="title"><a href="https://arxiv.org/pdf/2603.09619">Context Engineering from Prompts to Multi-Agent (arxiv)</a></td><td class="notes">Academic paper, good for formal mental models</td></tr>
+    <tr><td class="title"><a href="https://blog.logrocket.com/llm-context-problem-strategies-2026/">LLM Context Problem: Strategies for 2026</a></td><td class="notes">Practical strategies: memory, relevance, scale</td></tr>
+    <tr><td class="title"><a href="https://www.the-ai-corner.com/p/context-engineering-guide-2026">Context Engineering Guide 2026</a></td><td class="notes">Claude 4.6 specific patterns</td></tr>
+  </tbody>
+</table>
+
+<h2>Harness Engineering</h2>
+<table>
+  <thead><tr><th>Title</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="title"><a href="https://addyosmani.com/blog/agent-harness-engineering/">Agent Harness Engineering (Addy Osmani)</a></td><td class="notes">Best conceptual overview. Ratchet principle, Ralph Loops, multi-agent.</td></tr>
+    <tr><td class="title"><a href="https://hidekazu-konishi.com/entry/claude_code_harness_and_environment_engineering_guide.html">Claude Code Harness &amp; Environment Engineering</a></td><td class="notes">Practical Claude Code specifics</td></tr>
+    <tr><td class="title"><a href="https://okhlopkov.com/claude-code-setup-mcp-hooks-skills-2026/">My Claude Code Setup: MCP, Hooks, Skills</a></td><td class="notes">Real-world setup walkthrough</td></tr>
+    <tr><td class="title"><a href="https://harness-engineering.fr/en/">Harness Engineering site</a></td><td class="notes">Skills, Hooks, MCP, Subagents reference</td></tr>
+    <tr><td class="title"><a href="https://www.paradime.io/guides/claude-code-skills-plugins-rules-guide">Paradime: Complete Guide to Skills &amp; MCP</a></td><td class="notes">Comprehensive skills + MCP guide</td></tr>
+    <tr><td class="title"><a href="https://mer.vin/2026/05/claude-code-architecture-explained-six-harness-layers-beyond-the-llm/">Claude Code Architecture: Six Harness Layers</a></td><td class="notes">Architecture deep-dive</td></tr>
+  </tbody>
+</table>
+
+<h2>Token Compression Tools</h2>
+<table>
+  <thead><tr><th>Title</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="title"><a href="https://aalmada.github.io/posts/Reducing-Token-Usage-in-Code-Agents/">Reducing Token Usage in Code Agents (RTK, Graphify, Caveman, LSP)</a></td><td class="notes">Best practical overview. Covers all four tools with real savings numbers.</td></tr>
+    <tr><td class="title"><a href="https://github.com/rtk-ai/rtk">RTK GitHub</a></td><td class="notes">Source and installation for Rust Token Killer</td></tr>
+    <tr><td class="title"><a href="https://www.rtk-ai.app/">RTK official site</a></td><td class="notes">Setup guide, supported commands, config reference</td></tr>
+    <tr><td class="title"><a href="https://graphify.net/">Graphify</a></td><td class="notes">AST-level code knowledge graph for AI coding assistants</td></tr>
+    <tr><td class="title"><a href="https://arxiv.org/pdf/2310.06839">LLMLingua arXiv (LongLLMLingua)</a></td><td class="notes">Microsoft Research — surgical token removal for RAG contexts</td></tr>
+    <tr><td class="title"><a href="https://techsy.io/en/blog/best-context-engineering-tools">Context Engineering Tools 2026</a></td><td class="notes">8 tools overview including LLMLingua, RTK, Repomix</td></tr>
+    <tr><td class="title"><a href="https://github.com/yamadashy/repomix">Repomix</a></td><td class="notes">Pack repos into LLM-optimized single-file format</td></tr>
+  </tbody>
+</table>
+
+<h2>Tool-Agnostic Harness Engineering</h2>
+<table>
+  <thead><tr><th>Title</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="title"><a href="https://cursor.com/docs/context/rules">Cursor Rules Docs</a></td><td class="notes">Official .mdc format, frontmatter fields, activation modes</td></tr>
+    <tr><td class="title"><a href="https://techsy.io/en/blog/cursor-rules-guide">TECHSY — Cursor Rules Guide 2026</a></td><td class="notes">Practical guide with glob triggers and always-on rules</td></tr>
+    <tr><td class="title"><a href="https://docs.github.com/copilot/customizing-copilot/adding-custom-instructions-for-github-copilot">GitHub Docs — Copilot Custom Instructions</a></td><td class="notes">Repo-wide and path-specific instruction files</td></tr>
+    <tr><td class="title"><a href="https://code.visualstudio.com/docs/agent-customization/custom-instructions">VS Code Docs — Custom Instructions</a></td><td class="notes">MCP in VS Code (mcp.json, "servers" key, agent mode only)</td></tr>
+    <tr><td class="title"><a href="https://docs.windsurf.com/windsurf/cascade/memories">Windsurf Docs — Cascade Memories</a></td><td class="notes">Automatic memory vs. .windsurfrules rules</td></tr>
+    <tr><td class="title"><a href="https://aider.chat/docs/usage/conventions.html">Aider — Coding Conventions</a></td><td class="notes">CONVENTIONS.md, --read flag, .aider.conf.yml</td></tr>
+    <tr><td class="title"><a href="https://www.augmentcode.com/guides/how-to-build-agents-md">Augment Code — AGENTS.md Guide 2026</a></td><td class="notes">Best guide for the cross-tool AGENTS.md standard</td></tr>
+    <tr><td class="title"><a href="https://arxiv.org/pdf/2602.14690">arXiv — Configuring Agentic AI Coding Tools</a></td><td class="notes">Research study: cross-tool config patterns across 2,923 repos</td></tr>
+    <tr><td class="title"><a href="https://www.remoet.dev/blog/how-to-set-up-mcp-server-claude-cursor-windsurf">remoet.dev — MCP in Claude, Cursor, Windsurf</a></td><td class="notes">Side-by-side MCP config for three tools</td></tr>
+    <tr><td class="title"><a href="https://lushbinary.com/blog/ai-coding-agents-comparison-cursor-windsurf-claude-copilot-kiro-2026/">Lushbinary — AI Coding Agents Comparison 2026</a></td><td class="notes">Feature matrix: pricing, hooks, MCP, memory across tools</td></tr>
+  </tbody>
+</table>
+
+<h2>Loop Engineering</h2>
+<table>
+  <thead><tr><th>Title</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="title"><a href="https://addyosmani.com/blog/loop-engineering/">Addy Osmani — Loop Engineering</a></td><td class="notes">The defining post. Six components, Ralph Wiggum failure mode, safeguards.</td></tr>
+    <tr><td class="title"><a href="https://addyo.substack.com/p/loop-engineering">Addy Osmani — Loop Engineering (Substack)</a></td><td class="notes">Same content, newsletter format</td></tr>
+    <tr><td class="title"><a href="https://github.com/cobusgreyling/loop-engineering">cobusgreyling/loop-engineering</a></td><td class="notes">Practical patterns repo: starters, loop-init, loop-audit, loop-cost, six production patterns</td></tr>
+    <tr><td class="title"><a href="https://cobusgreyling.medium.com/loop-engineering-playbook-4460e01e88d8">Cobus Greyling — Loop Engineering Playbook</a></td><td class="notes">Where loops live, how to run your first one</td></tr>
+    <tr><td class="title"><a href="https://lushbinary.com/blog/loop-engineering-ai-coding-agents-guide/">Lushbinary — Loop Engineering Guide for AI Agents</a></td><td class="notes">Overview with phased rollout (L1/L2/L3) detail</td></tr>
+    <tr><td class="title"><a href="https://explainx.ai/blog/loop-engineering-coding-agents-claude-code-guide-2026">explainx.ai — Loop Engineering for Coding Agents</a></td><td class="notes">Claude Code-specific walkthrough</td></tr>
+  </tbody>
+</table>
+
+<h2>Community</h2>
+<table>
+  <thead><tr><th>Where</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="title"><a href="https://www.reddit.com/r/ClaudeAI/">r/ClaudeAI</a></td><td class="notes">Active community, real-world usage patterns</td></tr>
+    <tr><td class="title"><a href="https://discord.gg/anthropic">Anthropic Discord</a></td><td class="notes">Official, good for harness/skills questions</td></tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  <a href="index.html">&larr; Back to index</a> · <a href="mission.html">Mission</a> · <a href="reference/curriculum.html">Curriculum</a> · <a href="reference/glossary.html">Glossary</a>
+</div>
+
+</body>
+</html>
