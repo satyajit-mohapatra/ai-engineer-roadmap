@@ -22,6 +22,15 @@
   .new{color:var(--yellow);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--yellow);border-radius:4px;padding:.05rem .35rem;margin-left:auto;flex-shrink:0}
   .intro{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem;margin-bottom:2rem;font-size:.9rem;color:var(--muted)}
   .footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.82rem;color:var(--muted)}
+  .pstatus{display:inline-flex;align-items:center;justify-content:center;width:1.1rem;height:1.1rem;border:1.5px solid var(--border);border-radius:50%;font-size:.7rem;color:var(--green);flex-shrink:0;line-height:1}
+  .pstatus.on{border-color:var(--green);background:var(--green-dim)}
+  .row.completed .ttl{color:var(--green)}
+  .meter{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:2rem}
+  .meter-top{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:.6rem}
+  .meter-label{font-size:.9rem;font-weight:600}
+  .meter-track{height:8px;background:var(--bg);border:1px solid var(--border);border-radius:99px;overflow:hidden}
+  .meter-fill{height:100%;width:0;background:var(--green);transition:width .4s ease}
+  .meter-reset{font-size:.78rem}
 </style>
 </head>
 <body>
@@ -31,6 +40,14 @@
 
 <div class="intro">
   <strong>Reordered 2026-06-19.</strong> Lessons originally ran in the order they were written (a Claude Code harness specialization, with general AI-engineering fundamentals tacked on afterward). They're now renumbered into a genuine basic&rarr;advanced sequence: general AI-engineering foundations and APIs first, the Claude Code harness specialization recast as an applied/advanced track in the middle, then the RAG stack and agents. Lessons cross-reference each other by their new numbers; later lessons lean on earlier ones.
+</div>
+
+<div class="meter">
+  <div class="meter-top">
+    <span class="meter-label" id="aieng-meter-label">Loading your progress&hellip;</span>
+    <a href="#" class="meter-reset" id="aieng-reset">Reset progress</a>
+  </div>
+  <div class="meter-track"><div class="meter-fill" id="aieng-meter-fill"></div></div>
 </div>
 
 <h2>Foundations</h2>
@@ -78,5 +95,6 @@
   <a href="glossary.html">Glossary</a> · <a href="../MISSION.md">Mission</a> · <a href="https://roadmap.sh/ai-engineer">roadmap.sh/ai-engineer</a>
 </div>
 
+<script src="../assets/progress.js"></script>
 </body>
 </html>
