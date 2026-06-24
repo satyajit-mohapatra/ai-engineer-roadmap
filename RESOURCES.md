@@ -58,6 +58,16 @@
 | Lushbinary — Loop Engineering Guide for AI Agents | https://lushbinary.com/blog/loop-engineering-ai-coding-agents-guide/ | Overview with phased rollout (L1/L2/L3) detail |
 | explainx.ai — Loop Engineering for Coding Agents | https://explainx.ai/blog/loop-engineering-coding-agents-claude-code-guide-2026 | Claude Code-specific walkthrough |
 
+## Speech-to-Text (Dictation for Faster Writing)
+
+Voice-to-text apps that let you dictate into any text field — handy for drafting
+lessons, notes, and prompts faster than typing.
+
+| Title | URL | Notes |
+|-------|-----|-------|
+| superwhisper | https://superwhisper.com | macOS/iOS dictation that runs Whisper models locally; works in any app via a hotkey, with modes for clean-up and custom prompts. |
+| Handy | https://handy.computer | Free, open-source, cross-platform (macOS/Windows/Linux) push-to-talk speech-to-text; runs locally, types into the focused field. Source: https://github.com/cjpais/Handy |
+
 ## Community
 
 | Where | URL | Notes |
